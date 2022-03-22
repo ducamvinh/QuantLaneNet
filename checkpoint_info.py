@@ -21,10 +21,10 @@ def get_best_model(checkpoint_path):
 
     return best_model
 
-def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device='cpu'):
+def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device='cuda'):
     checkpoint = torch.load(f'{checkpoint_path}/checkpoint_{get_best_model(checkpoint_path)}.pth', map_location=device)
 
-    model = LaneDetectionModel()
+    model = LaneDetectionModel().to(device)
     model.load_state_dict(checkpoint['model_state'], strict=False)
     model.eval()
 
@@ -57,7 +57,7 @@ def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device=
         f'\tfn  = {fn  / len(test_set)}\n'
     )
 
-def show_training_curve(checkpoint_path):
+def show_training_curves(checkpoint_path):
     for paths in [glob.glob(f'{checkpoint_path}/loss_*.pth'), glob.glob(f'{checkpoint_path}/eval_*.pth')]:
         val_dict = dict()
         for name in torch.load(paths[0]):
@@ -87,17 +87,21 @@ def get_arguments():
     parser.add_argument('--checkpoint_path', type=str)
 
     # Show training curve
-    parser.add_argument('--show_train_curve', dest='train_curve', action='store_true')
-    parser.set_defaults(train_curve=False)
+    parser.add_argument('--show_train_curves', dest='show_train_curves', action='store_true')
+    parser.set_defaults(show_train_curves=False)
 
     # Evaluate best model
-    parser.add_argument('--eval_best', dest='eval', action='store_true')
-    parser.set_defaults(eval=False)
+    parser.add_argument('--eval_best', dest='eval_best', action='store_true')
+    parser.set_defaults(eval_best=False)
 
     # Use offset to evaluate
     parser.add_argument('--use_offset', dest='offset', action='store_true')
     parser.add_argument('--no_offset', dest='offset', action='store_false')
     parser.set_defaults(offset=True)
+
+    # Verbose
+    parser.add_argument('--verbose', dest='verbose', action='store_true')
+    parser.set_defaults(verbose=False)
 
     args = parser.parse_args()
 
@@ -112,18 +116,19 @@ def get_arguments():
 def main():
     args = get_arguments()
 
-    best_model = get_best_model(checkpoint_path=args.checkpoint_path)
-    checkpoint_eval = torch.load(f'{args.checkpoint_path}/eval_{best_model}.pth')
+    if args.verbose:
+        best_model = get_best_model(checkpoint_path=args.checkpoint_path)
+        checkpoint_eval = torch.load(f'{args.checkpoint_path}/eval_{best_model}.pth')
 
-    print(f'Best checkpoint: epoch {int(best_model) + 1}')
-    for name in checkpoint_eval:
-        print(f'\t{name}: {checkpoint_eval[name]}')
+        print(f'Best checkpoint: epoch {int(best_model) + 1}')
+        for name in checkpoint_eval:
+            print(f'\t{name}: {checkpoint_eval[name]}')
 
-    if args.eval:
+    if args.eval_best:
         evaluate_best_model(dataset_path=args.dataset_path, checkpoint_path=args.checkpoint_path, with_offset=args.offset, device=args.device)
 
-    if args.train_curve:
-        show_training_curve(checkpoint_path=args.checkpoint_path)
+    if args.show_train_curves:
+        show_training_curves(checkpoint_path=args.checkpoint_path)
 
 if __name__ == '__main__':
     main()
