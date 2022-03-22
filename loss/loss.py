@@ -10,7 +10,7 @@ class ClassificationLoss(torch.nn.Module):
     def forward(self, cls_pred, vertical_pred, cls_true, vertical_true):
         
         _cls_true = cls_true.clone()
-        _cls_pred = cls_pred.clone()
+        _cls_pred = torch.sigmoid(cls_pred.clone())
         _vertical_true = vertical_true.clone()
         _vertical_pred = vertical_pred.clone()
 
