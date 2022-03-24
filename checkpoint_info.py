@@ -22,7 +22,8 @@ def get_best_model(checkpoint_path):
     return best_model
 
 def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device='cuda'):
-    checkpoint = torch.load(f'{checkpoint_path}/checkpoint_{get_best_model(checkpoint_path)}.pth', map_location=device)
+    best_model = get_best_model(checkpoint_path)
+    checkpoint = torch.load(f'{checkpoint_path}/checkpoint_{best_model}.pth', map_location=device)
 
     model = LaneDetectionModel().to(device)
     model.load_state_dict(checkpoint['model_state'], strict=False)
@@ -51,7 +52,7 @@ def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device=
         fn  += _fn
 
     print(
-        f'\nEvaluate best model [{"WITH" if with_offset else "WITHOUT"}] offset:\n'
+        f'\nEvaluate best model (epoch {int(best_model) + 1}) [{"WITH" if with_offset else "WITHOUT"}] offset:\n'
         f'\tacc = {acc / len(test_set)}\n'
         f'\tfp  = {fp  / len(test_set)}\n'
         f'\tfn  = {fn  / len(test_set)}\n'
