@@ -1,18 +1,11 @@
 import timeout_decorator
 import numpy as np
 import subprocess
-import time
 import os
 
-class LaneDetectionModelFPGA(object):
+import fpga_utils.fpga_address_map as fpga_address_map
 
-    OFFSET_INPUT  = 0x0000_0000
-    OFFSET_OUTPUT = 0x0006_0000
-    OFFSET_OVALID = 0x0006_0800
-    OFFSET_BUSY   = 0x0006_0804
-    OFFSET_RESET  = 0x0006_0808
-    OFFSET_WEIGHT = 0x0006_080C
-    NUM_WEIGHTS   = 76976
+class LaneDetectionModelFPGA(object):
 
     def __init__(self, h2c_device='/dev/xdma0_h2c_0', c2h_device='/dev/xdma0_c2h_0', xdma_tool_dir='/home/ducamvinh/FPGA/dma_ip_drivers/XDMA/linux-kernel/tools'):
         self.h2c_device = h2c_device
@@ -21,7 +14,7 @@ class LaneDetectionModelFPGA(object):
 
     def reset(self):
         with open(self.h2c_device, 'wb') as f:
-            f.seek(LaneDetectionModelFPGA.OFFSET_RESET)
+            f.seek(fpga_address_map.OFFSET_RESET)
             f.write(bytes([1]))
 
     def write_weights(self, weight_file_path):
@@ -30,8 +23,8 @@ class LaneDetectionModelFPGA(object):
                 os.path.join(self.xdma_tool_dir, 'dma_to_device'),
                 '--device', self.h2c_device,
                 '--count', '1',
-                '--address', f'0x{LaneDetectionModelFPGA.OFFSET_WEIGHT:x}',
-                '--size', f'0x{(LaneDetectionModelFPGA.NUM_WEIGHTS * 2):x}',
+                '--address', f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
+                '--size', f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
                 '--data infile', weight_file_path
             ],
             stdout=subprocess.PIPE, 
@@ -48,7 +41,7 @@ class LaneDetectionModelFPGA(object):
 
         while valid != valid_ref:
             with open(self.c2h_device, 'rb') as f:
-                f.seek(LaneDetectionModelFPGA.OFFSET_OVALID)
+                f.seek(fpga_address_map.OFFSET_OVALID)
                 valid = f.read(4)
 
     def post_process(self, hw_output):
@@ -64,7 +57,7 @@ class LaneDetectionModelFPGA(object):
     def __call__(self, img, post_process=True):  # np.array((256, 512, 3)) -> (cls: np.array(32, 64, 4), vertical: np.array(32, 1, 4))
         # Write image to FPGA
         with open(self.h2c_device, 'wb') as f:
-            f.seek(LaneDetectionModelFPGA.OFFSET_INPUT)
+            f.seek(fpga_address_map.OFFSET_INPUT)
             img.tofile(file=f)
 
         # Wait for valid signal with a timeout
@@ -75,7 +68,7 @@ class LaneDetectionModelFPGA(object):
 
         # Read output from FPGA
         with open(self.c2h_device, 'rb') as f:
-            f.seek(LaneDetectionModelFPGA.OFFSET_OUTPUT)
+            f.seek(fpga_address_map.OFFSET_OUTPUT)
             hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64)
 
         # Post-process output and return
@@ -84,40 +77,3 @@ class LaneDetectionModelFPGA(object):
             return self.post_process(hw_output)
         else:
             return hw_output
-
-def main():
-    import random
-    import glob
-    import cv2
-
-    img_paths = glob.glob('./dataset/tusimple/*/clips/*/*/*.jpg')
-    img_idx = random.randint(0, len(img_paths))
-    print(f'Image index: {img_idx}')
-
-    # Load image
-    img = cv2.imread(img_paths[img_idx])
-    img = cv2.resize(img, (512, 256))
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    # Initialize model
-    model_fpga = LaneDetectionModelFPGA()
-    model_fpga.reset()
-    model_fpga.write_weights('/home/ducamvinh/FPGA/Lane_Detection_CNN_PCIe/Lane_Detection_CNN_PCIe.python/weights.bin')
-
-    # Run image
-    hw_output = model_fpga(img, post_process=False)
-    
-    # Print image to console
-    for row in range(32):
-        for col in range(64):
-            val = hw_output[row, col]
-            print(f'{hw_output[row, col]:2x}' if val else ' -', end='')
-        print('\n', end='')
-
-    # Display input image
-    cv2.imshow('img', cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
-if __name__ == '__main__':
-    main()
