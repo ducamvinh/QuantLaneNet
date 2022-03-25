@@ -1,5 +1,5 @@
 ############################################### Create project ###############################################
-set project_dir [file join [file dirname $argv0] "../vivado_project_new"]
+set project_dir [file join [file dirname $argv0] "../vivado_project"]
 create_project LaneDetectionCNN $project_dir -part xc7vx485tffg1761-2
 set_property board_part xilinx.com:vc707:part0:1.4 [current_project]
 
