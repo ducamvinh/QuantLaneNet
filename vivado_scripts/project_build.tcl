@@ -63,10 +63,10 @@ set_property name pcie_mgt [get_bd_intf_ports pcie_mgt_0]
 
 # Connect AXI interfaces
 connect_bd_intf_net [get_bd_intf_pins xdma_0/M_AXI] -boundary_type upper [get_bd_intf_pins axi_interconnect_0/S00_AXI]
-connect_bd_net [get_bd_pins xdma_0/axi_aclk] [get_bd_pins axi_interconnect_0/ACLK]
+connect_bd_net [get_bd_pins axi_interconnect_0/ACLK] [get_bd_pins xdma_0/axi_aclk]
 connect_bd_net [get_bd_pins axi_interconnect_0/S00_ACLK] [get_bd_pins xdma_0/axi_aclk]
 connect_bd_net [get_bd_pins axi_interconnect_0/M00_ACLK] [get_bd_pins xdma_0/axi_aclk]
-connect_bd_net [get_bd_pins xdma_0/axi_aresetn] [get_bd_pins axi_interconnect_0/ARESETN]
+connect_bd_net [get_bd_pins axi_interconnect_0/ARESETN] [get_bd_pins xdma_0/axi_aresetn]
 connect_bd_net [get_bd_pins axi_interconnect_0/S00_ARESETN] [get_bd_pins xdma_0/axi_aresetn]
 connect_bd_net [get_bd_pins axi_interconnect_0/M00_ARESETN] [get_bd_pins xdma_0/axi_aresetn]
 connect_bd_intf_net -boundary_type upper [get_bd_intf_pins axi_interconnect_0/M00_AXI] [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
@@ -83,14 +83,19 @@ set_property CONFIG.FREQ_HZ [get_property CONFIG.FREQ_HZ [get_bd_pins /xdma_0/ax
 
 # Create counters to make clock leds
 for {set i 0} {$i < 2} {incr i} {
+    # Binary counter
     create_bd_cell -type ip -vlnv xilinx.com:ip:c_counter_binary:12.0 c_counter_binary_$i
     set_property -dict [list CONFIG.Output_Width {25}] [get_bd_cells c_counter_binary_$i]
+
+    # Slice block
     create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice:1.0 xlslice_$i
-    set_property -dict [list CONFIG.DIN_TO {24} CONFIG.DIN_FROM {24} CONFIG.DIN_WIDTH {25} CONFIG.DOUT_WIDTH {1}] [get_bd_cells xlslice_$i]
+    set_property -dict [list CONFIG.DIN_TO {24} CONFIG.DIN_FROM {24} CONFIG.DIN_WIDTH {25} CONFIG.DOUT_WIDTH {1}] [get_bd_cells xlslice_$i] 
+    
+    # Connect counter to slice block
     connect_bd_net [get_bd_pins c_counter_binary_$i/Q] [get_bd_pins xlslice_$i/Din]
 }
 
-# Connect clock sources
+# Connect counter clock sources
 connect_bd_net [get_bd_pins c_counter_binary_0/CLK] [get_bd_pins util_ds_buf_0/IBUF_OUT]
 connect_bd_net [get_bd_pins c_counter_binary_1/CLK] [get_bd_pins xdma_0/axi_aclk]
 
@@ -99,7 +104,17 @@ create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 xlconcat_0
 set_property -dict [list CONFIG.NUM_PORTS {8}] [get_bd_cells xlconcat_0]
 
 # Connect concat block's inputs
-set led_signals {xlslice_0/Dout xlslice_1/Dout sys_rst_n xdma_0/axi_aresetn xdma_0/user_lnk_up LaneDetectionCNN_AXI_0/wr_led LaneDetectionCNN_AXI_0/rd_led LaneDetectionCNN_AXI_0/busy} 
+set led_signals {
+    xlslice_0/Dout
+    xlslice_1/Dout
+    sys_rst_n
+    xdma_0/axi_aresetn
+    xdma_0/user_lnk_up
+    LaneDetectionCNN_AXI_0/wr_led
+    LaneDetectionCNN_AXI_0/rd_led
+    LaneDetectionCNN_AXI_0/busy
+}
+
 for {set i 0} {$i < 8} {incr i} {
     connect_bd_net [get_bd_pins [lindex $led_signals $i]] [get_bd_pins xlconcat_0/In$i]  
 }
