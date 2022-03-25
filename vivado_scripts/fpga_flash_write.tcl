@@ -1,6 +1,6 @@
 set current_dir [file dirname $argv0]
-set bitstream_path [file join $current_dir "vivado_project/LaneDetectionCNN.runs/impl_1/design_1_wrapper.bit"]
-set mcs_path [file join $current_dir "vivado_project/design_1_wrapper.mcs"]
+set bitstream_path [file join $current_dir "../vivado_project/LaneDetectionCNN.runs/impl_1/design_1_wrapper.bit"]
+set mcs_path [file join $current_dir "../vivado_project/design_1_wrapper.mcs"]
 
 if {![file exists $bitstream_path]} {
     puts "$bitstream_path not found!"
@@ -11,7 +11,6 @@ if {![file exists $bitstream_path]} {
 write_cfgmem -force -format MCS -size 128 -interface BPIx16 -loadbit "up 0x00000000 $bitstream_path" $mcs_path
 
 # Open hardware manager and set properties
-config_webtalk -user off
 open_hw_manager
 connect_hw_server -url localhost:3121
 current_hw_target [get_hw_targets */xilinx_tcf/Digilent/*]

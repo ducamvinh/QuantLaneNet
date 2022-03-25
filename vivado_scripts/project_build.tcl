@@ -1,5 +1,5 @@
 ############################################### Create project ###############################################
-set project_dir [file join [file dirname $argv0] "vivado_project_new"]
+set project_dir [file join [file dirname $argv0] "../vivado_project_new"]
 create_project LaneDetectionCNN $project_dir -part xc7vx485tffg1761-2
 set_property board_part xilinx.com:vc707:part0:1.4 [current_project]
 
@@ -8,7 +8,7 @@ puts "\n########################### Creating IP ###########################\n"
 set ip_repo_dir [file join $project_dir "ip_repo"]
 create_peripheral user.org user LaneDetectionCNN 1.0 -dir $ip_repo_dir
 ipx::edit_ip_in_project -quiet -upgrade true -name edit_LaneDetectionCNN_v1_0 -directory $ip_repo_dir [file join $ip_repo_dir "LaneDetectionCNN_1.0/component.xml"]
-add_files -norecurse -copy_to [file join $ip_repo_dir "LaneDetectionCNN_1.0/src"] [glob -directory [file join [file dirname $argv0] "rtl_sources"] *.v]
+add_files -norecurse -copy_to [file join $ip_repo_dir "LaneDetectionCNN_1.0/src"] [glob -directory [file join [file dirname $argv0] "../rtl_sources"] *.v]
 set_property top LaneDetectionCNN_AXI_IP [current_fileset]
 update_compile_order -fileset sources_1
 
@@ -120,7 +120,7 @@ make_wrapper -files [get_files [file join $project_dir "LaneDetectionCNN.srcs/so
 add_files -norecurse [file join $project_dir "LaneDetectionCNN.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v"]
 
 # Add constraints
-add_files -fileset constrs_1 -norecurse [file join [file dirname $argv0] "rtl_sources/constraints.xdc"]
+add_files -fileset constrs_1 -norecurse [file join [file dirname $argv0] "../rtl_sources/constraints.xdc"]
 update_compile_order -fileset sources_1
 
 puts "\n########################### Finished building project ###########################\n"
