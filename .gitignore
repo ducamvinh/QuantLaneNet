@@ -3,3 +3,8 @@ __pycache__
 dataset/*
 checkpoint/*
 fpga_test*.py
+vivado_project/*
+*.log
+*.jou
+.Xil
+vivado_pid*
