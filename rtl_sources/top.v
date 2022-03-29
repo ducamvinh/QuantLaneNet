@@ -196,7 +196,7 @@ module top #(
     );
 
     // Post process
-    wire [NUM_LANES-1:0]                    bram_wr_data;
+    wire [7:0]                              bram_wr_data;
     wire [$clog2(OUT_WIDTH*OUT_HEIGHT)-1:0] bram_wr_addr;
     wire                                    bram_wr_en;
 
@@ -223,7 +223,7 @@ module top #(
     );
 
     // Post process BRAM
-    wire [NUM_LANES*4-1:0] bram_rd_data;
+    wire [8*4-1:0] bram_rd_data;
     wire [AXI_ADDR_WIDTH-1:0] bram_rd_addr_ = axi_rd_addr - OFFSET_OUTPUT;
     wire [$clog2(OUT_WIDTH*OUT_HEIGHT)-1:0] bram_rd_addr = bram_rd_addr_[$clog2(OUT_WIDTH*OUT_HEIGHT)+1:2];
     wire bram_within_range = axi_rd_addr >= OFFSET_OUTPUT && axi_rd_addr - OFFSET_OUTPUT < OUT_WIDTH * OUT_HEIGHT;
@@ -240,7 +240,7 @@ module top #(
     end
 
     block_ram_multi_word #(
-        .DATA_WIDTH (NUM_LANES),
+        .DATA_WIDTH (8),
         .DEPTH      (OUT_WIDTH * OUT_HEIGHT / 4),
         .NUM_WORDS  (4),
         .RAM_STYLE  ("auto")
@@ -259,18 +259,7 @@ module top #(
         case (axi_rd_addr)
             OFFSET_OVALID : axi_rd_data <= {{31{1'b0}}, o_valid};
             OFFSET_BUSY   : axi_rd_data <= {{31{1'b0}}, busy};
-            default       : begin
-                if (bram_within_range) begin
-                    axi_rd_data <= {
-                        {{8-NUM_LANES{1'b0}}, bram_rd_data[NUM_LANES*4-1:NUM_LANES*3]},
-                        {{8-NUM_LANES{1'b0}}, bram_rd_data[NUM_LANES*3-1:NUM_LANES*2]},
-                        {{8-NUM_LANES{1'b0}}, bram_rd_data[NUM_LANES*2-1:NUM_LANES*1]},
-                        {{8-NUM_LANES{1'b0}}, bram_rd_data[NUM_LANES*1-1:NUM_LANES*0]}
-                    };
-                end else begin
-                    axi_rd_data <= {32{1'b0}};
-                end
-            end
+            default       : axi_rd_data <= bram_within_range ? bram_rd_data : {32{1'b0}};
         endcase
     end
 

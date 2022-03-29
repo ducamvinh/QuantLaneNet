@@ -7,7 +7,7 @@ module post_process #(
     parameter DATA_WIDTH = 16,
     parameter FRAC_BITS = 8
 )(
-    output     [NUM_LANES-1:0]                    bram_wr_data,
+    output     [7:0]                              bram_wr_data,
     output     [$clog2(OUT_WIDTH*OUT_HEIGHT)-1:0] bram_wr_addr,
     output                                        bram_wr_en,
     output                                        fifo_rd_en_cls,
@@ -211,6 +211,7 @@ module post_process #(
         end
     endgenerate
 
+    assign bram_wr_data[7:NUM_LANES] = {8-NUM_LANES{1'b0}};
     assign bram_wr_addr = row_cnt_2 * OUT_WIDTH + col_cnt_2;
     assign bram_wr_en = write_stage_start || col_cnt_2 != 0;
 
