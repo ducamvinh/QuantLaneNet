@@ -36,7 +36,7 @@ class LaneDetectionModelFPGA(object):
 
     @timeout_decorator.timeout(seconds=1, timeout_exception=TimeoutError)
     def wait_valid(self):
-        valid = bytes([0])
+        valid = 0
         valid_ref = (1).to_bytes(length=4, byteorder='little')
 
         while valid != valid_ref:

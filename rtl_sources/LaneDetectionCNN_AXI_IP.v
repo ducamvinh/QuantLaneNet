@@ -11,7 +11,7 @@
 
 		// Parameters of Axi Slave Bus Interface S00_AXI
 		parameter integer C_S00_AXI_DATA_WIDTH	= 32,
-		parameter integer C_S00_AXI_ADDR_WIDTH	= $clog2(549224)
+		parameter integer C_S00_AXI_ADDR_WIDTH	= $clog2(549228)
 	)
 	(
 		// Users to add ports here
@@ -104,6 +104,7 @@
     	.rst_n         (s00_axi_aresetn)
 	);
 
+	// Blink LEDs 4 times when there's a read/write request
 	activity_led_blink #(
     	.COUNTER_WIDTH (24)
 	) u_led [1:0] (

@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module top #(
-    parameter AXI_ADDR_WIDTH = $clog2(549224)
+    parameter AXI_ADDR_WIDTH = $clog2(549228)
 )(
     output                          o_valid,
     output                          busy,
@@ -83,7 +83,7 @@ module top #(
 
     axi_write_control_fifo #(
         .IN_WIDTH       (IN_WIDTH),
-        .IN_HEIGHT      (256),
+        .IN_HEIGHT      (IN_HEIGHT),
         .AXI_BASE_ADDR  (OFFSET_INPUT),
         .AXI_ADDR_WIDTH (AXI_ADDR_WIDTH)
     ) u_fifo_wr (
@@ -106,7 +106,8 @@ module top #(
 
     fifo_single_read #(
         .DATA_WIDTH        (8 * 3),
-        .DEPTH             (IN_WIDTH * IN_HEIGHT),
+        // .DEPTH             (IN_WIDTH * IN_HEIGHT),
+        .DEPTH             (IN_WIDTH * (IN_HEIGHT - 2) * 23 / 32),
         .ALMOST_FULL_THRES (10)
     ) u_fifo (
         .rd_data     (fifo_rd_data),

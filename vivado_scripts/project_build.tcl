@@ -146,7 +146,8 @@ add_files -fileset constrs_1 -norecurse [file join $rtl_dir "constraints.xdc"]
 update_compile_order -fileset sources_1
 
 # Change synthesis and implementation strategies
-set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
+# set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
+set_property strategy {Vivado Synthesis Defaults} [get_runs synth_1]
 set_property strategy Performance_NetDelay_high [get_runs impl_1]
 
 puts "\n########################### Finished building project ###########################\n"
