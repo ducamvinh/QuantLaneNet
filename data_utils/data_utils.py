@@ -2,7 +2,7 @@ import numpy as np
 import csaps
 import cv2
 
-def visualize(img, cls, vertical, offset, aux_seg=None, show_grid=True, num_lanes=4, input_size=(256, 512)):
+def visualize(img, cls, vertical, offset, show_grid=False, num_lanes=4, input_size=(256, 512)):
     output_size = (input_size[0] // 8, input_size[1] // 8)
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255)]
 
@@ -39,27 +39,7 @@ def visualize(img, cls, vertical, offset, aux_seg=None, show_grid=True, num_lane
         for i in range(7, input_size[1], 8):
             cv2.line(img=img, pt1=(i, 0), pt2=(i, input_size[0]), color=(0, 0, 0), thickness=1)
 
-    if aux_seg is not None:
-        aux_seg = aux_seg.detach().cpu().numpy().squeeze()
-        _aux_seg = np.zeros(shape=(input_size[0] // 2, input_size[1] // 2, 3), dtype=np.uint8)
-
-        if aux_seg.ndim == 2:
-            for i in range(num_lanes):
-                _aux_seg[aux_seg == i + 1, :] = colors[i]
-        elif aux_seg.ndim == 3:
-            aux_seg = (np.clip(aux_seg, a_min=0.0, a_max=1.0) * 255.0).astype(np.uint8)
-
-            _aux_seg[:, :, 0] = cv2.bitwise_or(_aux_seg[:, :, 0], aux_seg[1, :, :])
-            _aux_seg[:, :, 1] = cv2.bitwise_or(_aux_seg[:, :, 1], aux_seg[2, :, :])
-            _aux_seg[:, :, 2] = cv2.bitwise_or(_aux_seg[:, :, 2], aux_seg[3, :, :])
-            _aux_seg[:, :, 0] = cv2.bitwise_or(_aux_seg[:, :, 0], aux_seg[4, :, :])
-            _aux_seg[:, :, 1] = cv2.bitwise_or(_aux_seg[:, :, 1], aux_seg[4, :, :])
-        else:
-            raise ValueError(f'Invalid shape for aux_seg: {aux_seg.shape}.')
-
-        return img, _aux_seg
-    else:
-        return img
+    return img
 
 def get_og_format(cls, vertical, offset, h_samples, input_size=(256, 512)):
 
