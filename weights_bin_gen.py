@@ -85,7 +85,7 @@ def get_arguments():
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--weights_bin_path', type=str, default='weights.bin')
-    parser.add_argument('--checkpoint_path', type=str)
+    parser.add_argument('--checkpoint_path', type=str, default='checkpoint')
 
     args = parser.parse_args()
 

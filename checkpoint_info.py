@@ -8,12 +8,13 @@ import argparse
 import torch
 import glob
 import tqdm
+import os
 
 def get_best_model(checkpoint_path):
     max_acc = 0
     best_model = '000'
 
-    for path in glob.glob(f'{checkpoint_path}/eval_*.pth'):
+    for path in glob.glob(os.path.join(checkpoint_path, 'eval_*.pth')):
         loaded_eval = torch.load(path)
         if loaded_eval['test_acc'] > max_acc:
             max_acc = loaded_eval['test_acc']
@@ -23,7 +24,7 @@ def get_best_model(checkpoint_path):
 
 def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device='cuda'):
     best_model = get_best_model(checkpoint_path)
-    checkpoint = torch.load(f'{checkpoint_path}/checkpoint_{best_model}.pth', map_location=device)
+    checkpoint = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_model}.pth'), map_location=device)
 
     model = LaneDetectionModel().to(device)
     model.load_state_dict(checkpoint['model_state'], strict=False)
@@ -59,7 +60,7 @@ def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device=
     )
 
 def show_training_curves(checkpoint_path):
-    for paths in [glob.glob(f'{checkpoint_path}/loss_*.pth'), glob.glob(f'{checkpoint_path}/eval_*.pth')]:
+    for paths in [glob.glob(os.path.join(checkpoint_path, 'loss_*.pth')), glob.glob(os.path.join(checkpoint_path, 'eval_*.pth'))]:
         val_dict = dict()
         for name in torch.load(paths[0]):
             val_dict[name] = list()
