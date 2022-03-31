@@ -117,14 +117,13 @@ def test_evaluate(model, dataset_path, use_offset, device):
         device = 'cpu'
 
     test_set = TuSimpleDataset(dir_path=dataset_path, train=False, evaluate=True, device=device, verbose=True)
-    test_loader = torch.utils.data.DataLoader(dataset=test_set, batch_size=16)
     evaluation = TuSimpleEval()
 
     acc = 0
     fp  = 0
     fn  = 0
 
-    iterator = tqdm.tqdm(test_loader)
+    iterator = tqdm.tqdm(test_set)
     for i, (img, cls_true, offset_true, vertical_true, gt) in enumerate(iterator):
         if model_type == 'software':
             cls_pred, vertical_pred, offset_pred = model(img.float() / 255.0)        
@@ -133,9 +132,9 @@ def test_evaluate(model, dataset_path, use_offset, device):
 
         if model_type == 'fpga' or not use_offset:
             offset_dummy = torch.ones_like(cls_pred) * (3.5 /8)
-            _acc, _fp, _fn = evaluation(cls_pred, vertical_pred, offset_dummy, gt)
+            _acc, _fp, _fn = evaluation(cls_pred, vertical_pred, offset_dummy, [gt])
         else:
-            _acc, _fp, _fn = evaluation(cls_pred, vertical_pred, offset_pred, gt)
+            _acc, _fp, _fn = evaluation(cls_pred, vertical_pred, offset_pred, [gt])
 
         acc += _acc
         fp  += _fp
@@ -151,9 +150,9 @@ def test_evaluate(model, dataset_path, use_offset, device):
 
     print(
         f'\nEvaluated {model_type} model{"" if model_type == "fpga" else (" [WITH] offset" if use_offset else " [WITHOUT] offset")}:\n'
-        f'\tacc = {(acc / len(test_loader) * 100):.4f}%\n'
-        f'\tfp  = {(fp  / len(test_loader) * 100):.4f}%\n'
-        f'\tfn  = {(fn  / len(test_loader) * 100):.4f}%\n'
+        f'\tacc = {(acc / len(test_set) * 100):.4f}%\n'
+        f'\tfp  = {(fp  / len(test_set) * 100):.4f}%\n'
+        f'\tfn  = {(fn  / len(test_set) * 100):.4f}%\n'
     )
 
 def get_arguments():

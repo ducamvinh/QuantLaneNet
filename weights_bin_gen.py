@@ -1,6 +1,7 @@
 from fixedpoint import FixedPoint
 import argparse
 import torch
+import os
 
 from model.LaneDetectionModel import LaneDetectionModel
 from checkpoint_info import get_best_model
@@ -99,12 +100,15 @@ def main():
     qformat = {'m': 8, 'n': 8, 'signed': 1}
 
     # Get best checkpoint
-    checkpoint = torch.load(f'{args.checkpoint_path}/checkpoint_{get_best_model(args.checkpoint_path)}.pth', map_location='cpu')
+    best_model = get_best_model(args.checkpoint_path)
+    checkpoint_path = os.path.join(args.checkpoint_path, f'checkpoint_{best_model}.pth')
+    checkpoint = torch.load(checkpoint_path, map_location='cpu')
+    print(f'[INFO] Loading checkpoint from {checkpoint_path}')
 
     # Initialize model
     model = LaneDetectionModel().to('cpu')
     model.load_state_dict(checkpoint['model_state'], strict=False)
-    model.eval()    
+    model.eval()
 
     # Write weights
     print('[INFO] Writing weights...')
