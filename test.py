@@ -126,7 +126,7 @@ def test_evaluate(model, dataset_path, use_offset, device):
     iterator = tqdm.tqdm(test_set)
     for i, (img, cls_true, offset_true, vertical_true, gt) in enumerate(iterator):
         if model_type == 'software':
-            cls_pred, vertical_pred, offset_pred = model(img.float() / 255.0)        
+            cls_pred, vertical_pred, offset_pred = model(img.unsqueeze(0).float() / 255.0)        
         else:
             cls_pred, vertical_pred = model(img, post_process=True)
 
