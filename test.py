@@ -151,9 +151,9 @@ def test_evaluate(model, dataset_path, use_offset, device):
 
     print(
         f'\nEvaluated {model_type} model{"" if model_type == "fpga" else (" [WITH] offset" if use_offset else " [WITHOUT] offset")}:\n'
-        f'\tacc = {(acc / len(test_set) * 100):.4f}%\n'
-        f'\tfp  = {(fp  / len(test_set) * 100):.4f}%\n'
-        f'\tfn  = {(fn  / len(test_set) * 100):.4f}%\n'
+        f'\tacc = {(acc / len(test_loader) * 100):.4f}%\n'
+        f'\tfp  = {(fp  / len(test_loader) * 100):.4f}%\n'
+        f'\tfn  = {(fn  / len(test_loader) * 100):.4f}%\n'
     )
 
 def get_arguments():
