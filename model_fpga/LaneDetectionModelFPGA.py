@@ -1,6 +1,7 @@
 import timeout_decorator
 import numpy as np
 import subprocess
+import torch
 import os
 
 import fpga_utils.fpga_address_map as fpga_address_map
@@ -44,17 +45,13 @@ class LaneDetectionModelFPGA(object):
                 f.seek(fpga_address_map.OFFSET_OVALID)
                 valid = f.read(4)
 
-    def post_process(self, hw_output):
-        cls = np.zeros(shape=(32, 64, 4), dtype=np.float32)
-        vertical = np.zeros(shape=(32, 1, 4), dtype=np.float32)
+    def _inference(self, img):
+        # Check image shape
+        if img.shape == (3, 256, 512):
+            img = np.moveaxis(img, 0, 2)
+        elif img.shape != (256, 512, 3):
+            raise ValueError(f'Unknown image shape: {img.shape}. Expected (3, 256, 512) or (256, 512, 3)')
 
-        for i in range(4):
-            cls[:, :, i] = np.bitwise_and(np.right_shift(hw_output, i), 1)
-            vertical[:, :, i] = np.sum(cls[:, :, i], axis=1)
-
-        return cls, vertical
-
-    def __call__(self, img, post_process=True):  # np.array((256, 512, 3)) -> (cls: np.array(32, 64, 4), vertical: np.array(32, 1, 4))
         # Write image to FPGA
         with open(self.h2c_device, 'wb') as f:
             f.seek(fpga_address_map.OFFSET_INPUT)
@@ -71,8 +68,49 @@ class LaneDetectionModelFPGA(object):
             f.seek(fpga_address_map.OFFSET_OUTPUT)
             hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64)
 
-        # Post-process output and return
-        hw_output = np.reshape(hw_output, (32, 64))
+        return np.reshape(hw_output, (32, 64))
+
+    def post_process(self, hw_output):
+        num_frame = hw_output.size(0)
+
+        cls = torch.zeros(size=(num_frame, 4, 32, 64), dtype=torch.float32)
+        vertical = torch.zeros(size=(num_frame, 4, 32, 1), dtype=torch.float32)
+
+        for i in range(4):
+            cls[:, i, :, :] = torch.bitwise_and(torch.bitwise_right_shift(hw_output, i), 1)
+            vertical[:, i, :, 0] = torch.sum(cls[:, i, :, :], dim=2)
+
+        return cls, vertical
+
+    def __call__(self, img, post_process=True):
+        # Convert to numpy if img is torch
+        if type(img) == torch.Tensor:
+            img = img.numpy()
+
+        # Check image dtype
+        if img.dtype not in (np.ubyte, np.uint8):
+            raise TypeError(f'Expected np.ubyte or np.uint8, instead got {img.dtype}')
+
+        # Run inference
+        if img.ndim == 3:
+            if img.shape not in ((256, 512, 3), (3, 256, 512)):
+                raise ValueError(f'Unknown image shape: {img.shape}. Expected (3, 256, 512) or (256, 512, 3)')
+            
+            hw_output = np.expand_dims(self._inference(img), axis=0)
+        else:
+            if img.shape[1:] not in ((256, 512, 3), (3, 256, 512)):
+                raise ValueError(f'Unknown image shape: {img.shape}. Expected (3, 256, 512) or (256, 512, 3)')
+            
+            num_frame = img.shape[0]
+            hw_output = np.zeros(shape=(num_frame, 32, 64), dtype=np.ubyte)
+
+            for i in range(num_frame):
+                hw_output[i, :, :] = self._inference(img[i, :, :, :])
+
+        # Convert output to torch
+        hw_output = torch.from_numpy(hw_output)
+
+        # Post-process and return
         if post_process:
             return self.post_process(hw_output)
         else:

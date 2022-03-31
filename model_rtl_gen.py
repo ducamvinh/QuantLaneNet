@@ -270,7 +270,7 @@ def rtl_gen(rtl_path, fifo_factor=1):
 
         f.write('endmodule\n')
 
-def addr_map(rtl_path):
+def weight_addr_map(rtl_path):
     with open(rtl_path, 'r') as f:
         lines = f.readlines()
 
@@ -340,7 +340,7 @@ def main():
     args = get_arguments()
 
     rtl_gen(rtl_path=args.rtl_path, fifo_factor=args.fifo_factor)
-    addr_map(rtl_path=args.rtl_path)
+    weight_addr_map(rtl_path=args.rtl_path)
     
 if __name__ == '__main__':
     main()

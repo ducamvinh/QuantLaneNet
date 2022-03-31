@@ -173,7 +173,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
 def get_arguments():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--device',          type=str,   default='cpu')
+    parser.add_argument('--device',          type=str,   default='cpu', choices=('cuda', 'cpu'))
     parser.add_argument('--dataset_path',    type=str)
     parser.add_argument('--checkpoint_path', type=str)
     parser.add_argument('--loader_workers',  type=int,   default=0)
@@ -194,9 +194,6 @@ def get_arguments():
     parser.set_defaults(dropout=False)
 
     args = parser.parse_args()
-
-    if args.device not in ['cpu', 'cuda']:
-        raise ValueError(f'Expected device "cpu" or "cuda", instead got "{args.device}".')
 
     if args.device == 'cuda' and args.loader_workers != 0:
         torch.multiprocessing.set_start_method('spawn')
