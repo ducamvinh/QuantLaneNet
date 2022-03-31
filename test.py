@@ -55,7 +55,7 @@ def test_random_image(model, dataset_path, use_offset):
     print(f'\tRandom index: {img_idx}')
     test_image(model, img_paths[img_idx], use_offset)
 
-def test_video(model, video_path, use_offset):
+def test_video(model, video_path, use_offset, device):
     print('[WARNING] Input video should be cropped to composition similar to TuSimple dataset for best accuracy')
     print(f'Video path: {video_path}')
 
@@ -82,7 +82,7 @@ def test_video(model, video_path, use_offset):
         # Run inference
         if isinstance(model, LaneDetectionModel):
             start_time = time.time()
-            cls, vertical, offset = model(torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0)
+            cls, vertical, offset = model(torch.from_numpy(np.moveaxis(img, 2, 0)).to(device).unsqueeze(0).float() / 255.0)
             runtime.append(time.time() - start_time)
         else:
             start_time = time.time()
@@ -222,7 +222,7 @@ def main():
     elif args.test_mode == 'image':
         test_image(model, args.image_path, args.offset)
     elif args.test_mode == 'video':
-        test_video(model, args.video_path, args.offset)
+        test_video(model, args.video_path, args.offset, args.device)
     elif args.test_mode == 'evaluate':
         test_evaluate(model, args.dataset_path, args.offset, args.device)
 
