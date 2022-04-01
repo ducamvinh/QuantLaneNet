@@ -24,7 +24,7 @@ def rtl_gen(rtl_path, fifo_factor=1):
             '\toutput                    o_valid_cls,\n'
             '\toutput                    o_valid_vertical,\n'
             '\toutput                    fifo_rd_en,\n'
-            '\tinput  [DATA_WIDTH*3-1:0] i_data,\n'
+            '\tinput  [8*3-1:0]          i_data,\n'
             '\tinput                     i_valid,\n'
             '\tinput                     cls_almost_full,\n'
             '\tinput                     vertical_almost_full,\n'
@@ -56,10 +56,12 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     i_data = 'i_data'
                     i_valid = 'i_valid'
                     conv_fifo_rd_en = 'fifo_rd_en'
+                    first_layer = 'true'
                 else:
                     i_data = f'fifo_rd_data_enc_{layer_num-1}'
                     i_valid = f'~fifo_empty_enc_{layer_num-1}'
                     conv_fifo_rd_en = f'fifo_rd_en_enc_{layer_num-1}'
+                    first_layer = 'false'
 
                 f.write(
                     f'\t// Encoder stage {i} conv {j}\n'
@@ -74,6 +76,7 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     f'\t\t.IN_WIDTH              ({int(in_size[1])}),\n'
                     f'\t\t.IN_HEIGHT             ({int(in_size[0])}),\n'
                     f'\t\t.OUTPUT_MODE           ("batchnorm_relu"),\n'
+                    f'\t\t.FIRST_LAYER           ("{first_layer}"),\n'
                     f'\t\t.KERNEL_0              ({kernel_size[0]}),\n'
                     f'\t\t.KERNEL_1              ({kernel_size[1]}),\n'
                     f'\t\t.PADDING_0             ({padding[0]}),\n'
@@ -206,6 +209,7 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     f'\t\t.IN_WIDTH              ({int(_in_size[1])}),\n'
                     f'\t\t.IN_HEIGHT             ({int(_in_size[0])}),\n'
                     f'\t\t.OUTPUT_MODE           ("{output_mode}"),\n'
+                    f'\t\t.FIRST_LAYER           ("false"),\n'
                     f'\t\t.KERNEL_0              ({kernel_size[0]}),\n'
                     f'\t\t.KERNEL_1              ({kernel_size[1]}),\n'
                     f'\t\t.PADDING_0             ({padding[0]}),\n'

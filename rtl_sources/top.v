@@ -122,12 +122,6 @@ module top #(
     );
 
     // Model
-    wire [DATA_WIDTH*3-1:0] model_i_data = {
-        {{INT_BITS{1'b0}}, fifo_rd_data[23:16]},
-        {{INT_BITS{1'b0}}, fifo_rd_data[15:8]},
-        {{INT_BITS{1'b0}}, fifo_rd_data[7:0]}
-    };
-
     wire [DATA_WIDTH*NUM_LANES-1:0] model_o_data_cls;
     wire [DATA_WIDTH*NUM_LANES-1:0] model_o_data_vertical;
     wire                            model_o_valid_cls;
@@ -144,7 +138,7 @@ module top #(
 	    .o_valid_cls          (model_o_valid_cls),
 	    .o_valid_vertical     (model_o_valid_vertical), 
 	    .fifo_rd_en           (fifo_rd_en),
-	    .i_data               (model_i_data),
+	    .i_data               (fifo_rd_data),
 	    .i_valid              (~fifo_empty),
 	    .cls_almost_full      (cls_fifo_almost_full),
 	    .vertical_almost_full (vertical_fifo_almost_full),

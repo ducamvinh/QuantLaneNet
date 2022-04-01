@@ -70,9 +70,12 @@ class LaneDetectionModelFPGA(object):
 
         return np.reshape(hw_output, (32, 64))
 
-    def post_process(self, hw_output):
+    @staticmethod
+    def post_process(hw_output):
+        if type(hw_output) == np.ndarray:
+            hw_output = torch.from_numpy(hw_output)
+        
         num_frame = hw_output.size(0)
-
         cls = torch.zeros(size=(num_frame, 4, 32, 64), dtype=torch.float32)
         vertical = torch.zeros(size=(num_frame, 4, 32, 1), dtype=torch.float32)
 

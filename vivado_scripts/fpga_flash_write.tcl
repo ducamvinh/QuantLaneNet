@@ -1,6 +1,6 @@
 set current_dir [file dirname $argv0]
 set bitstream_path [file join $current_dir "../vivado_project/LaneDetectionCNN.runs/impl_1/design_1_wrapper.bit"]
-set mcs_path [file join $current_dir "../vivado_project/design_1_wrapper.mcs"]
+set mcs_path [file join [file dirname $bitstream_path] "design_1_wrapper.mcs"]
 
 if {![file exists $bitstream_path]} {
     puts "$bitstream_path not found!"

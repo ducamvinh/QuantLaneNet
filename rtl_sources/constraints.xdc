@@ -42,7 +42,7 @@ set_property PACKAGE_PIN AU39 [get_ports {leds[7]}]
 ###############################################################################
 
 # Clock
-create_clock -period 10.000 -name PCIE_DIFF_CLOCK [get_ports pcie_diff_clock_clk_p]
+create_clock -period 10.000 -name pcie_diff_clock_clk_p [get_ports pcie_diff_clock_clk_p]
 
 # Reset
 set_false_path -from [get_ports pcie_rst_n]
