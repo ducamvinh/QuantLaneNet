@@ -94,7 +94,7 @@ def write_weights(model, weights_bin_path):
 def get_arguments():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('--weights_bin_path', type=str, default='weights.bin')
+    parser.add_argument('--weights_bin_path', type=str, default='fpga_weights.bin')
     parser.add_argument('--quantized_weights_path', type=str, default='quantized_weights_pertensor_symmetric.pth')
 
     args = parser.parse_args()

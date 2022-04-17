@@ -170,7 +170,7 @@ def get_arguments():
     parser.add_argument('--dataset_path',           type=str, default='dataset')
     parser.add_argument('--checkpoint_path',        type=str, default='checkpoint')
     parser.add_argument('--quantized_weights_path', type=str, default='quantized_weights_pertensor_symmetric.pth')
-    parser.add_argument('--weights_bin_path',       type=str, default='weights.bin')
+    parser.add_argument('--weights_bin_path',       type=str, default='fpga_weights.bin')
     parser.add_argument('--image_path',             type=str, default='dataset/tusimple/train_set/clips/0313-1/37920/20.jpg')
     parser.add_argument('--video_path',             type=str, default='test_videos/video_0.mp4')
     parser.add_argument('--h2c_device',             type=str, default='/dev/xdma0_h2c_0')

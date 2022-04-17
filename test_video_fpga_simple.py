@@ -13,7 +13,7 @@ import os
 def get_arguments():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--weights_bin_path', type=str, default='weights.bin')
+    parser.add_argument('--weights_bin_path', type=str, default='fpga_weights.bin')
     parser.add_argument('--video_path',       type=str, default='test_videos/video_0.mp4')
     parser.add_argument('--h2c_device',       type=str, default='/dev/xdma0_h2c_0')
     parser.add_argument('--c2h_device',       type=str, default='/dev/xdma0_c2h_0')
