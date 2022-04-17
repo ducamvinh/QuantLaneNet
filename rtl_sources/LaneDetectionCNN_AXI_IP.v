@@ -109,7 +109,7 @@
     	.COUNTER_WIDTH (24)
 	) u_led [1:0] (
     	.led_out ({wr_led, rd_led}),
-		.trigger ({s00_axi_wren, s00_axi_rden}),
+		.trigger ({s00_axi_wren & |s00_axi_wstrb, s00_axi_rden}),
     	.clk     (s00_axi_aclk),
 		.rst_n   (s00_axi_aresetn)
 	);

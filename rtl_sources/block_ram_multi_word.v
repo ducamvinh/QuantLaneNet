@@ -1,10 +1,10 @@
 `timescale 1ns / 1ps
 
 module block_ram_multi_word #(
-    parameter DATA_WIDTH = 16,
-    parameter DEPTH = 128,
+    parameter DATA_WIDTH = 8,
+    parameter DEPTH = 64,
     parameter NUM_WORDS = 9 * 32,
-    parameter RAM_STYLE = "auto"
+    parameter RAM_STYLE = "auto"  
 )(
     output reg [DATA_WIDTH*NUM_WORDS-1:0] rd_data,
     input      [DATA_WIDTH-1:0]           wr_data,

@@ -66,15 +66,15 @@ set_property name pcie_diff_clock [get_bd_intf_ports CLK_IN_D_0]
 make_bd_intf_pins_external  [get_bd_intf_pins xdma_0/pcie_mgt]
 set_property name pcie_mgt [get_bd_intf_ports pcie_mgt_0]
 
-# FPGA 150 MHz clock
+# FPGA 170 MHz clock
 create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_0
 apply_board_connection -board_interface "sys_diff_clock" -ip_intf "clk_wiz_0/CLK_IN1_D" -diagram "design_1" 
-set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {150.000} CONFIG.RESET_TYPE {ACTIVE_HIGH} CONFIG.MMCM_DIVCLK_DIVIDE {4} CONFIG.MMCM_CLKFBOUT_MULT_F {19.875} CONFIG.MMCM_CLKIN1_PERIOD {5.000} CONFIG.MMCM_CLKOUT0_DIVIDE_F {6.625} CONFIG.RESET_PORT {reset} CONFIG.CLKOUT1_JITTER {142.473} CONFIG.CLKOUT1_PHASE_ERROR {157.402}] [get_bd_cells clk_wiz_0]
+set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {170.000} CONFIG.RESET_TYPE {ACTIVE_HIGH} CONFIG.MMCM_DIVCLK_DIVIDE {4} CONFIG.MMCM_CLKFBOUT_MULT_F {19.875} CONFIG.MMCM_CLKIN1_PERIOD {5.000} CONFIG.MMCM_CLKOUT0_DIVIDE_F {6.625} CONFIG.RESET_PORT {reset} CONFIG.CLKOUT1_JITTER {142.473} CONFIG.CLKOUT1_PHASE_ERROR {157.402}] [get_bd_cells clk_wiz_0]
 set_property name fpga_diff_clock [get_bd_intf_ports sys_diff_clock]
 
 # Connect AXI interfaces
 apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {reset ( FPGA Reset ) } Manual_Source {New External Port (ACTIVE_HIGH)}}  [get_bd_pins clk_wiz_0/reset]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (150 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (170 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
 set_property name fpga_rst [get_bd_ports reset]
 
 # Set AXI address map
@@ -142,12 +142,11 @@ make_wrapper -files [get_files [file join $project_dir "LaneDetectionCNN.srcs/so
 add_files -norecurse [file join $project_dir "LaneDetectionCNN.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v"]
 
 # Add constraints
-add_files -fileset constrs_1 -norecurse [file join $rtl_dir "constraints.xdc"]
+add_files -fileset constrs_1 -force -norecurse -copy_to [file join $project_dir "LaneDetectionCNN.srcs/constrs_1/new"] [file join $rtl_dir "constraints.xdc"]
 update_compile_order -fileset sources_1
 
 # Change synthesis and implementation strategies
-# set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
-set_property strategy {Vivado Synthesis Defaults} [get_runs synth_1]
+set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
 set_property strategy Performance_NetDelay_high [get_runs impl_1]
 
 puts "\n########################### Finished building project ###########################\n"

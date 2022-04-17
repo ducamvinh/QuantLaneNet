@@ -13,10 +13,9 @@ module pe_controller (
     // Control FSM
     localparam IDLE = 0;
     localparam BUSY = 1;
-    localparam LAST = 2;
 
-    reg [1:0] current_state;
-    reg [1:0] next_state;
+    reg [0:0] current_state;
+    reg [0:0] next_state;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
@@ -29,14 +28,13 @@ module pe_controller (
     always @ (current_state or i_valid or cnt_limit) begin
         case (current_state)
             IDLE    : next_state <= i_valid ? BUSY : IDLE;
-            BUSY    : next_state <= cnt_limit ? LAST : BUSY;
-            LAST    : next_state <= i_valid ? BUSY : IDLE;
+            BUSY    : next_state <= cnt_limit ? IDLE : BUSY;
             default : next_state <= IDLE;
         endcase
     end
 
-    assign pe_ready = (current_state == BUSY && cnt_limit) || current_state == LAST || current_state == IDLE;
-    assign pe_ack = i_valid && (current_state == IDLE || current_state == LAST);
+    assign pe_ready = (current_state == BUSY && cnt_limit) || current_state == IDLE;
+    assign pe_ack = i_valid && current_state == IDLE;
     assign cnt_en = pe_ack || current_state == BUSY;
 
 endmodule

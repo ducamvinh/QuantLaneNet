@@ -34,19 +34,21 @@ module fifo_dual_read #(
     );
 
     // Ram
-    block_ram_dual_read #(
+    block_ram_dual_port #(
         .DATA_WIDTH (DATA_WIDTH),
-        .DEPTH      (DEPTH)
+        .DEPTH      (DEPTH),
+        .RAM_STYLE  ("auto")
     ) u_bram (
         .rd_data_a (rd_data_a),
         .rd_data_b (rd_data_b),
-        .wr_data   (wr_data),
-        .rd_addr_a (rd_cnt_a[ADDR_WIDTH-1:0]),
-        .rd_addr_b (rd_cnt_b[ADDR_WIDTH-1:0]),
-        .wr_addr   (wr_cnt[ADDR_WIDTH-1:0]),
-        .rw        (wr_en),
-        .rd_en_a   (rd_en_a),
+        .wr_data_a (wr_data),
+        .wr_data_b ({DATA_WIDTH{1'b0}}),
+        .addr_a    (wr_en ? wr_cnt[ADDR_WIDTH-1:0] : rd_cnt_a[ADDR_WIDTH-1:0]),
+        .addr_b    (rd_cnt_b[ADDR_WIDTH-1:0]),
+        .rd_en_a   (rd_en_a & ~wr_en),
         .rd_en_b   (rd_en_b),
+        .wr_en_a   (wr_en),
+        .wr_en_b   (1'b0),
         .clk       (clk)
     );
 

@@ -124,13 +124,16 @@ module post_process #(
 
     // Data latch
     reg signed [DATA_WIDTH-1:0] max_cls[0:NUM_LANES-1];
-    reg [NUM_LANES-1:0] vertical;
     reg [$clog2(OUT_WIDTH)-1:0] max_cls_idx[0:NUM_LANES-1];
+    reg [NUM_LANES-1:0] vertical;
+    wire [NUM_LANES-1:0] vertical_;
 
     generate
         for (i = 0; i < NUM_LANES; i = i + 1) begin : gen0
             wire signed [DATA_WIDTH-1:0] cls_curr = i_data_cls[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH];
             wire signed [DATA_WIDTH-1:0] vertical_curr = i_data_vertical[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH];
+
+            assign vertical_[i] = vertical_curr >= ZERO_POINT_FIVE;
 
             always @ (posedge clk) begin
                 if (fifo_rd_en_cls_prev && (col_cnt_1_prev == 0 || cls_curr > max_cls[i])) begin
@@ -139,7 +142,7 @@ module post_process #(
                 end
 
                 if (fifo_rd_en_vertical_prev) begin
-                    vertical[i] <= vertical_curr >= ZERO_POINT_FIVE;
+                    vertical[i] <= vertical_[i];
                 end
             end
         end
@@ -189,6 +192,13 @@ module post_process #(
         end
     end
 
+    // Fix a dumb bug I missed
+    reg f_ing_bug_fix;
+
+    always @ (posedge clk) begin
+        f_ing_bug_fix <= (current_state == NO_VERT_FINISHED_CLS) && i_valid_vertical;
+    end
+
     generate
         for (i = 0; i < NUM_LANES; i = i + 1) begin : gen1
             // Write stage data latch
@@ -198,13 +208,13 @@ module post_process #(
             always @ (posedge clk) begin
                 if (write_stage_start) begin
                     write_stage_max_cls_idx <= max_cls_idx[i];
-                    write_stage_vertical <= vertical[i];
+                    write_stage_vertical <= f_ing_bug_fix ? vertical_[i] : vertical[i];
                 end
             end
 
             // One hot input select
             wire [$clog2(OUT_WIDTH)-1:0] one_hot_max_cls_idx = write_stage_start ? max_cls_idx[i] : write_stage_max_cls_idx;
-            wire one_hot_vertical = write_stage_start ? vertical[i] : write_stage_vertical;
+            wire one_hot_vertical = write_stage_start ? (f_ing_bug_fix ? vertical_[i] : vertical[i]) : write_stage_vertical;
 
             // bram_wr_data
             assign bram_wr_data[i] = one_hot_vertical && col_cnt_2 == one_hot_max_cls_idx;

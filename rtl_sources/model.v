@@ -1,38 +1,33 @@
 `timescale 1ns / 1ps
 
-module model #(
-	parameter DATA_WIDTH = 16,
-	parameter FRAC_BITS = 8
-)(
-	output [DATA_WIDTH*4-1:0] o_data_cls,
-	output [DATA_WIDTH*4-1:0] o_data_vertical,
-	output                    o_valid_cls,
-	output                    o_valid_vertical,
-	output                    fifo_rd_en,
-	input  [8*3-1:0]          i_data,
-	input                     i_valid,
-	input                     cls_almost_full,
-	input                     vertical_almost_full,
-	input  [DATA_WIDTH-1:0]   weight_data,
-	input  [31:0]             weight_addr,
-	input                     weight_we,
-	input                     clk,
-	input                     rst_n
+module model (
+	output [16*4-1:0] o_data_cls,
+	output [16*4-1:0] o_data_vertical,
+	output            o_valid_cls,
+	output            o_valid_vertical,
+	output            fifo_rd_en,
+	input  [8*3-1:0]  i_data,
+	input             i_valid,
+	input             cls_almost_full,
+	input             vertical_almost_full,
+	input  [15:0]     weight_wr_data,
+	input  [31:0]     weight_wr_addr,
+	input             weight_wr_en,
+	input             clk,
+	input             rst_n
 );
 
 	// Encoder stage 0 conv 0
-	wire [DATA_WIDTH*8-1:0] o_data_enc_0;
+	wire [8*8-1:0] o_data_enc_0;
 	wire o_valid_enc_0;
 	wire fifo_almost_full_enc_0;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (512),
 		.IN_HEIGHT             (256),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("true"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("true"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (2),
@@ -45,8 +40,8 @@ module model #(
 		.OUT_CHANNEL           (8),
 		.KERNEL_BASE_ADDR      (0),  // Num kernel: 216
 		.BIAS_BASE_ADDR        (75960),  // Num bias: 8
-		.BATCHNORM_A_BASE_ADDR (76304),  // Num bn_a: 8
-		.BATCHNORM_B_BASE_ADDR (76640)   // Num bn_b: 8
+		.MACC_COEFF_BASE_ADDR  (76304),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_0 (
 		.o_data           (o_data_enc_0),
 		.o_valid          (o_valid_enc_0),
@@ -54,19 +49,19 @@ module model #(
 		.i_data           (i_data),
 		.i_valid          (i_valid),
 		.fifo_almost_full (fifo_almost_full_enc_0),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*8-1:0] fifo_rd_data_enc_0;
+	wire [8*8-1:0] fifo_rd_data_enc_0;
 	wire fifo_empty_enc_0;
 	wire fifo_rd_en_enc_0;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 8),
+		.DATA_WIDTH        (8 * 8),
 		.DEPTH             (1024),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_0 (
@@ -82,18 +77,16 @@ module model #(
 	);
 
 	// Encoder stage 0 conv 1
-	wire [DATA_WIDTH*8-1:0] o_data_enc_1;
+	wire [8*8-1:0] o_data_enc_1;
 	wire o_valid_enc_1;
 	wire fifo_almost_full_enc_1;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (512),
 		.IN_HEIGHT             (256),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("true"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (2),
@@ -106,8 +99,8 @@ module model #(
 		.OUT_CHANNEL           (8),
 		.KERNEL_BASE_ADDR      (216),  // Num kernel: 576
 		.BIAS_BASE_ADDR        (75968),  // Num bias: 8
-		.BATCHNORM_A_BASE_ADDR (76312),  // Num bn_a: 8
-		.BATCHNORM_B_BASE_ADDR (76648)   // Num bn_b: 8
+		.MACC_COEFF_BASE_ADDR  (76305),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_1 (
 		.o_data           (o_data_enc_1),
 		.o_valid          (o_valid_enc_1),
@@ -115,19 +108,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_0),
 		.i_valid          (~fifo_empty_enc_0),
 		.fifo_almost_full (fifo_almost_full_enc_1),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*8-1:0] fifo_rd_data_enc_1;
+	wire [8*8-1:0] fifo_rd_data_enc_1;
 	wire fifo_empty_enc_1;
 	wire fifo_rd_en_enc_1;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 8),
+		.DATA_WIDTH        (8 * 8),
 		.DEPTH             (512),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_1 (
@@ -143,18 +136,16 @@ module model #(
 	);
 
 	// Encoder stage 0 conv 2
-	wire [DATA_WIDTH*16-1:0] o_data_enc_2;
+	wire [8*16-1:0] o_data_enc_2;
 	wire o_valid_enc_2;
 	wire fifo_almost_full_enc_2;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (512),
 		.IN_HEIGHT             (256),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("true"),
 		.KERNEL_0              (2),
 		.KERNEL_1              (2),
 		.PADDING_0             (0),
@@ -167,8 +158,8 @@ module model #(
 		.OUT_CHANNEL           (16),
 		.KERNEL_BASE_ADDR      (792),  // Num kernel: 512
 		.BIAS_BASE_ADDR        (75976),  // Num bias: 16
-		.BATCHNORM_A_BASE_ADDR (76320),  // Num bn_a: 16
-		.BATCHNORM_B_BASE_ADDR (76656)   // Num bn_b: 16
+		.MACC_COEFF_BASE_ADDR  (76306),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_2 (
 		.o_data           (o_data_enc_2),
 		.o_valid          (o_valid_enc_2),
@@ -176,19 +167,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_1),
 		.i_valid          (~fifo_empty_enc_1),
 		.fifo_almost_full (fifo_almost_full_enc_2),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*16-1:0] fifo_rd_data_enc_2;
+	wire [8*16-1:0] fifo_rd_data_enc_2;
 	wire fifo_empty_enc_2;
 	wire fifo_rd_en_enc_2;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 16),
+		.DATA_WIDTH        (8 * 16),
 		.DEPTH             (256),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_2 (
@@ -204,18 +195,16 @@ module model #(
 	);
 
 	// Encoder stage 1 conv 0
-	wire [DATA_WIDTH*16-1:0] o_data_enc_3;
+	wire [8*16-1:0] o_data_enc_3;
 	wire o_valid_enc_3;
 	wire fifo_almost_full_enc_3;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (256),
 		.IN_HEIGHT             (128),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (2),
@@ -228,8 +217,8 @@ module model #(
 		.OUT_CHANNEL           (16),
 		.KERNEL_BASE_ADDR      (1304),  // Num kernel: 2304
 		.BIAS_BASE_ADDR        (75992),  // Num bias: 16
-		.BATCHNORM_A_BASE_ADDR (76336),  // Num bn_a: 16
-		.BATCHNORM_B_BASE_ADDR (76672)   // Num bn_b: 16
+		.MACC_COEFF_BASE_ADDR  (76307),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_3 (
 		.o_data           (o_data_enc_3),
 		.o_valid          (o_valid_enc_3),
@@ -237,19 +226,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_2),
 		.i_valid          (~fifo_empty_enc_2),
 		.fifo_almost_full (fifo_almost_full_enc_3),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*16-1:0] fifo_rd_data_enc_3;
+	wire [8*16-1:0] fifo_rd_data_enc_3;
 	wire fifo_empty_enc_3;
 	wire fifo_rd_en_enc_3;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 16),
+		.DATA_WIDTH        (8 * 16),
 		.DEPTH             (256),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_3 (
@@ -265,18 +254,16 @@ module model #(
 	);
 
 	// Encoder stage 1 conv 1
-	wire [DATA_WIDTH*16-1:0] o_data_enc_4;
+	wire [8*16-1:0] o_data_enc_4;
 	wire o_valid_enc_4;
 	wire fifo_almost_full_enc_4;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (256),
 		.IN_HEIGHT             (128),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (2),
@@ -289,8 +276,8 @@ module model #(
 		.OUT_CHANNEL           (16),
 		.KERNEL_BASE_ADDR      (3608),  // Num kernel: 2304
 		.BIAS_BASE_ADDR        (76008),  // Num bias: 16
-		.BATCHNORM_A_BASE_ADDR (76352),  // Num bn_a: 16
-		.BATCHNORM_B_BASE_ADDR (76688)   // Num bn_b: 16
+		.MACC_COEFF_BASE_ADDR  (76308),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_4 (
 		.o_data           (o_data_enc_4),
 		.o_valid          (o_valid_enc_4),
@@ -298,19 +285,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_3),
 		.i_valid          (~fifo_empty_enc_3),
 		.fifo_almost_full (fifo_almost_full_enc_4),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*16-1:0] fifo_rd_data_enc_4;
+	wire [8*16-1:0] fifo_rd_data_enc_4;
 	wire fifo_empty_enc_4;
 	wire fifo_rd_en_enc_4;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 16),
+		.DATA_WIDTH        (8 * 16),
 		.DEPTH             (256),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_4 (
@@ -326,18 +313,16 @@ module model #(
 	);
 
 	// Encoder stage 1 conv 2
-	wire [DATA_WIDTH*32-1:0] o_data_enc_5;
+	wire [8*32-1:0] o_data_enc_5;
 	wire o_valid_enc_5;
 	wire fifo_almost_full_enc_5;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (256),
 		.IN_HEIGHT             (128),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (2),
 		.KERNEL_1              (2),
 		.PADDING_0             (0),
@@ -350,8 +335,8 @@ module model #(
 		.OUT_CHANNEL           (32),
 		.KERNEL_BASE_ADDR      (5912),  // Num kernel: 2048
 		.BIAS_BASE_ADDR        (76024),  // Num bias: 32
-		.BATCHNORM_A_BASE_ADDR (76368),  // Num bn_a: 32
-		.BATCHNORM_B_BASE_ADDR (76704)   // Num bn_b: 32
+		.MACC_COEFF_BASE_ADDR  (76309),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_5 (
 		.o_data           (o_data_enc_5),
 		.o_valid          (o_valid_enc_5),
@@ -359,19 +344,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_4),
 		.i_valid          (~fifo_empty_enc_4),
 		.fifo_almost_full (fifo_almost_full_enc_5),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*32-1:0] fifo_rd_data_enc_5;
+	wire [8*32-1:0] fifo_rd_data_enc_5;
 	wire fifo_empty_enc_5;
 	wire fifo_rd_en_enc_5;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 32),
+		.DATA_WIDTH        (8 * 32),
 		.DEPTH             (128),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_5 (
@@ -387,18 +372,16 @@ module model #(
 	);
 
 	// Encoder stage 2 conv 0
-	wire [DATA_WIDTH*32-1:0] o_data_enc_6;
+	wire [8*32-1:0] o_data_enc_6;
 	wire o_valid_enc_6;
 	wire fifo_almost_full_enc_6;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (128),
 		.IN_HEIGHT             (64),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (2),
@@ -411,8 +394,8 @@ module model #(
 		.OUT_CHANNEL           (32),
 		.KERNEL_BASE_ADDR      (7960),  // Num kernel: 9216
 		.BIAS_BASE_ADDR        (76056),  // Num bias: 32
-		.BATCHNORM_A_BASE_ADDR (76400),  // Num bn_a: 32
-		.BATCHNORM_B_BASE_ADDR (76736)   // Num bn_b: 32
+		.MACC_COEFF_BASE_ADDR  (76310),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_6 (
 		.o_data           (o_data_enc_6),
 		.o_valid          (o_valid_enc_6),
@@ -420,19 +403,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_5),
 		.i_valid          (~fifo_empty_enc_5),
 		.fifo_almost_full (fifo_almost_full_enc_6),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*32-1:0] fifo_rd_data_enc_6;
+	wire [8*32-1:0] fifo_rd_data_enc_6;
 	wire fifo_empty_enc_6;
 	wire fifo_rd_en_enc_6;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 32),
+		.DATA_WIDTH        (8 * 32),
 		.DEPTH             (128),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_6 (
@@ -448,18 +431,16 @@ module model #(
 	);
 
 	// Encoder stage 2 conv 1
-	wire [DATA_WIDTH*32-1:0] o_data_enc_7;
+	wire [8*32-1:0] o_data_enc_7;
 	wire o_valid_enc_7;
 	wire fifo_almost_full_enc_7;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (128),
 		.IN_HEIGHT             (64),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (2),
@@ -472,8 +453,8 @@ module model #(
 		.OUT_CHANNEL           (32),
 		.KERNEL_BASE_ADDR      (17176),  // Num kernel: 9216
 		.BIAS_BASE_ADDR        (76088),  // Num bias: 32
-		.BATCHNORM_A_BASE_ADDR (76432),  // Num bn_a: 32
-		.BATCHNORM_B_BASE_ADDR (76768)   // Num bn_b: 32
+		.MACC_COEFF_BASE_ADDR  (76311),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_7 (
 		.o_data           (o_data_enc_7),
 		.o_valid          (o_valid_enc_7),
@@ -481,19 +462,19 @@ module model #(
 		.i_data           (fifo_rd_data_enc_6),
 		.i_valid          (~fifo_empty_enc_6),
 		.fifo_almost_full (fifo_almost_full_enc_7),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*32-1:0] fifo_rd_data_enc_7;
+	wire [8*32-1:0] fifo_rd_data_enc_7;
 	wire fifo_empty_enc_7;
 	wire fifo_rd_en_enc_7;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 32),
+		.DATA_WIDTH        (8 * 32),
 		.DEPTH             (128),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_enc_7 (
@@ -509,18 +490,16 @@ module model #(
 	);
 
 	// Encoder stage 2 conv 2
-	wire [DATA_WIDTH*64-1:0] o_data_enc_8;
+	wire [8*64-1:0] o_data_enc_8;
 	wire o_valid_enc_8;
 	wire fifo_almost_full_enc_8;
 
 	conv #(
 		.UNROLL_MODE           ("incha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (128),
 		.IN_HEIGHT             (64),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (2),
 		.KERNEL_1              (2),
 		.PADDING_0             (0),
@@ -533,8 +512,8 @@ module model #(
 		.OUT_CHANNEL           (64),
 		.KERNEL_BASE_ADDR      (26392),  // Num kernel: 8192
 		.BIAS_BASE_ADDR        (76120),  // Num bias: 64
-		.BATCHNORM_A_BASE_ADDR (76464),  // Num bn_a: 64
-		.BATCHNORM_B_BASE_ADDR (76800)   // Num bn_b: 64
+		.MACC_COEFF_BASE_ADDR  (76312),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_enc_8 (
 		.o_data           (o_data_enc_8),
 		.o_valid          (o_valid_enc_8),
@@ -542,15 +521,15 @@ module model #(
 		.i_data           (fifo_rd_data_enc_7),
 		.i_valid          (~fifo_empty_enc_7),
 		.fifo_almost_full (fifo_almost_full_enc_8),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*64-1:0] enc_rd_data_a;
-	wire [DATA_WIDTH*64-1:0] enc_rd_data_b;
+	wire [8*64-1:0] enc_rd_data_a;
+	wire [8*64-1:0] enc_rd_data_b;
 	wire enc_empty_a;
 	wire enc_empty_b;
 	wire enc_rd_en_a;
@@ -558,7 +537,7 @@ module model #(
 	wire enc_wr_en = o_valid_enc_8;
 
 	fifo_dual_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 64),
+		.DATA_WIDTH        (8 * 64),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_dual (
@@ -577,18 +556,16 @@ module model #(
 	);
 
 	// cls branch conv 0
-	wire [DATA_WIDTH*32-1:0] o_data_cls_0;
+	wire [8*32-1:0] o_data_cls_0;
 	wire o_valid_cls_0;
 	wire fifo_almost_full_cls_0;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (64),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (1),
@@ -601,8 +578,8 @@ module model #(
 		.OUT_CHANNEL           (32),
 		.KERNEL_BASE_ADDR      (34584),  // Num kernel: 18432
 		.BIAS_BASE_ADDR        (76184),  // Num bias: 32
-		.BATCHNORM_A_BASE_ADDR (76528),  // Num bn_a: 32
-		.BATCHNORM_B_BASE_ADDR (76864)   // Num bn_b: 32
+		.MACC_COEFF_BASE_ADDR  (76313),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_cls_0 (
 		.o_data           (o_data_cls_0),
 		.o_valid          (o_valid_cls_0),
@@ -610,19 +587,19 @@ module model #(
 		.i_data           (enc_rd_data_a),
 		.i_valid          (~enc_empty_a & ~enc_wr_en),
 		.fifo_almost_full (fifo_almost_full_cls_0),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*32-1:0] fifo_rd_data_cls_0;
+	wire [8*32-1:0] fifo_rd_data_cls_0;
 	wire fifo_empty_cls_0;
 	wire fifo_rd_en_cls_0;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 32),
+		.DATA_WIDTH        (8 * 32),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_cls_0 (
@@ -638,18 +615,16 @@ module model #(
 	);
 
 	// cls branch conv 1
-	wire [DATA_WIDTH*16-1:0] o_data_cls_1;
+	wire [8*16-1:0] o_data_cls_1;
 	wire o_valid_cls_1;
 	wire fifo_almost_full_cls_1;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (64),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (1),
@@ -662,8 +637,8 @@ module model #(
 		.OUT_CHANNEL           (16),
 		.KERNEL_BASE_ADDR      (53016),  // Num kernel: 4608
 		.BIAS_BASE_ADDR        (76216),  // Num bias: 16
-		.BATCHNORM_A_BASE_ADDR (76560),  // Num bn_a: 16
-		.BATCHNORM_B_BASE_ADDR (76896)   // Num bn_b: 16
+		.MACC_COEFF_BASE_ADDR  (76314),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_cls_1 (
 		.o_data           (o_data_cls_1),
 		.o_valid          (o_valid_cls_1),
@@ -671,19 +646,19 @@ module model #(
 		.i_data           (fifo_rd_data_cls_0),
 		.i_valid          (~fifo_empty_cls_0),
 		.fifo_almost_full (fifo_almost_full_cls_1),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*16-1:0] fifo_rd_data_cls_1;
+	wire [8*16-1:0] fifo_rd_data_cls_1;
 	wire fifo_empty_cls_1;
 	wire fifo_rd_en_cls_1;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 16),
+		.DATA_WIDTH        (8 * 16),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_cls_1 (
@@ -699,18 +674,16 @@ module model #(
 	);
 
 	// cls branch conv 2
-	wire [DATA_WIDTH*8-1:0] o_data_cls_2;
+	wire [8*8-1:0] o_data_cls_2;
 	wire o_valid_cls_2;
 	wire fifo_almost_full_cls_2;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (64),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (1),
@@ -723,8 +696,8 @@ module model #(
 		.OUT_CHANNEL           (8),
 		.KERNEL_BASE_ADDR      (57624),  // Num kernel: 1152
 		.BIAS_BASE_ADDR        (76232),  // Num bias: 8
-		.BATCHNORM_A_BASE_ADDR (76576),  // Num bn_a: 8
-		.BATCHNORM_B_BASE_ADDR (76912)   // Num bn_b: 8
+		.MACC_COEFF_BASE_ADDR  (76315),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_cls_2 (
 		.o_data           (o_data_cls_2),
 		.o_valid          (o_valid_cls_2),
@@ -732,19 +705,19 @@ module model #(
 		.i_data           (fifo_rd_data_cls_1),
 		.i_valid          (~fifo_empty_cls_1),
 		.fifo_almost_full (fifo_almost_full_cls_2),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*8-1:0] fifo_rd_data_cls_2;
+	wire [8*8-1:0] fifo_rd_data_cls_2;
 	wire fifo_empty_cls_2;
 	wire fifo_rd_en_cls_2;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 8),
+		.DATA_WIDTH        (8 * 8),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_cls_2 (
@@ -760,17 +733,15 @@ module model #(
 	);
 
 	// cls branch conv 3
-	wire [DATA_WIDTH*4-1:0] o_data_cls_3;
+	wire [16*4-1:0] o_data_cls_3;
 	wire o_valid_cls_3;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (64),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("linear"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("dequant"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (3),
 		.PADDING_0             (1),
@@ -783,8 +754,8 @@ module model #(
 		.OUT_CHANNEL           (4),
 		.KERNEL_BASE_ADDR      (58776),  // Num kernel: 288
 		.BIAS_BASE_ADDR        (76240),  // Num bias: 4
-		.BATCHNORM_A_BASE_ADDR (),
-		.BATCHNORM_B_BASE_ADDR ()
+		.MACC_COEFF_BASE_ADDR  (76316),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR (76321)   // Num layer_scale: 1
 	) u_cls_3 (
 		.o_data           (o_data_cls_3),
 		.o_valid          (o_valid_cls_3),
@@ -792,9 +763,9 @@ module model #(
 		.i_data           (fifo_rd_data_cls_2),
 		.i_valid          (~fifo_empty_cls_2),
 		.fifo_almost_full (cls_almost_full),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
@@ -803,18 +774,16 @@ module model #(
 	assign o_valid_cls = o_valid_cls_3;
 
 	// vertical branch conv 0
-	wire [DATA_WIDTH*32-1:0] o_data_vertical_0;
+	wire [8*32-1:0] o_data_vertical_0;
 	wire o_valid_vertical_0;
 	wire fifo_almost_full_vertical_0;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (64),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (2),
 		.PADDING_0             (1),
@@ -827,8 +796,8 @@ module model #(
 		.OUT_CHANNEL           (32),
 		.KERNEL_BASE_ADDR      (59064),  // Num kernel: 12288
 		.BIAS_BASE_ADDR        (76244),  // Num bias: 32
-		.BATCHNORM_A_BASE_ADDR (76584),  // Num bn_a: 32
-		.BATCHNORM_B_BASE_ADDR (76920)   // Num bn_b: 32
+		.MACC_COEFF_BASE_ADDR  (76317),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_vertical_0 (
 		.o_data           (o_data_vertical_0),
 		.o_valid          (o_valid_vertical_0),
@@ -836,19 +805,19 @@ module model #(
 		.i_data           (enc_rd_data_b),
 		.i_valid          (~enc_empty_b & ~enc_wr_en),
 		.fifo_almost_full (fifo_almost_full_vertical_0),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*32-1:0] fifo_rd_data_vertical_0;
+	wire [8*32-1:0] fifo_rd_data_vertical_0;
 	wire fifo_empty_vertical_0;
 	wire fifo_rd_en_vertical_0;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 32),
+		.DATA_WIDTH        (8 * 32),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_vertical_0 (
@@ -864,18 +833,16 @@ module model #(
 	);
 
 	// vertical branch conv 1
-	wire [DATA_WIDTH*16-1:0] o_data_vertical_1;
+	wire [8*16-1:0] o_data_vertical_1;
 	wire o_valid_vertical_1;
 	wire fifo_almost_full_vertical_1;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (32),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (2),
 		.PADDING_0             (1),
@@ -888,8 +855,8 @@ module model #(
 		.OUT_CHANNEL           (16),
 		.KERNEL_BASE_ADDR      (71352),  // Num kernel: 3072
 		.BIAS_BASE_ADDR        (76276),  // Num bias: 16
-		.BATCHNORM_A_BASE_ADDR (76616),  // Num bn_a: 16
-		.BATCHNORM_B_BASE_ADDR (76952)   // Num bn_b: 16
+		.MACC_COEFF_BASE_ADDR  (76318),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_vertical_1 (
 		.o_data           (o_data_vertical_1),
 		.o_valid          (o_valid_vertical_1),
@@ -897,19 +864,19 @@ module model #(
 		.i_data           (fifo_rd_data_vertical_0),
 		.i_valid          (~fifo_empty_vertical_0),
 		.fifo_almost_full (fifo_almost_full_vertical_1),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*16-1:0] fifo_rd_data_vertical_1;
+	wire [8*16-1:0] fifo_rd_data_vertical_1;
 	wire fifo_empty_vertical_1;
 	wire fifo_rd_en_vertical_1;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 16),
+		.DATA_WIDTH        (8 * 16),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_vertical_1 (
@@ -925,18 +892,16 @@ module model #(
 	);
 
 	// vertical branch conv 2
-	wire [DATA_WIDTH*8-1:0] o_data_vertical_2;
+	wire [8*8-1:0] o_data_vertical_2;
 	wire o_valid_vertical_2;
 	wire fifo_almost_full_vertical_2;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (16),
 		.IN_HEIGHT             (32),
-		.OUTPUT_MODE           ("batchnorm_relu"),
-		.FIRST_LAYER           ("false"),
+		.OUTPUT_MODE           ("relu"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (2),
 		.PADDING_0             (1),
@@ -949,8 +914,8 @@ module model #(
 		.OUT_CHANNEL           (8),
 		.KERNEL_BASE_ADDR      (74424),  // Num kernel: 768
 		.BIAS_BASE_ADDR        (76292),  // Num bias: 8
-		.BATCHNORM_A_BASE_ADDR (76632),  // Num bn_a: 8
-		.BATCHNORM_B_BASE_ADDR (76968)   // Num bn_b: 8
+		.MACC_COEFF_BASE_ADDR  (76319),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR ()
 	) u_vertical_2 (
 		.o_data           (o_data_vertical_2),
 		.o_valid          (o_valid_vertical_2),
@@ -958,19 +923,19 @@ module model #(
 		.i_data           (fifo_rd_data_vertical_1),
 		.i_valid          (~fifo_empty_vertical_1),
 		.fifo_almost_full (fifo_almost_full_vertical_2),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);
 
-	wire [DATA_WIDTH*8-1:0] fifo_rd_data_vertical_2;
+	wire [8*8-1:0] fifo_rd_data_vertical_2;
 	wire fifo_empty_vertical_2;
 	wire fifo_rd_en_vertical_2;
 
 	fifo_single_read #(
-		.DATA_WIDTH        (DATA_WIDTH * 8),
+		.DATA_WIDTH        (8 * 8),
 		.DEPTH             (64),
 		.ALMOST_FULL_THRES (10)
 	) u_fifo_vertical_2 (
@@ -986,17 +951,15 @@ module model #(
 	);
 
 	// vertical branch conv 3
-	wire [DATA_WIDTH*4-1:0] o_data_vertical_3;
+	wire [16*4-1:0] o_data_vertical_3;
 	wire o_valid_vertical_3;
 
 	conv #(
 		.UNROLL_MODE           ("outcha"),
-		.DATA_WIDTH            (DATA_WIDTH),
-		.FRAC_BITS             (FRAC_BITS),
 		.IN_WIDTH              (8),
 		.IN_HEIGHT             (32),
 		.OUTPUT_MODE           ("sigmoid"),
-		.FIRST_LAYER           ("false"),
+		.DUAL                  ("false"),
 		.KERNEL_0              (3),
 		.KERNEL_1              (8),
 		.PADDING_0             (1),
@@ -1009,8 +972,8 @@ module model #(
 		.OUT_CHANNEL           (4),
 		.KERNEL_BASE_ADDR      (75192),  // Num kernel: 768
 		.BIAS_BASE_ADDR        (76300),  // Num bias: 4
-		.BATCHNORM_A_BASE_ADDR (),
-		.BATCHNORM_B_BASE_ADDR ()
+		.MACC_COEFF_BASE_ADDR  (76320),  // Num macc_coeff: 1
+		.LAYER_SCALE_BASE_ADDR (76322)   // Num layer_scale: 1
 	) u_vertical_3 (
 		.o_data           (o_data_vertical_3),
 		.o_valid          (o_valid_vertical_3),
@@ -1018,9 +981,9 @@ module model #(
 		.i_data           (fifo_rd_data_vertical_2),
 		.i_valid          (~fifo_empty_vertical_2),
 		.fifo_almost_full (vertical_almost_full),
-		.weight_data      (weight_data),
-		.weight_addr      (weight_addr),
-		.weight_we        (weight_we),
+		.weight_wr_data   (weight_wr_data),
+		.weight_wr_addr   (weight_wr_addr),
+		.weight_wr_en     (weight_wr_en),
 		.clk              (clk),
 		.rst_n            (rst_n)
 	);

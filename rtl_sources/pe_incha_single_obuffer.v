@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module output_buffer #(
+module pe_incha_single_obuffer #(
     parameter DATA_WIDTH = 16,
     parameter OUT_CHANNEL = 16
 )(

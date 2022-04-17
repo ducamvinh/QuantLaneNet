@@ -10,3 +10,4 @@ vivado_project*
 vivado_pid*
 *.bit
 test_videos
+rtl_sources_fixed_point*

@@ -1,9 +1,8 @@
-from model.LaneDetectionModel import LaneDetectionModel
+from model_quantized.LaneDetectionModelQuantized import LaneDetectionModelQuantized
+from model_quantized.quantize_utils import convert_quantized_model
 import argparse
 
-def rtl_gen(rtl_path, fifo_factor=1):
-    model = LaneDetectionModel().to('cpu')
-    model.eval()
+def rtl_gen(model, rtl_path, fifo_factor=1):
 
     encoder_stage_1 = model.encoder_stage_1
     encoder_stage_2 = model.encoder_stage_2
@@ -15,24 +14,21 @@ def rtl_gen(rtl_path, fifo_factor=1):
         f.write(
             '`timescale 1ns / 1ps\n'
             '\n'
-            'module model #(\n'
-            '\tparameter DATA_WIDTH = 16,\n'
-            '\tparameter FRAC_BITS = 8\n'
-            ')(\n'
-            '\toutput [DATA_WIDTH*4-1:0] o_data_cls,\n'
-            '\toutput [DATA_WIDTH*4-1:0] o_data_vertical,\n'
-            '\toutput                    o_valid_cls,\n'
-            '\toutput                    o_valid_vertical,\n'
-            '\toutput                    fifo_rd_en,\n'
-            '\tinput  [8*3-1:0]          i_data,\n'
-            '\tinput                     i_valid,\n'
-            '\tinput                     cls_almost_full,\n'
-            '\tinput                     vertical_almost_full,\n'
-            '\tinput  [DATA_WIDTH-1:0]   weight_data,\n'
-            '\tinput  [31:0]             weight_addr,\n'
-            '\tinput                     weight_we,\n'
-            '\tinput                     clk,\n'
-            '\tinput                     rst_n\n'
+            'module model (\n'
+            '\toutput [16*4-1:0] o_data_cls,\n'
+            '\toutput [16*4-1:0] o_data_vertical,\n'
+            '\toutput            o_valid_cls,\n'
+            '\toutput            o_valid_vertical,\n'
+            '\toutput            fifo_rd_en,\n'
+            '\tinput  [8*3-1:0]  i_data,\n'
+            '\tinput             i_valid,\n'
+            '\tinput             cls_almost_full,\n'
+            '\tinput             vertical_almost_full,\n'
+            '\tinput  [15:0]     weight_wr_data,\n'
+            '\tinput  [31:0]     weight_wr_addr,\n'
+            '\tinput             weight_wr_en,\n'
+            '\tinput             clk,\n'
+            '\tinput             rst_n\n'
             ');\n\n'
         )
 
@@ -56,27 +52,28 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     i_data = 'i_data'
                     i_valid = 'i_valid'
                     conv_fifo_rd_en = 'fifo_rd_en'
-                    first_layer = 'true'
                 else:
                     i_data = f'fifo_rd_data_enc_{layer_num-1}'
                     i_valid = f'~fifo_empty_enc_{layer_num-1}'
                     conv_fifo_rd_en = f'fifo_rd_en_enc_{layer_num-1}'
-                    first_layer = 'false'
+
+                if i == 0:
+                    dual = 'true'
+                else:
+                    dual = 'false'
 
                 f.write(
                     f'\t// Encoder stage {i} conv {j}\n'
-                    f'\twire [DATA_WIDTH*{out_channel}-1:0] o_data_enc_{layer_num};\n'
+                    f'\twire [8*{out_channel}-1:0] o_data_enc_{layer_num};\n'
                     f'\twire o_valid_enc_{layer_num};\n'
                     f'\twire fifo_almost_full_enc_{layer_num};\n'
                     f'\n'
                     f'\tconv #(\n'
                     f'\t\t.UNROLL_MODE           ("incha"),\n'
-                    f'\t\t.DATA_WIDTH            (DATA_WIDTH),\n'
-                    f'\t\t.FRAC_BITS             (FRAC_BITS),\n'
                     f'\t\t.IN_WIDTH              ({int(in_size[1])}),\n'
                     f'\t\t.IN_HEIGHT             ({int(in_size[0])}),\n'
-                    f'\t\t.OUTPUT_MODE           ("batchnorm_relu"),\n'
-                    f'\t\t.FIRST_LAYER           ("{first_layer}"),\n'
+                    f'\t\t.OUTPUT_MODE           ("relu"),\n'
+                    f'\t\t.DUAL                  ("{dual}"),\n'
                     f'\t\t.KERNEL_0              ({kernel_size[0]}),\n'
                     f'\t\t.KERNEL_1              ({kernel_size[1]}),\n'
                     f'\t\t.PADDING_0             ({padding[0]}),\n'
@@ -89,8 +86,8 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     f'\t\t.OUT_CHANNEL           ({out_channel}),\n'
                     f'\t\t.KERNEL_BASE_ADDR      (),\n'
                     f'\t\t.BIAS_BASE_ADDR        (),\n'
-                    f'\t\t.BATCHNORM_A_BASE_ADDR (),\n'
-                    f'\t\t.BATCHNORM_B_BASE_ADDR ()\n'
+                    f'\t\t.MACC_COEFF_BASE_ADDR  (),\n'
+                    f'\t\t.LAYER_SCALE_BASE_ADDR ()\n'
                     f'\t) u_enc_{layer_num} (\n'
                     f'\t\t.o_data           (o_data_enc_{layer_num}),\n'
                     f'\t\t.o_valid          (o_valid_enc_{layer_num}),\n'
@@ -98,9 +95,9 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     f'\t\t.i_data           ({i_data}),\n'
                     f'\t\t.i_valid          ({i_valid}),\n'
                     f'\t\t.fifo_almost_full (fifo_almost_full_enc_{layer_num}),\n'
-                    f'\t\t.weight_data      (weight_data),\n'
-                    f'\t\t.weight_addr      (weight_addr),\n'
-                    f'\t\t.weight_we        (weight_we),\n'
+                    f'\t\t.weight_wr_data   (weight_wr_data),\n'
+                    f'\t\t.weight_wr_addr   (weight_wr_addr),\n'
+                    f'\t\t.weight_wr_en     (weight_wr_en),\n'
                     f'\t\t.clk              (clk),\n'
                     f'\t\t.rst_n            (rst_n)\n'
                     f'\t);\n\n'
@@ -112,12 +109,12 @@ def rtl_gen(rtl_path, fifo_factor=1):
 
                 if i != 2 or j != 2:
                     f.write(
-                        f'\twire [DATA_WIDTH*{out_channel}-1:0] fifo_rd_data_enc_{layer_num};\n'
+                        f'\twire [8*{out_channel}-1:0] fifo_rd_data_enc_{layer_num};\n'
                         f'\twire fifo_empty_enc_{layer_num};\n'
                         f'\twire fifo_rd_en_enc_{layer_num};\n'
                         f'\n'
                         f'\tfifo_single_read #(\n'
-                        f'\t\t.DATA_WIDTH        (DATA_WIDTH * {out_channel}),\n'
+                        f'\t\t.DATA_WIDTH        (8 * {out_channel}),\n'
                         f'\t\t.DEPTH             ({buffer_depth}),\n'
                         f'\t\t.ALMOST_FULL_THRES (10)\n'
                         f'\t) u_fifo_enc_{layer_num} (\n'
@@ -134,8 +131,8 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     )
                 else:
                     f.write(
-                        f'\twire [DATA_WIDTH*{out_channel}-1:0] enc_rd_data_a;\n'
-                        f'\twire [DATA_WIDTH*{out_channel}-1:0] enc_rd_data_b;\n'
+                        f'\twire [8*{out_channel}-1:0] enc_rd_data_a;\n'
+                        f'\twire [8*{out_channel}-1:0] enc_rd_data_b;\n'
                         f'\twire enc_empty_a;\n'
                         f'\twire enc_empty_b;\n'
                         f'\twire enc_rd_en_a;\n'
@@ -143,7 +140,7 @@ def rtl_gen(rtl_path, fifo_factor=1):
                         f'\twire enc_wr_en = o_valid_enc_{layer_num};\n'
                         f'\n'
                         f'\tfifo_dual_read #(\n'
-                        f'\t\t.DATA_WIDTH        (DATA_WIDTH * {out_channel}),\n'
+                        f'\t\t.DATA_WIDTH        (8 * {out_channel}),\n'
                         f'\t\t.DEPTH             ({buffer_depth}),\n'
                         f'\t\t.ALMOST_FULL_THRES (10)\n'
                         f'\t) u_fifo_dual (\n'
@@ -169,14 +166,16 @@ def rtl_gen(rtl_path, fifo_factor=1):
 
                 if layer._get_name() == 'ConvBatchnormReLU':
                     conv = layer.conv
-                    output_mode = 'batchnorm_relu'
+                    output_mode = 'relu'
                     almost_full = f'fifo_almost_full_{name}_{j}'
                     almost_full_decl = f'\twire {almost_full};\n'
-                elif layer._get_name() == 'Conv2d':
+                    data_width = 8
+                elif layer._get_name() == 'QuantizedConv2d':
                     conv = layer
-                    output_mode = 'sigmoid' if name == 'vertical' else 'linear'
+                    output_mode = 'sigmoid' if name == 'vertical' else 'dequant'
                     almost_full = f'{name}_almost_full'
                     almost_full_decl = ''
+                    data_width = 16
                 else:
                     continue
 
@@ -198,18 +197,16 @@ def rtl_gen(rtl_path, fifo_factor=1):
 
                 f.write(
                     f'\t// {name} branch conv {j}\n'
-                    f'\twire [DATA_WIDTH*{out_channel}-1:0] o_data_{name}_{j};\n'
+                    f'\twire [{data_width}*{out_channel}-1:0] o_data_{name}_{j};\n'
                     f'\twire o_valid_{name}_{j};\n'
                     f'{almost_full_decl}'
                     f'\n'
                     f'\tconv #(\n'
                     f'\t\t.UNROLL_MODE           ("outcha"),\n'
-                    f'\t\t.DATA_WIDTH            (DATA_WIDTH),\n'
-                    f'\t\t.FRAC_BITS             (FRAC_BITS),\n'
                     f'\t\t.IN_WIDTH              ({int(_in_size[1])}),\n'
                     f'\t\t.IN_HEIGHT             ({int(_in_size[0])}),\n'
                     f'\t\t.OUTPUT_MODE           ("{output_mode}"),\n'
-                    f'\t\t.FIRST_LAYER           ("false"),\n'
+                    f'\t\t.DUAL                  ("false"),\n'
                     f'\t\t.KERNEL_0              ({kernel_size[0]}),\n'
                     f'\t\t.KERNEL_1              ({kernel_size[1]}),\n'
                     f'\t\t.PADDING_0             ({padding[0]}),\n'
@@ -222,8 +219,8 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     f'\t\t.OUT_CHANNEL           ({out_channel}),\n'
                     f'\t\t.KERNEL_BASE_ADDR      (),\n'
                     f'\t\t.BIAS_BASE_ADDR        (),\n'
-                    f'\t\t.BATCHNORM_A_BASE_ADDR (),\n'
-                    f'\t\t.BATCHNORM_B_BASE_ADDR ()\n'
+                    f'\t\t.MACC_COEFF_BASE_ADDR  (),\n'
+                    f'\t\t.LAYER_SCALE_BASE_ADDR ()\n'
                     f'\t) u_{name}_{j} (\n'
                     f'\t\t.o_data           (o_data_{name}_{j}),\n'
                     f'\t\t.o_valid          (o_valid_{name}_{j}),\n'
@@ -231,9 +228,9 @@ def rtl_gen(rtl_path, fifo_factor=1):
                     f'\t\t.i_data           ({i_data}),\n'
                     f'\t\t.i_valid          ({i_valid}),\n'
                     f'\t\t.fifo_almost_full ({almost_full}),\n'
-                    f'\t\t.weight_data      (weight_data),\n'
-                    f'\t\t.weight_addr      (weight_addr),\n'
-                    f'\t\t.weight_we        (weight_we),\n'
+                    f'\t\t.weight_wr_data   (weight_wr_data),\n'
+                    f'\t\t.weight_wr_addr   (weight_wr_addr),\n'
+                    f'\t\t.weight_wr_en     (weight_wr_en),\n'
                     f'\t\t.clk              (clk),\n'
                     f'\t\t.rst_n            (rst_n)\n'
                     f'\t);\n\n'
@@ -241,16 +238,16 @@ def rtl_gen(rtl_path, fifo_factor=1):
 
                 _in_size = tuple((_in_size[_i] + 2 * padding[_i] - dilation[_i] * (kernel_size[_i] - 1) - 1) / stride[_i] + 1 for _i in range(2))
 
-                if output_mode == 'batchnorm_relu':
+                if output_mode == 'relu':
                     buffer_depth = max(int(in_size[1]) * fifo_factor, 64)
 
                     f.write(
-                        f'\twire [DATA_WIDTH*{out_channel}-1:0] fifo_rd_data_{name}_{j};\n'
+                        f'\twire [8*{out_channel}-1:0] fifo_rd_data_{name}_{j};\n'
                         f'\twire fifo_empty_{name}_{j};\n'
                         f'\twire fifo_rd_en_{name}_{j};\n'
                         f'\n'
                         f'\tfifo_single_read #(\n'
-                        f'\t\t.DATA_WIDTH        (DATA_WIDTH * {out_channel}),\n'
+                        f'\t\t.DATA_WIDTH        (8 * {out_channel}),\n'
                         f'\t\t.DEPTH             ({buffer_depth}),\n'
                         f'\t\t.ALMOST_FULL_THRES (10)\n'
                         f'\t) u_fifo_{name}_{j} (\n'
@@ -308,26 +305,21 @@ def weight_addr_map(rtl_path):
             lines[i] = line.split('(')[0] + f'({total_weights}),  // Num bias: {out_channel}\n'
             total_weights += out_channel
 
-    # Batchnorm a
+    # MACC co-efficient
+    for i, line in enumerate(lines):
+        if 'MACC_COEFF_BASE_ADDR' in line:
+            lines[i] = line.split('(')[0] + f'({total_weights}),  // Num macc_coeff: 1\n'
+            total_weights += 1
+
+    # Layer scale
     for i, line in enumerate(lines):
         if 'OUTPUT_MODE' in line:
             output_mode = line.split('"')[1]
-        if 'OUT_CHANNEL' in line:
-            out_channel = int(line.split('(')[1].split(')')[0])
-        if 'BATCHNORM_A_BASE_ADDR' in line and output_mode == 'batchnorm_relu':
-            lines[i] = line.split('(')[0] + f'({total_weights}),  // Num bn_a: {out_channel}\n'
-            total_weights += out_channel
+        if 'LAYER_SCALE_BASE_ADDR' in line and output_mode in ['dequant', 'sigmoid']:
+            lines[i] = line.split('(')[0] + f'({total_weights})   // Num layer_scale: 1\n'
+            total_weights += 1
 
-    # Batchnorm b
-    for i, line in enumerate(lines):
-        if 'OUTPUT_MODE' in line:
-            output_mode = line.split('"')[1]
-        if 'OUT_CHANNEL' in line:
-            out_channel = int(line.split('(')[1].split(')')[0])
-        if 'BATCHNORM_B_BASE_ADDR' in line and output_mode == 'batchnorm_relu':
-            lines[i] = line.split('(')[0] + f'({total_weights})   // Num bn_b: {out_channel}\n'
-            total_weights += out_channel
-
+    print(f'Total weights: {total_weights:,}')
     with open(rtl_path, 'w') as f:
         for line in lines:
             f.write(line)
@@ -343,7 +335,12 @@ def get_arguments():
 def main():
     args = get_arguments()
 
-    rtl_gen(rtl_path=args.rtl_path, fifo_factor=args.fifo_factor)
+    # Initialize model
+    model = LaneDetectionModelQuantized().to('cpu')
+    model = convert_quantized_model(model)
+
+    # Write RTL file
+    rtl_gen(model=model, rtl_path=args.rtl_path, fifo_factor=args.fifo_factor)
     weight_addr_map(rtl_path=args.rtl_path)
     
 if __name__ == '__main__':

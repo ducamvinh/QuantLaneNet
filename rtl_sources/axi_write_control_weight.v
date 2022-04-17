@@ -5,9 +5,9 @@ module axi_write_control_weight #(
     parameter AXI_BASE_ADDR = (512 * 256 * 3) + (32 * 64 / 4) + 4,
     parameter AXI_ADDR_WIDTH = 32
 )(
-    output reg [15:0]               weight_data,
-    output reg [31:0]               weight_addr,
-    output reg                      weight_we,
+    output reg [15:0]               weight_wr_data,
+    output reg [31:0]               weight_wr_addr,
+    output reg                      weight_wr_en,
     input      [31:0]               axi_wr_data,
     input      [AXI_ADDR_WIDTH-1:0] axi_wr_addr,
     input      [3:0]                axi_wr_strobe,
@@ -53,13 +53,13 @@ module axi_write_control_weight #(
     // Output
     always @ (*) begin
         if (~fsm_state) begin
-            weight_data <= axi_wr_data[15:0];
-            weight_addr <= {wr_addr[AXI_ADDR_WIDTH-1:2], 1'b0};
-            weight_we   <= wr_en[0];
+            weight_wr_data <= axi_wr_data[15:0];
+            weight_wr_addr <= {wr_addr[AXI_ADDR_WIDTH-1:2], 1'b0};
+            weight_wr_en   <= wr_en[0];
         end else begin
-            weight_data <= data_buff_reg;
-            weight_addr <= {addr_buff_reg, 1'b1};
-            weight_we   <= 1'b1;
+            weight_wr_data <= data_buff_reg;
+            weight_wr_addr <= {addr_buff_reg, 1'b1};
+            weight_wr_en   <= 1'b1;
         end
     end
 

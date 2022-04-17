@@ -1,6 +1,6 @@
 from model_fpga.LaneDetectionModelFPGA import LaneDetectionModelFPGA
-from data_utils.data_utils import visualize
 import fpga_utils.fpga_address_map as fpga_address_map
+from data_utils.data_utils import visualize
 
 import numpy as np
 import subprocess

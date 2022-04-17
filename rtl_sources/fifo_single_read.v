@@ -31,7 +31,7 @@ module fifo_single_read #(
     );
 
     // Ram
-    block_ram_single_read #(
+    block_ram_single_port #(
         .DATA_WIDTH (DATA_WIDTH),
         .DEPTH      (DEPTH)
     ) u_bram (

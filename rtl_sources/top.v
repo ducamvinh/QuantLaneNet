@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 
 module top #(
-    parameter AXI_ADDR_WIDTH = $clog2(549228)
+    parameter AXI_ADDR_WIDTH = $clog2(547922)
 )(
     output                          o_valid,
     output                          busy,
@@ -17,13 +17,10 @@ module top #(
 );
 
     // IP params
-    localparam DATA_WIDTH = 16;
-    localparam FRAC_BITS = 8;
-    localparam INT_BITS = DATA_WIDTH - FRAC_BITS;
     localparam IN_WIDTH = 512;
     localparam IN_HEIGHT = 256;
     localparam NUM_LANES = 4;
-    localparam NUM_WEIGHTS = 76976;
+    localparam NUM_WEIGHTS = 76323;
     localparam OUT_WIDTH = IN_WIDTH / 8;
     localparam OUT_HEIGHT = IN_HEIGHT / 8;
 
@@ -34,8 +31,8 @@ module top #(
     localparam OFFSET_BUSY = OFFSET_OVALID + 4;                         // 0x0006_0804 ### 395268
     localparam OFFSET_RESET = OFFSET_BUSY + 4;                          // 0x0006_0808 ### 395272
     localparam OFFSET_WEIGHT = OFFSET_RESET + 4;                        // 0x0006_080C ### 395276
-                                                             // HIGH_ADDR: 0x0008_616C ### 549228
-                                                             // RANGE:     536.36K
+                                                             // HIGH_ADDR: 0x0008_5C52 ### 547922
+                                                             // RANGE:     535.08K
 
     // Soft reset
     reg [3:0] soft_reset_count;
@@ -56,24 +53,24 @@ module top #(
     end
 
     // Weight write control
-    wire [DATA_WIDTH-1:0] weight_data;
-    wire [31:0]           weight_addr;
-    wire                  weight_we;
+    wire [15:0] weight_wr_data;
+    wire [31:0] weight_wr_addr;
+    wire        weight_wr_en;
 
     axi_write_control_weight #(
         .NUM_WEIGHTS    (NUM_WEIGHTS),
         .AXI_BASE_ADDR  (OFFSET_WEIGHT),
         .AXI_ADDR_WIDTH (AXI_ADDR_WIDTH)
     ) u_weight_wr (
-        .weight_data   (weight_data),
-        .weight_addr   (weight_addr), 
-        .weight_we     (weight_we),
-        .axi_wr_data   (axi_wr_data),
-        .axi_wr_addr   (axi_wr_addr),
-        .axi_wr_strobe (axi_wr_strobe),
-        .axi_wr_en     (axi_wr_en),
-        .clk           (clk), 
-        .rst_n         (internal_reset_n)
+        .weight_wr_data (weight_wr_data),
+        .weight_wr_addr (weight_wr_addr), 
+        .weight_wr_en   (weight_wr_en),
+        .axi_wr_data    (axi_wr_data),
+        .axi_wr_addr    (axi_wr_addr),
+        .axi_wr_strobe  (axi_wr_strobe),
+        .axi_wr_en      (axi_wr_en),
+        .clk            (clk), 
+        .rst_n          (internal_reset_n)
     ); 
 
     // Input fifo write control
@@ -122,40 +119,44 @@ module top #(
     );
 
     // Model
-    wire [DATA_WIDTH*NUM_LANES-1:0] model_o_data_cls;
-    wire [DATA_WIDTH*NUM_LANES-1:0] model_o_data_vertical;
-    wire                            model_o_valid_cls;
-    wire                            model_o_valid_vertical;
-    wire                            cls_fifo_almost_full;
-    wire                            vertical_fifo_almost_full;
+    wire [16*NUM_LANES-1:0] model_o_data_cls;
+    wire [16*NUM_LANES-1:0] model_o_data_vertical;
+    wire [23:0]             model_i_data;
+    wire                    model_o_valid_cls;
+    wire                    model_o_valid_vertical;
+    wire                    cls_fifo_almost_full;
+    wire                    vertical_fifo_almost_full;
     
-    model #(
-	    .DATA_WIDTH (DATA_WIDTH),
-	    .FRAC_BITS  (FRAC_BITS)
-    ) u_model (
+    assign model_i_data = {
+        {1'b0, fifo_rd_data[23:17]},
+        {1'b0, fifo_rd_data[15:9] },
+        {1'b0, fifo_rd_data[7:1]  }
+    };
+
+    model u_model (
         .o_data_cls           (model_o_data_cls),
 	    .o_data_vertical      (model_o_data_vertical),
 	    .o_valid_cls          (model_o_valid_cls),
 	    .o_valid_vertical     (model_o_valid_vertical), 
 	    .fifo_rd_en           (fifo_rd_en),
-	    .i_data               (fifo_rd_data),
+	    .i_data               (model_i_data),
 	    .i_valid              (~fifo_empty),
 	    .cls_almost_full      (cls_fifo_almost_full),
 	    .vertical_almost_full (vertical_fifo_almost_full),
-	    .weight_data          (weight_data),
-	    .weight_addr          (weight_addr),
-	    .weight_we            (weight_we),
+	    .weight_wr_data       (weight_wr_data),
+	    .weight_wr_addr       (weight_wr_addr),
+	    .weight_wr_en         (weight_wr_en),
 	    .clk                  (clk),
 	    .rst_n                (internal_reset_n)
     );
 
     // Output FIFOs
-    wire [DATA_WIDTH*NUM_LANES-1:0] cls_fifo_rd_data;
-    wire                            cls_fifo_empty;
-    wire                            cls_fifo_rd_en;
+    wire [16*NUM_LANES-1:0] cls_fifo_rd_data;
+    wire                    cls_fifo_empty;
+    wire                    cls_fifo_rd_en;
 
     fifo_single_read #(
-        .DATA_WIDTH        (DATA_WIDTH * NUM_LANES),
+        .DATA_WIDTH        (16 * NUM_LANES),
         .DEPTH             (OUT_WIDTH * 1),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_cls (
@@ -170,12 +171,12 @@ module top #(
         .clk         (clk)
     );
 
-    wire [DATA_WIDTH*NUM_LANES-1:0] vertical_fifo_rd_data;
-    wire                            vertical_fifo_empty;
-    wire                            vertical_fifo_rd_en;
+    wire [16*NUM_LANES-1:0] vertical_fifo_rd_data;
+    wire                    vertical_fifo_empty;
+    wire                    vertical_fifo_rd_en;
 
     fifo_single_read #(
-        .DATA_WIDTH        (DATA_WIDTH * NUM_LANES),
+        .DATA_WIDTH        (16 * NUM_LANES),
         .DEPTH             (OUT_HEIGHT),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_vertical (
@@ -199,8 +200,8 @@ module top #(
         .OUT_WIDTH  (OUT_WIDTH),
         .OUT_HEIGHT (OUT_HEIGHT),
         .NUM_LANES  (NUM_LANES),
-        .DATA_WIDTH (DATA_WIDTH),
-        .FRAC_BITS  (FRAC_BITS)
+        .DATA_WIDTH (16),
+        .FRAC_BITS  (8)
     ) u_post (
         .bram_wr_data        (bram_wr_data), 
         .bram_wr_addr        (bram_wr_addr),

@@ -3,10 +3,10 @@ import argparse
 import torch
 import os
 
-from model.LaneDetectionModel import LaneDetectionModel
-from checkpoint_info import get_best_model
+from model_quantized.LaneDetectionModelQuantized import LaneDetectionModelQuantized
+from model_quantized.quantize_utils import convert_quantized_model
 
-def write_weights(model, weights_bin_path, qformat):
+def write_weights(model, weights_bin_path):
     encoder_stage_1 = model.encoder_stage_1
     encoder_stage_2 = model.encoder_stage_2
     encoder_stage_3 = model.encoder_stage_3
@@ -15,104 +15,107 @@ def write_weights(model, weights_bin_path, qformat):
 
     kernel_list = []
     bias_list = []
-    batchnorm_a_list = []
-    batchnorm_b_list = []
+    macc_coeff_list = []
+    layer_scale_list = []
+
+    last_layer = model.quant
 
     for i, stage in enumerate([encoder_stage_1, encoder_stage_2, encoder_stage_3, cls_out, vertical_out]):
         if i < 3:
             layers = [stage.conv_same_1, stage.conv_same_2, stage.conv_down]
-        elif i == 3:
-            layers = stage[:]
         else:
-            layers = stage[:-1]
+            last_layer = model.encoder_stage_3.conv_down.conv
+            if i == 3:
+                layers = stage[:]
+            else:
+                layers = stage[:-1]
 
         for layer in layers:
-
             if layer._get_name() == 'ConvBatchnormReLU':
                 conv = layer.conv
-                bn = layer.bn
-            elif layer._get_name() == 'Conv2d':
+            elif layer._get_name() == 'QuantizedConv2d':
                 conv = layer
             else:
                 raise Exception(f'Unknown layer:\n{layer}')
 
-            if layer._get_name() != 'Conv2d':
-                gamma = bn.weight.detach()
-                beta = bn.bias.detach()
-                mean = bn.running_mean.detach()
-                var = bn.running_var.detach()
-                eps = bn.eps
-
-                for fil in range(bn.num_features):
-                    a = gamma[fil] / torch.sqrt(var[fil] + eps)
-                    b = beta[fil] - a * mean[fil]
-
-                    batchnorm_a_list.append(a)
-                    batchnorm_b_list.append(b)
-
-            kernel = conv.weight.detach()
-            bias = conv.bias.detach()
+            # Kernel and bias
+            kernel = conv.weight().detach()
+            bias = conv.bias().detach()
+            y_scale = conv.scale
 
             for fil in range(conv.out_channels):
-                bias_list.append(bias[fil])
+                bias_list.append(bias[fil] / y_scale)
 
                 for row in range(conv.kernel_size[0]):
                     for col in range(conv.kernel_size[1]):
                         for cha in range(conv.in_channels):
-                            kernel_list.append(kernel[fil, cha, row, col])
+                            kernel_list.append(kernel[fil, cha, row, col].int_repr())
 
+            # MACC co-efficient
+            x_scale = last_layer.scale
+            w_scale = kernel.q_scale()
+            macc_coeff_list.append(x_scale * w_scale / y_scale)
+
+            # Layer scale
+            if layer._get_name() == 'QuantizedConv2d':
+                layer_scale_list.append(y_scale)
+
+            last_layer = conv
+            
     print(
         f'Num kernel      : {len(kernel_list)}\n'
         f'Num bias        : {len(bias_list)}\n'
-        f'Num batchnorm_a : {len(batchnorm_a_list)}\n'
-        f'Num batchnorm_b : {len(batchnorm_b_list)}\n'
-        f'Total weights   : {len(kernel_list) + len(bias_list) + len(batchnorm_a_list) + len(batchnorm_b_list)}'
+        f'Num macc_coeff  : {len(macc_coeff_list)}\n'
+        f'Num layer_scale : {len(layer_scale_list)}\n'
+        f'Total weights   : {len(kernel_list) + len(bias_list) + len(macc_coeff_list) + len(layer_scale_list)}'
     )
     
     # Write to file
-    byte_list = []
-    format_str = f"%0{(qformat['m'] + qformat['n']) / 4}x"
+    byte_array = bytearray()
+    bias_qformat = {'m': 8, 'n': 8, 'signed': 1}
+    scale_qformat = {'m': 2, 'n': 16, 'signed': 0}
 
-    for val in kernel_list + bias_list + batchnorm_a_list + batchnorm_b_list:
-        hex_str = format_str % FixedPoint(val, **qformat)
-        val_bytes = [hex_str[i:i+2] for i in range(0, len(hex_str), 2)]
-        val_bytes.reverse()
-        byte_list.extend(val_bytes)
+    for val in kernel_list:
+        byte_array.extend((val.item() & 0xffff).to_bytes(length=2, byteorder='little'))
+
+    for val in bias_list:
+        byte_array.extend(int(f'{FixedPoint(val, **bias_qformat):04x}', 16).to_bytes(length=2, byteorder='little'))
+        
+    for val in macc_coeff_list + layer_scale_list:
+        byte_array.extend(int(f'{FixedPoint(val, **scale_qformat):04x}', 16).to_bytes(length=2, byteorder='little'))
+
+    # if (len(byte_array) / 2) % 2:
+    #     print('byte_array is odd')
+    #     byte_array.extend((0).to_bytes(length=2, byteorder='little'))
 
     with open(weights_bin_path, 'wb') as f:
-        f.write(bytearray.fromhex(''.join(byte_list)))
+        f.write(byte_array)
 
 def get_arguments():
     parser = argparse.ArgumentParser()
     
     parser.add_argument('--weights_bin_path', type=str, default='weights.bin')
-    parser.add_argument('--checkpoint_path', type=str, default='checkpoint')
+    parser.add_argument('--quantized_weights_path', type=str, default='quantized_weights_pertensor_symmetric.pth')
 
     args = parser.parse_args()
 
-    if args.checkpoint_path[-1] in ['/', '\\']:
-        args.checkpoint_path = args.checkpoint_path[:-1]
+    args.weights_bin_path = os.path.abspath(args.weights_bin_path)
+    args.quantized_weights_path = os.path.abspath(args.quantized_weights_path)
 
     return args
 
 def main():
     args = get_arguments()
-    qformat = {'m': 8, 'n': 8, 'signed': 1}
 
-    # Get best checkpoint
-    best_model = get_best_model(args.checkpoint_path)
-    checkpoint_path = os.path.join(args.checkpoint_path, f'checkpoint_{best_model}.pth')
-    checkpoint = torch.load(checkpoint_path, map_location='cpu')
-    print(f'[INFO] Loading checkpoint from {checkpoint_path}')
-
-    # Initialize model
-    model = LaneDetectionModel().to('cpu')
-    model.load_state_dict(checkpoint['model_state'], strict=False)
-    model.eval()
+    # Load quantized model
+    print(f'[INFO] Loading quantized model from {args.quantized_weights_path}')
+    model = LaneDetectionModelQuantized().to('cpu')
+    model = convert_quantized_model(model)
+    model.load_state_dict(torch.load(args.quantized_weights_path, map_location='cpu'))
 
     # Write weights
     print('[INFO] Writing weights...')
-    write_weights(model, args.weights_bin_path, qformat)
+    write_weights(model, args.weights_bin_path)
 
 if __name__ == '__main__':
     main()
