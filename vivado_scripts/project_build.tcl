@@ -47,15 +47,15 @@ puts "\n########################### Creating block design ######################
 create_bd_design "design_1"
 
 # XDMA
-create_bd_cell -type ip -vlnv xilinx.com:ip:xdma:4.1 xdma_0
+create_bd_cell -type ip -vlnv xilinx.com:ip:xdma xdma_0
 set_property -dict [list CONFIG.pl_link_cap_max_link_width {X2} CONFIG.pl_link_cap_max_link_speed {5.0_GT/s} CONFIG.axisten_freq {125} CONFIG.pf0_device_id {7022} CONFIG.plltype {QPLL1} CONFIG.PF0_DEVICE_ID_mqdma {9022} CONFIG.PF2_DEVICE_ID_mqdma {9022} CONFIG.PF3_DEVICE_ID_mqdma {9022}] [get_bd_cells xdma_0]
 
 # Clock buffer
-create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf:2.1 util_ds_buf_0
+create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf util_ds_buf_0
 set_property -dict [list CONFIG.C_BUF_TYPE {IBUFDSGTE}] [get_bd_cells util_ds_buf_0]
 
 # Lane detection CNN IP
-create_bd_cell -type ip -vlnv user.org:user:LaneDetectionCNN_AXI_IP:1.0 LaneDetectionCNN_AXI_0
+create_bd_cell -type ip -vlnv user.org:user:LaneDetectionCNN_AXI_IP LaneDetectionCNN_AXI_0
 
 # Connect nets
 connect_bd_net [get_bd_pins util_ds_buf_0/IBUF_OUT] [get_bd_pins xdma_0/sys_clk]
@@ -66,15 +66,15 @@ set_property name pcie_diff_clock [get_bd_intf_ports CLK_IN_D_0]
 make_bd_intf_pins_external  [get_bd_intf_pins xdma_0/pcie_mgt]
 set_property name pcie_mgt [get_bd_intf_ports pcie_mgt_0]
 
-# FPGA 170 MHz clock
-create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz:6.0 clk_wiz_0
+# FPGA 180 MHz clock
+create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0
 apply_board_connection -board_interface "sys_diff_clock" -ip_intf "clk_wiz_0/CLK_IN1_D" -diagram "design_1" 
-set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {170.000} CONFIG.MMCM_DIVCLK_DIVIDE {5} CONFIG.MMCM_CLKFBOUT_MULT_F {25.500} CONFIG.MMCM_CLKOUT0_DIVIDE_F {6.000} CONFIG.CLKOUT1_JITTER {152.484} CONFIG.CLKOUT1_PHASE_ERROR {187.805}] [get_bd_cells clk_wiz_0]
+set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {180.000} CONFIG.MMCM_DIVCLK_DIVIDE {5} CONFIG.MMCM_CLKFBOUT_MULT_F {24.750} CONFIG.MMCM_CLKOUT0_DIVIDE_F {5.500} CONFIG.CLKOUT1_JITTER {153.392} CONFIG.CLKOUT1_PHASE_ERROR {190.431}] [get_bd_cells clk_wiz_0]
 set_property name fpga_diff_clock [get_bd_intf_ports sys_diff_clock]
 
 # Connect AXI interfaces
 apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {reset ( FPGA Reset ) } Manual_Source {New External Port (ACTIVE_HIGH)}}  [get_bd_pins clk_wiz_0/reset]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (170 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (180 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
 set_property name fpga_rst [get_bd_ports reset]
 
 # Set AXI address map
@@ -84,17 +84,17 @@ set_property range 1M [get_bd_addr_segs {xdma_0/M_AXI/SEG_LaneDetectionCNN_AXI_0
 ############################################### Create logic for signal leds ###############################################
 
 create_bd_cell -type hier signal_leds
-create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant:1.1 signal_leds/xlconstant_0
+create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant signal_leds/xlconstant_0
 set_property -dict [list CONFIG.CONST_VAL {0}] [get_bd_cells signal_leds/xlconstant_0]
 
 # Create counters to make clock leds
 for {set i 0} {$i < 3} {incr i} {
     # Binary counter
-    create_bd_cell -type ip -vlnv xilinx.com:ip:c_counter_binary:12.0 signal_leds/c_counter_binary_$i
+    create_bd_cell -type ip -vlnv xilinx.com:ip:c_counter_binary signal_leds/c_counter_binary_$i
     set_property -dict [list CONFIG.Output_Width {25}] [get_bd_cells signal_leds/c_counter_binary_$i]
 
     # Slice block
-    create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice:1.0 signal_leds/xlslice_$i
+    create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice signal_leds/xlslice_$i
     set_property -dict [list CONFIG.DIN_TO {24} CONFIG.DIN_FROM {24} CONFIG.DIN_WIDTH {25} CONFIG.DOUT_WIDTH {1}] [get_bd_cells signal_leds/xlslice_$i] 
     
     # Connect counter to slice block
@@ -107,7 +107,7 @@ connect_bd_net [get_bd_pins signal_leds/c_counter_binary_1/CLK] [get_bd_pins xdm
 connect_bd_net [get_bd_pins signal_leds/c_counter_binary_2/CLK] [get_bd_pins clk_wiz_0/clk_out1]
 
 # Create concat block for leds
-create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat:2.1 signal_leds/xlconcat_0
+create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat signal_leds/xlconcat_0
 set_property -dict [list CONFIG.NUM_PORTS {8}] [get_bd_cells signal_leds/xlconcat_0]
 
 # Connect concat block's inputs

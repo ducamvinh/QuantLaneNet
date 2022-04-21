@@ -149,10 +149,11 @@ module pe_outcha_single #(
     end
 
     block_ram_multi_word #(
-        .DATA_WIDTH (8),
-        .DEPTH      (IN_CHANNEL),
-        .NUM_WORDS  (KERNEL_PTS * OUT_CHANNEL),
-        .RAM_STYLE  ("auto")
+        .DATA_WIDTH      (8),
+        .DEPTH           (IN_CHANNEL),
+        .NUM_WORDS       (KERNEL_PTS * OUT_CHANNEL),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("true")
     ) u_kernel (
         .rd_data (kernel),
         .wr_data (kernel_wr_data),
@@ -198,6 +199,28 @@ module pe_outcha_single #(
             coeff_valid <= macc_valid_o_reg;
         end
     end
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // BRAM output pipeline register because Vivado won't stop screaming about it
+    reg [8*KERNEL_PTS-1:0] i_data_reg_pipeline;
+    reg                    macc_valid_i_pipeline;
+
+    always @ (posedge clk) begin
+        if (macc_valid_i) begin
+            i_data_reg_pipeline <= i_data_reg[0];
+        end
+    end
+
+    always @ (posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            macc_valid_i_pipeline <= 1'b0;
+        end else begin
+            macc_valid_i_pipeline <= macc_valid_i;
+        end
+    end
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // In channel counter
     reg [$clog2(IN_CHANNEL)-1:0] in_cha_cnt;
@@ -270,8 +293,8 @@ module pe_outcha_single #(
         .o_data       (macc_data_out),
         .o_valid      (macc_valid_o),
         .input_n      (kernel),
-        .input_common (i_data_reg[0]),
-        .i_valid      (macc_valid_i),
+        .input_common (i_data_reg_pipeline),
+        .i_valid      (macc_valid_i_pipeline),
         .clk          (clk),
         .rst_n        (rst_n)
     );

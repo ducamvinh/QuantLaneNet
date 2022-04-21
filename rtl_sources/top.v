@@ -74,7 +74,7 @@ module top #(
     ); 
 
     // Input fifo write control
-    wire [8*3-1:0] fifo_wr_data;
+    wire [8*3-1:0] fifo_wr_data_;
     wire           fifo_wr_en;
     wire           first_pixel;
 
@@ -84,7 +84,7 @@ module top #(
         .AXI_BASE_ADDR  (OFFSET_INPUT),
         .AXI_ADDR_WIDTH (AXI_ADDR_WIDTH)
     ) u_fifo_wr (
-        .fifo_wr_data  (fifo_wr_data),
+        .fifo_wr_data  (fifo_wr_data_),
         .fifo_wr_en    (fifo_wr_en),
         .first_pixel   (first_pixel),
         .axi_wr_data   (axi_wr_data),
@@ -96,21 +96,27 @@ module top #(
     );
 
     // Input FIFO
-    wire [8*3-1:0] fifo_rd_data;
+    wire [7*3-1:0] fifo_wr_data;
+    wire [7*3-1:0] fifo_rd_data;
     wire           fifo_empty;
-    wire           fifo_almost_full;
     wire           fifo_rd_en;
 
+    assign fifo_wr_data = {
+        fifo_wr_data_[3*8-1:2*8+1],
+        fifo_wr_data_[2*8-1:1*8+1],
+        fifo_wr_data_[1*8-1:0*8+1]
+    };
+
     fifo_single_read #(
-        .DATA_WIDTH        (8 * 3),
+        .DATA_WIDTH        (7 * 3),
         // .DEPTH             (IN_WIDTH * IN_HEIGHT),
-        .DEPTH             (IN_WIDTH * (IN_HEIGHT - 2) * 23 / 32),
+        .DEPTH             (56976),
         .ALMOST_FULL_THRES (10)
     ) u_fifo (
         .rd_data     (fifo_rd_data),
         .empty       (fifo_empty),
         .full        (),
-        .almost_full (fifo_almost_full),
+        .almost_full (),
         .wr_data     (fifo_wr_data),
         .wr_en       (fifo_wr_en), 
         .rd_en       (fifo_rd_en),
@@ -128,9 +134,9 @@ module top #(
     wire                    vertical_fifo_almost_full;
     
     assign model_i_data = {
-        {1'b0, fifo_rd_data[23:17]},
-        {1'b0, fifo_rd_data[15:9] },
-        {1'b0, fifo_rd_data[7:1]  }
+        {1'b0, fifo_rd_data[3*7-1:2*7]},
+        {1'b0, fifo_rd_data[2*7-1:1*7]},
+        {1'b0, fifo_rd_data[1*7-1:0*7]}
     };
 
     model u_model (
@@ -236,10 +242,11 @@ module top #(
     end
 
     block_ram_multi_word #(
-        .DATA_WIDTH (8),
-        .DEPTH      (OUT_WIDTH * OUT_HEIGHT / 4),
-        .NUM_WORDS  (4),
-        .RAM_STYLE  ("auto")
+        .DATA_WIDTH      (8),
+        .DEPTH           (OUT_WIDTH * OUT_HEIGHT / 4),
+        .NUM_WORDS       (4),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("false")
     ) u_bram (
         .rd_data (bram_rd_data),
         .wr_data (bram_wr_data),

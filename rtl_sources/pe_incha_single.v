@@ -132,10 +132,11 @@ module pe_incha_single #(
     end
 
     block_ram_multi_word #(
-        .DATA_WIDTH (8),
-        .DEPTH      (OUT_CHANNEL),
-        .NUM_WORDS  (KERNEL_PTS * IN_CHANNEL),
-        .RAM_STYLE  ("auto")  
+        .DATA_WIDTH      (8),
+        .DEPTH           (OUT_CHANNEL),
+        .NUM_WORDS       (KERNEL_PTS * IN_CHANNEL),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("true")
     ) u_kernel (
         .rd_data (kernel),
         .wr_data (kernel_wr_data),
@@ -162,9 +163,10 @@ module pe_incha_single #(
     end
 
     block_ram_single_port #(
-        .DATA_WIDTH (16),
-        .DEPTH      (OUT_CHANNEL),
-        .RAM_STYLE  ("auto")
+        .DATA_WIDTH      (16),
+        .DEPTH           (OUT_CHANNEL),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("true")
     ) u_bias (
         .rd_data (bias),
         .wr_data (weight_wr_data),
@@ -199,14 +201,34 @@ module pe_incha_single #(
         end
     end
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // BRAM output pipeline register because Vivado won't stop screaming about it
+    reg [8*IN_CHANNEL*KERNEL_PTS-1:0] i_data_reg_pipeline;
+    reg                               macc_valid_i_pipeline;
+
+    always @ (posedge clk) begin
+        i_data_reg_pipeline <= i_data_reg;
+    end
+
+    always @ (posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            macc_valid_i_pipeline <= 1'b0;
+        end else begin
+            macc_valid_i_pipeline <= macc_valid_i;
+        end
+    end
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     macc_8bit_single #(
         .NUM_INPUTS (KERNEL_PTS * IN_CHANNEL)
     ) u_macc_single (
         .o_data   (macc_data_out),
         .o_valid  (macc_valid_o),
         .i_data_a (kernel),
-        .i_data_b (i_data_reg),
-        .i_valid  (macc_valid_i),
+        .i_data_b (i_data_reg_pipeline),
+        .i_valid  (macc_valid_i_pipeline),
         .clk      (clk),
         .rst_n    (rst_n)
     );
@@ -252,7 +274,7 @@ module pe_incha_single #(
     reg  signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] bias_sum;
     reg                                         bias_valid;
 
-    assign bias_cnt_en = macc_valid_o_reg;
+    assign bias_cnt_en = macc_valid_o;
 
     always @ (posedge clk) begin
         if (coeff_valid) begin

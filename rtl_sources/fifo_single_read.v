@@ -32,8 +32,9 @@ module fifo_single_read #(
 
     // Ram
     block_ram_single_port #(
-        .DATA_WIDTH (DATA_WIDTH),
-        .DEPTH      (DEPTH)
+        .DATA_WIDTH      (DATA_WIDTH),
+        .DEPTH           (DEPTH),
+        .OUTPUT_REGISTER ("false")
     ) u_bram (
         .rd_data (rd_data),
         .wr_data (wr_data),

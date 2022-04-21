@@ -135,10 +135,11 @@ module pe_incha_dual #(
     end
 
     block_ram_multi_word_dual_port #(
-        .DATA_WIDTH (8),
-        .DEPTH      (OUT_CHANNEL),
-        .NUM_WORDS  (KERNEL_PTS * IN_CHANNEL),
-        .RAM_STYLE  ("auto")
+        .DATA_WIDTH      (8),
+        .DEPTH           (OUT_CHANNEL),
+        .NUM_WORDS       (KERNEL_PTS * IN_CHANNEL),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("true")
     ) u_kernel (
         .rd_data_a (kernel_port_a),
         .rd_data_b (kernel_port_b),
@@ -170,9 +171,10 @@ module pe_incha_dual #(
     end
 
     block_ram_dual_port #(
-        .DATA_WIDTH (16),
-        .DEPTH      (OUT_CHANNEL),
-        .RAM_STYLE  ("auto")
+        .DATA_WIDTH      (16),
+        .DEPTH           (OUT_CHANNEL),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("true")
     ) u_bias (
         .rd_data_a (bias_port_a),
         .rd_data_b (bias_port_b),
@@ -212,11 +214,37 @@ module pe_incha_dual #(
         end
     end
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // BRAM output pipeline register because Vivado won't stop screaming about it
+    reg [8*IN_CHANNEL*KERNEL_PTS-1:0] i_data_reg_pipeline;
+    reg                               macc_valid_i_pipeline;
+
+    always @ (posedge clk) begin
+        i_data_reg_pipeline <= i_data_reg;
+    end
+
+    always @ (posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            macc_valid_i_pipeline <= 1'b0;
+        end else begin
+            macc_valid_i_pipeline <= macc_valid_i;
+        end
+    end
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     wire [8*IN_CHANNEL*KERNEL_PTS-1:0] macc_in_b;
 
     generate
         if (OUT_CHANNEL % 2) begin : gen0
-            assign macc_in_b = kernel_cnt == 0 ? 0 : kernel_port_b;
+            reg kernel_cnt_zero;
+
+            always @ (posedge clk) begin
+                kernel_cnt_zero <= kernel_cnt == 0;
+            end
+
+            assign macc_in_b = kernel_cnt_zero ? 0 : kernel_port_b;
         end else begin : gen1
             assign macc_in_b = kernel_port_b;
         end
@@ -230,8 +258,8 @@ module pe_incha_dual #(
         .o_valid  (macc_valid_o),
         .i_data_a (kernel_port_a),
         .i_data_b (macc_in_b),
-        .i_data_c (i_data_reg),
-        .i_valid  (macc_valid_i),
+        .i_data_c (i_data_reg_pipeline),
+        .i_valid  (macc_valid_i_pipeline),
         .clk      (clk),
         .rst_n    (rst_n)
     );
@@ -283,7 +311,7 @@ module pe_incha_dual #(
     reg  signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] bias_sum_b;
     reg                                         bias_valid;
 
-    assign bias_cnt_en = macc_valid_o_reg;
+    assign bias_cnt_en = macc_valid_o;
 
     always @ (posedge clk) begin
         if (coeff_valid) begin

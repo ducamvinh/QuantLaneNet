@@ -35,9 +35,10 @@ module fifo_dual_read #(
 
     // Ram
     block_ram_dual_port #(
-        .DATA_WIDTH (DATA_WIDTH),
-        .DEPTH      (DEPTH),
-        .RAM_STYLE  ("auto")
+        .DATA_WIDTH      (DATA_WIDTH),
+        .DEPTH           (DEPTH),
+        .RAM_STYLE       ("auto"),
+        .OUTPUT_REGISTER ("false")
     ) u_bram (
         .rd_data_a (rd_data_a),
         .rd_data_b (rd_data_b),
