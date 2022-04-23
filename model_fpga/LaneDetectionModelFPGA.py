@@ -4,11 +4,11 @@ import subprocess
 import torch
 import os
 
-import fpga_utils.fpga_address_map as fpga_address_map
+import model_fpga.fpga_address_map as fpga_address_map
 
 class LaneDetectionModelFPGA(object):
 
-    def __init__(self, h2c_device='/dev/xdma0_h2c_0', c2h_device='/dev/xdma0_c2h_0', xdma_tool_dir='/home/ducamvinh/FPGA/dma_ip_drivers/XDMA/linux-kernel/tools'):
+    def __init__(self, h2c_device='/dev/xdma0_h2c_0', c2h_device='/dev/xdma0_c2h_0', xdma_tool_dir='~/xdma/tools'):
         self.h2c_device = h2c_device
         self.c2h_device = c2h_device
         self.xdma_tool_dir = xdma_tool_dir
@@ -61,7 +61,7 @@ class LaneDetectionModelFPGA(object):
         try:
             self.wait_valid()
         except TimeoutError:
-            raise TimeoutError('Wait for output valid timed out')
+            raise TimeoutError('Valid polling timed out')
 
         # Read output from FPGA
         with open(self.c2h_device, 'rb') as f:

@@ -193,6 +193,8 @@ def get_arguments():
 
     if args.model == 'fpga' and args.offset:
         raise ValueError("FPGA model doesn't use offset, please use --no_offset option or leave offset options empty")
+    elif args.model == 'quantized' and args.device == 'cuda':
+        raise NotImplementedError("PyTorch quantization doesn't support CUDA inference as of the making of this project (PyTorch 1.11.0)")
 
     return args
 

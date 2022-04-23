@@ -17,6 +17,6 @@ def convert_quantized_model(model):
     )
     model_fused = torch.quantization.fuse_modules(model, fuse_modules)
     model_prepared = torch.quantization.prepare(model_fused)
-    model_prepared(torch.rand(size=(1, 3, 256, 512)))
+    model_prepared(torch.rand(size=(1, 3, 256, 512), device=('cuda' if next(model.parameters()).is_cuda else 'cpu')))
 
     return torch.quantization.convert(model_prepared)
