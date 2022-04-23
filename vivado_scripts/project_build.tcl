@@ -29,15 +29,21 @@ set_property widget {textEdit} [ipgui::get_guiparamspec -name "C_S00_AXI_DATA_WI
 set_property enablement_value false [ipx::get_user_parameters "C_S00_AXI_DATA_WIDTH" -of_objects [ipx::current_core]]
 set_property widget {textEdit} [ipgui::get_guiparamspec -name "C_S00_AXI_ADDR_WIDTH" -component [ipx::current_core] ]
 set_property enablement_value false [ipx::get_user_parameters "C_S00_AXI_ADDR_WIDTH" -of_objects [ipx::current_core]]
-ipx::merge_project_changes files [ipx::current_core]
+
+# Add bus interface parameters
+ipx::add_bus_parameter "FREQ_HZ" [ipx::get_bus_interfaces s00_axi_aclk -of_objects [ipx::current_core]]
+ipx::add_bus_parameter "PHASE" [ipx::get_bus_interfaces s00_axi_aclk -of_objects [ipx::current_core]]
 
 # Repackage and save IP
+ipx::merge_project_changes files [ipx::current_core]
 set_property previous_version_for_upgrade ::: [ipx::find_open_core user.org:user:LaneDetectionCNN_AXI_IP:1.0]
 set_property core_revision 1 [ipx::find_open_core user.org:user:LaneDetectionCNN_AXI_IP:1.0]
 ipx::create_xgui_files [ipx::find_open_core user.org:user:LaneDetectionCNN_AXI_IP:1.0]
 ipx::update_checksums [ipx::find_open_core user.org:user:LaneDetectionCNN_AXI_IP:1.0]
 ipx::check_integrity [ipx::find_open_core user.org:user:LaneDetectionCNN_AXI_IP:1.0]
 ipx::save_core [ipx::find_open_core user.org:user:LaneDetectionCNN_AXI_IP:1.0]
+
+# Close edit_ip project and update IP catalog
 close_project -delete
 set_property ip_repo_paths [file join $ip_repo_dir "LaneDetectionCNN_1.0/src"] [current_project]
 update_ip_catalog
@@ -48,7 +54,7 @@ create_bd_design "design_1"
 
 # XDMA
 create_bd_cell -type ip -vlnv xilinx.com:ip:xdma xdma_0
-set_property -dict [list CONFIG.pl_link_cap_max_link_width {X2} CONFIG.pl_link_cap_max_link_speed {5.0_GT/s} CONFIG.axisten_freq {125} CONFIG.pf0_device_id {7022} CONFIG.plltype {QPLL1} CONFIG.PF0_DEVICE_ID_mqdma {9022} CONFIG.PF2_DEVICE_ID_mqdma {9022} CONFIG.PF3_DEVICE_ID_mqdma {9022}] [get_bd_cells xdma_0]
+set_property -dict [list CONFIG.pl_link_cap_max_link_width {X1} CONFIG.pl_link_cap_max_link_speed {5.0_GT/s} CONFIG.axisten_freq {125} CONFIG.pf0_device_id {7021} CONFIG.plltype {QPLL1} CONFIG.PF0_DEVICE_ID_mqdma {9021} CONFIG.PF2_DEVICE_ID_mqdma {9021} CONFIG.PF3_DEVICE_ID_mqdma {9021}] [get_bd_cells xdma_0]
 
 # Clock buffer
 create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf util_ds_buf_0
@@ -59,23 +65,21 @@ create_bd_cell -type ip -vlnv user.org:user:LaneDetectionCNN_AXI_IP LaneDetectio
 
 # Connect nets
 connect_bd_net [get_bd_pins util_ds_buf_0/IBUF_OUT] [get_bd_pins xdma_0/sys_clk]
-make_bd_pins_external  [get_bd_pins xdma_0/sys_rst_n]
-set_property name pcie_rst_n [get_bd_ports sys_rst_n_0]
-make_bd_intf_pins_external  [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
-set_property name pcie_diff_clock [get_bd_intf_ports CLK_IN_D_0]
-make_bd_intf_pins_external  [get_bd_intf_pins xdma_0/pcie_mgt]
-set_property name pcie_mgt [get_bd_intf_ports pcie_mgt_0]
+make_bd_pins_external [get_bd_pins xdma_0/sys_rst_n]
+set_property name pcie_perstn [get_bd_ports sys_rst_n_0]
+make_bd_intf_pins_external [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
+set_property name pcie_refclk [get_bd_intf_ports CLK_IN_D_0]
+make_bd_intf_pins_external [get_bd_intf_pins xdma_0/pcie_mgt]
+set_property name pci_express_x1 [get_bd_intf_ports pcie_mgt_0]
 
 # FPGA 180 MHz clock
 create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0
 apply_board_connection -board_interface "sys_diff_clock" -ip_intf "clk_wiz_0/CLK_IN1_D" -diagram "design_1" 
 set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {180.000} CONFIG.MMCM_DIVCLK_DIVIDE {5} CONFIG.MMCM_CLKFBOUT_MULT_F {24.750} CONFIG.MMCM_CLKOUT0_DIVIDE_F {5.500} CONFIG.CLKOUT1_JITTER {153.392} CONFIG.CLKOUT1_PHASE_ERROR {190.431}] [get_bd_cells clk_wiz_0]
-set_property name fpga_diff_clock [get_bd_intf_ports sys_diff_clock]
 
 # Connect AXI interfaces
 apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {reset ( FPGA Reset ) } Manual_Source {New External Port (ACTIVE_HIGH)}}  [get_bd_pins clk_wiz_0/reset]
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (180 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
-set_property name fpga_rst [get_bd_ports reset]
 
 # Set AXI address map
 set_property offset 0x00000000C0000000 [get_bd_addr_segs {xdma_0/M_AXI/SEG_LaneDetectionCNN_AXI_0_reg0}]

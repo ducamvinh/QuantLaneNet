@@ -11,12 +11,12 @@ set_property CONFIG_MODE BPI16 [current_design]
 set_property CFGBVS GND [current_design]
 set_property CONFIG_VOLTAGE 1.8 [current_design]
 
-# Reset
-set_property IOSTANDARD LVCMOS18 [get_ports pcie_rst_n]
-set_property PULLUP true [get_ports pcie_rst_n]
-set_property PACKAGE_PIN AV35 [get_ports pcie_rst_n]
+# PCIe reset
+set_property IOSTANDARD LVCMOS18 [get_ports pcie_perstn]
+set_property PULLUP true [get_ports pcie_perstn]
+set_property PACKAGE_PIN AV35 [get_ports pcie_perstn]
 
-# Clock
+# PCIe clock
 set_property LOC IBUFDS_GTE2_X1Y5 [get_cells {design_1_i/util_ds_buf_0/U0/USE_IBUFDS_GTE2.GEN_IBUFDS_GTE2[0].IBUFDS_GTE2_I}]
 
 # LEDs
@@ -41,8 +41,8 @@ set_property PACKAGE_PIN AU39 [get_ports {leds[7]}]
 # Timing Constraints
 ###############################################################################
 
-# Clock
-create_clock -period 10.000 -name pcie_diff_clock_clk_p [get_ports pcie_diff_clock_clk_p]
+# PCIe clock
+create_clock -period 10.000 -name pcie_refclk_clk_p [get_ports pcie_refclk_clk_p]
 
-# Reset
-set_false_path -from [get_ports pcie_rst_n]
+# PCIe reset
+set_false_path -from [get_ports pcie_perstn]
