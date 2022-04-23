@@ -88,8 +88,9 @@ def test_video(model, video_path, use_offset, device):
             runtime.append(time.time() - start_time)
             cls, vertical = model.post_process(fpga_output)
         else:
+            model_input = torch.from_numpy(np.moveaxis(img, 2, 0)).to(device).unsqueeze(0).float() / 255.0
             start_time = time.time()
-            cls, vertical, offset = model(torch.from_numpy(np.moveaxis(img, 2, 0)).to(device).unsqueeze(0).float() / 255.0)
+            cls, vertical, offset = model(model_input)
             runtime.append(time.time() - start_time)
 
         if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
