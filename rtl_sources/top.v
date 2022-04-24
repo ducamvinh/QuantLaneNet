@@ -109,8 +109,7 @@ module top #(
 
     fifo_single_read #(
         .DATA_WIDTH        (7 * 3),
-        // .DEPTH             (IN_WIDTH * IN_HEIGHT),
-        .DEPTH             (56976),
+        .DEPTH             (128),
         .ALMOST_FULL_THRES (10)
     ) u_fifo (
         .rd_data     (fifo_rd_data),

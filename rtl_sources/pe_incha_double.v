@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module pe_incha_single #(
+module pe_incha_double #(
     // Layer parameters
     parameter IN_WIDTH = 513,
     parameter IN_HEIGHT = 257,
@@ -118,10 +118,13 @@ module pe_incha_single #(
     end
 
     // Kernel ram
-    wire [8*IN_CHANNEL*KERNEL_PTS-1:0] kernel;
-    reg  [$clog2(OUT_CHANNEL)-1:0]     kernel_cnt;
+    localparam COUNTER_MAX = (OUT_CHANNEL + 1) / 2;
+    
+    wire [8*IN_CHANNEL*KERNEL_PTS-1:0] kernel_port_a;
+    wire [8*IN_CHANNEL*KERNEL_PTS-1:0] kernel_port_b;
+    reg  [$clog2(COUNTER_MAX)-1:0]     kernel_cnt;
 
-    assign cnt_limit = kernel_cnt == OUT_CHANNEL - 1;
+    assign cnt_limit = kernel_cnt == COUNTER_MAX - 1;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
@@ -131,28 +134,34 @@ module pe_incha_single #(
         end
     end
 
-    block_ram_multi_word #(
+    block_ram_multi_word_dual_port #(
         .DATA_WIDTH      (8),
         .DEPTH           (OUT_CHANNEL),
         .NUM_WORDS       (KERNEL_PTS * IN_CHANNEL),
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
     ) u_kernel (
-        .rd_data (kernel),
-        .wr_data (kernel_wr_data),
-        .rd_addr (kernel_cnt),
-        .wr_addr (kernel_ram_addr[$clog2(OUT_CHANNEL)-1:0]),
-        .wr_en   (kernel_ram_wr_en),
-        .rd_en   (1'b1),
-        .clk     (clk)
+        .rd_data_a (kernel_port_a),
+        .rd_data_b (kernel_port_b),
+        .wr_data_a (kernel_wr_data),
+        .wr_data_b ({8{1'b0}}),
+        .addr_a    (kernel_ram_wr_en_ ? kernel_ram_addr[$clog2(OUT_CHANNEL)-1:0] : {kernel_cnt, 1'b0}),
+        .addr_b    ({kernel_cnt, 1'b1}),
+        .rd_en_a   (1'b1),
+        .rd_en_b   (1'b1),
+        .wr_en_a   (kernel_ram_wr_en),
+        .wr_en_b   ({KERNEL_PTS*IN_CHANNEL{1'b0}}),
+        .clk       (clk)
     );
 
-    // Bias ram
-    wire signed [15:0] bias;
 
-    reg  [$clog2(OUT_CHANNEL)-1:0] bias_cnt;
+    // Bias ram
+    wire signed [15:0] bias_port_a;
+    wire signed [15:0] bias_port_b;
+
+    reg  [$clog2(COUNTER_MAX)-1:0] bias_cnt;
     wire                           bias_cnt_en;
-    wire                           bias_cnt_limit = bias_cnt == OUT_CHANNEL - 1;
+    wire                           bias_cnt_limit = bias_cnt == COUNTER_MAX - 1;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
@@ -162,19 +171,23 @@ module pe_incha_single #(
         end
     end
 
-    block_ram_single_port #(
+    block_ram_dual_port #(
         .DATA_WIDTH      (16),
         .DEPTH           (OUT_CHANNEL),
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
     ) u_bias (
-        .rd_data (bias),
-        .wr_data (weight_wr_data),
-        .wr_addr (bias_wr_addr),
-        .rd_addr (bias_cnt),
-        .wr_en   (bias_wr_en),
-        .rd_en   (1'b1),
-        .clk     (clk)
+        .rd_data_a (bias_port_a),
+        .rd_data_b (bias_port_b),
+        .wr_data_a (weight_wr_data),
+        .wr_data_b ({16{1'b0}}),
+        .addr_a    (bias_wr_en ? bias_wr_addr : {bias_cnt, 1'b0}),
+        .addr_b    ({bias_cnt, 1'b1}),
+        .rd_en_a   (1'b1),
+        .rd_en_b   (1'b1),
+        .wr_en_a   (bias_wr_en),
+        .wr_en_b   (1'b0),
+        .clk       (clk)
     );
 
     // MACC co-efficient reg
@@ -186,10 +199,11 @@ module pe_incha_single #(
         end
     end
 
-    // MACC
+    // Dual MACC
     localparam MACC_OUTPUT_DATA_WIDTH = 16 + $clog2(KERNEL_PTS * IN_CHANNEL);
 
-    wire [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out;
+    wire [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_a;
+    wire [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_b;
     wire                              macc_valid_o;
     reg                               macc_valid_i;
 
@@ -221,25 +235,45 @@ module pe_incha_single #(
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    macc_8bit_single #(
+    wire [8*IN_CHANNEL*KERNEL_PTS-1:0] macc_in_b;
+
+    generate
+        if (OUT_CHANNEL % 2) begin : gen0
+            reg kernel_cnt_zero;
+
+            always @ (posedge clk) begin
+                kernel_cnt_zero <= kernel_cnt == 0;
+            end
+
+            assign macc_in_b = kernel_cnt_zero ? 0 : kernel_port_b;
+        end else begin : gen1
+            assign macc_in_b = kernel_port_b;
+        end
+    endgenerate
+
+    macc_8bit_dual #(
         .NUM_INPUTS (KERNEL_PTS * IN_CHANNEL)
-    ) u_macc_single (
-        .o_data   (macc_data_out),
+    ) u_macc_dual (
+        .o_data_a (macc_data_out_a),
+        .o_data_b (macc_data_out_b),
         .o_valid  (macc_valid_o),
-        .i_data_a (kernel),
-        .i_data_b (i_data_reg_pipeline),
+        .i_data_a (kernel_port_a),
+        .i_data_b (macc_in_b),
+        .i_data_c (i_data_reg_pipeline),
         .i_valid  (macc_valid_i_pipeline),
         .clk      (clk),
         .rst_n    (rst_n)
     );
 
     // MACC out reg
-    reg signed [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_reg;
+    reg signed [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_a_reg;
+    reg signed [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_b_reg;
     reg                                     macc_valid_o_reg;
 
     always @ (posedge clk) begin
         if (macc_valid_o) begin
-            macc_data_out_reg <= macc_data_out;
+            macc_data_out_a_reg <= macc_data_out_a;
+            macc_data_out_b_reg <= macc_data_out_b;
         end
     end
 
@@ -252,12 +286,14 @@ module pe_incha_single #(
     end
 
     // MACC co-efficient
-    reg signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] coeff_prod;
+    reg signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] coeff_prod_a;  // 16-bit co-eff (x2^-16) x {MACC_OUTPUT_DATA_WIDTH}-bit macc output (x2^0)
+    reg signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] coeff_prod_b;  // = {MACC_OUTPUT_DATA_WIDTH+16}-bit product (x2^-16)
     reg                                        coeff_valid;
 
     always @ (posedge clk) begin
         if (macc_valid_o_reg) begin
-            coeff_prod <= macc_coeff * macc_data_out_reg;
+            coeff_prod_a <= macc_coeff * macc_data_out_a_reg;
+            coeff_prod_b <= macc_coeff * macc_data_out_b_reg;
         end
     end
 
@@ -270,15 +306,18 @@ module pe_incha_single #(
     end
 
     // Bias
-    wire signed [23:0]                          bias_adjusted = {bias, {8{1'b0}}};
-    reg  signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] bias_sum;
+    wire signed [23:0]                          bias_adjusted_a = {bias_port_a, {8{1'b0}}};
+    wire signed [23:0]                          bias_adjusted_b = {bias_port_b, {8{1'b0}}};
+    reg  signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] bias_sum_a;  // {MACC_OUTPUT_DATA_WIDTH+16}-bit co-eff prod (x2^-16) + 16-bit bias (x2^-8)
+    reg  signed [MACC_OUTPUT_DATA_WIDTH+16-1:0] bias_sum_b;
     reg                                         bias_valid;
 
     assign bias_cnt_en = macc_valid_o;
 
     always @ (posedge clk) begin
         if (coeff_valid) begin
-            bias_sum <= coeff_prod + bias_adjusted;
+            bias_sum_a <= coeff_prod_a + bias_adjusted_a;
+            bias_sum_b <= coeff_prod_b + bias_adjusted_b;
         end
     end
 
@@ -291,16 +330,18 @@ module pe_incha_single #(
     end
 
     // Output
-    wire signed [OUTPUT_DATA_WIDTH-1:0] obuffer_data;
+    wire signed [OUTPUT_DATA_WIDTH-1:0] obuffer_data_a;
+    wire signed [OUTPUT_DATA_WIDTH-1:0] obuffer_data_b;
     wire                                obuffer_valid;
 
     generate
-        if (OUTPUT_MODE == "relu") begin : gen0
-            assign obuffer_data = bias_sum < 0 ? 0 : ((bias_sum[23] || bias_sum[22:16] == {7{1'b1}}) ? 127 : (bias_sum[23:16] + (bias_sum[15] & |bias_sum[14:12])));
+        if (OUTPUT_MODE == "relu") begin : gen2
+            assign obuffer_data_a = bias_sum_a < 0 ? 0 : ((bias_sum_a[23] || bias_sum_a[22:16] == {7{1'b1}}) ? 127 : (bias_sum_a[23:16] + (bias_sum_a[15] & |bias_sum_a[14:12])));
+            assign obuffer_data_b = bias_sum_b < 0 ? 0 : ((bias_sum_b[23] || bias_sum_b[22:16] == {7{1'b1}}) ? 127 : (bias_sum_b[23:16] + (bias_sum_b[15] & |bias_sum_b[14:12])));
             assign obuffer_valid  = bias_valid;
         end
-
-        else if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen1
+        
+        else if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen3
             // layer_scale reg
             reg signed [15:0] layer_scale;  // 16-bit layer_scale (x2^-16)
 
@@ -313,17 +354,21 @@ module pe_incha_single #(
             // ######### Output dequant #########
 
             // bias_sum truncate
-            wire signed [MACC_OUTPUT_DATA_WIDTH-1:0] bias_sum_int = bias_sum[MACC_OUTPUT_DATA_WIDTH+16-1:16];
+            wire signed [MACC_OUTPUT_DATA_WIDTH-1:0] bias_sum_a_int = bias_sum_a[MACC_OUTPUT_DATA_WIDTH+16-1:16];
+            wire signed [MACC_OUTPUT_DATA_WIDTH-1:0] bias_sum_b_int = bias_sum_b[MACC_OUTPUT_DATA_WIDTH+16-1:16];
             // 24-bit bias sum truncate (x2^-16)
-            wire signed [8+16-1:0] bias_sum_trunc = bias_sum_int >= 127 ? (127 << 16) : (bias_sum_int <= -128 ? (-128 << 16) : bias_sum[8+16-1:0]); 
-            
+            wire signed [8+16-1:0] bias_sum_a_trunc = bias_sum_a_int >= 127 ? (127 << 16) : (bias_sum_a_int <= -128 ? (-128 << 16) : bias_sum_a[8+16-1:0]); 
+            wire signed [8+16-1:0] bias_sum_b_trunc = bias_sum_b_int >= 127 ? (127 << 16) : (bias_sum_b_int <= -128 ? (-128 << 16) : bias_sum_b[8+16-1:0]); 
+
             // layer_scale mult
-            reg signed [39:0] dequant;  // 24-bit bias sum (x2^-16) x 16-bit layer_scale (x2^-16) = 40-bit product (x2^-32)
+            reg signed [39:0] dequant_a;  // 24-bit bias sum (x2^-16) x 16-bit layer_scale (x2^-16) = 40-bit product (x2^-32)
+            reg signed [39:0] dequant_b;
             reg               dequant_valid;
 
             always @ (posedge clk) begin
                 if (bias_valid) begin
-                    dequant <= bias_sum_trunc * layer_scale;
+                    dequant_a <= bias_sum_a_trunc * layer_scale;
+                    dequant_b <= bias_sum_b_trunc * layer_scale;
                 end
             end
 
@@ -336,21 +381,25 @@ module pe_incha_single #(
             end
 
             // Truncate for output
-            wire signed [15:0] dequant_trunc = dequant[39:24] + (dequant[23] & |dequant[22:20]);
+            wire signed [15:0] dequant_trunc_a = dequant_a[39:24] + (dequant_a[23] & |dequant_a[22:20]);
+            wire signed [15:0] dequant_trunc_b = dequant_b[39:24] + (dequant_b[23] & |dequant_b[22:20]);
 
-            if (OUTPUT_MODE == "dequant") begin : gen2
-                assign obuffer_data = dequant_trunc;
+            if (OUTPUT_MODE == "dequant") begin : gen4
+                assign obuffer_data_a = dequant_trunc_a;
+                assign obuffer_data_b = dequant_trunc_b;
                 assign obuffer_valid  = dequant_valid;
             end
 
-            else if (OUTPUT_MODE == "sigmoid") begin : gen3
+            else if (OUTPUT_MODE == "sigmoid") begin : gen5
+                wire valid_dummy;
+
                 sigmoid #(
                     .DATA_WIDTH (16),
                     .FRAC_BITS  (8)
-                ) u_sigmoid (
-                    .o_data  (obuffer_data),
-                    .o_valid (obuffer_valid),
-                    .i_data  (dequant_trunc),
+                ) u_sigmoid[1:0] (
+                    .o_data  ({obuffer_data_b, obuffer_data_a}),
+                    .o_valid ({valid_dummy, obuffer_valid}),
+                    .i_data  ({dequant_trunc_b, dequant_trunc_a}),
                     .i_valid (dequant_valid),
                     .clk     (clk),
                     .rst_n   (rst_n)
@@ -359,15 +408,15 @@ module pe_incha_single #(
         end
     endgenerate
 
-    // Output buffer
+    // obuffer
     pe_incha_obuffer #(
         .DATA_WIDTH  (OUTPUT_DATA_WIDTH),
-        .NUM_INPUTS  (1),
+        .NUM_INPUTS  (2),
         .OUT_CHANNEL (OUT_CHANNEL)
     ) u_obuffer (
         .o_data  (o_data),
         .o_valid (o_valid),
-        .i_data  (obuffer_data),
+        .i_data  ({obuffer_data_b, obuffer_data_a}),
         .i_valid (obuffer_valid),
         .clk     (clk),
         .rst_n   (rst_n)

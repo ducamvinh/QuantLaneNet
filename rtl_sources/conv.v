@@ -9,8 +9,9 @@ module conv #(
     parameter OUTPUT_MODE = "dequant",
     parameter UNROLL_MODE = "incha",
     // parameter UNROLL_MODE = "outcha",
-    parameter DUAL = "true",
-    // parameter DUAL = "false",
+    // parameter COMPUTE_FACTOR = "single",
+    // parameter COMPUTE_FACTOR = "double",
+    parameter COMPUTE_FACTOR = "quadruple",
 
     // Conv parameters
     // Conv parameters
@@ -93,41 +94,7 @@ module conv #(
     // PE
     generate
         if (UNROLL_MODE == "incha") begin : gen0
-            if (DUAL == "true") begin : gen1
-                pe_incha_dual #(
-                    .IN_WIDTH              (IN_WIDTH),
-                    .IN_HEIGHT             (IN_HEIGHT),
-                    .IN_CHANNEL            (IN_CHANNEL),
-                    .OUT_CHANNEL           (OUT_CHANNEL),
-                    .OUTPUT_MODE           (OUTPUT_MODE),
-                    .KERNEL_0              (KERNEL_0),
-                    .KERNEL_1              (KERNEL_1),
-                    .DILATION_0            (DILATION_0),
-                    .DILATION_1            (DILATION_1),
-                    .PADDING_0             (PADDING_0),
-                    .PADDING_1             (PADDING_1),
-                    .STRIDE_0              (STRIDE_0),
-                    .STRIDE_1              (STRIDE_1),
-                    .KERNEL_BASE_ADDR      (KERNEL_BASE_ADDR),
-                    .BIAS_BASE_ADDR        (BIAS_BASE_ADDR),
-                    .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
-                    .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
-                ) u_pe_incha_dual (
-                    .o_data         (o_data),
-                    .o_valid        (o_valid),
-                    .pe_ready       (pe_ready),
-                    .pe_ack         (pe_ack),
-                    .i_data         (line_buffer_data),
-                    .i_valid        (line_buffer_valid),
-                    .weight_wr_data (weight_wr_data),
-                    .weight_wr_addr (weight_wr_addr),
-                    .weight_wr_en   (weight_wr_en),
-                    .clk            (clk),
-                    .rst_n          (rst_n)
-                );
-            end
-            
-            else if (DUAL == "false") begin : gen2
+            if (COMPUTE_FACTOR == "single") begin : gen1
                 pe_incha_single #(
                     .IN_WIDTH              (IN_WIDTH),
                     .IN_HEIGHT             (IN_HEIGHT),
@@ -160,11 +127,9 @@ module conv #(
                     .rst_n          (rst_n)
                 );
             end
-        end
-
-        else if (UNROLL_MODE == "outcha") begin : gen3
-            if (DUAL == "true") begin : gen4
-                pe_outcha_dual #(
+            
+            else if (COMPUTE_FACTOR == "double") begin : gen2
+                pe_incha_double #(
                     .IN_WIDTH              (IN_WIDTH),
                     .IN_HEIGHT             (IN_HEIGHT),
                     .IN_CHANNEL            (IN_CHANNEL),
@@ -182,7 +147,7 @@ module conv #(
                     .BIAS_BASE_ADDR        (BIAS_BASE_ADDR),
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
-                ) u_pe_outcha_dual (
+                ) u_pe_incha_double (
                     .o_data         (o_data),
                     .o_valid        (o_valid),
                     .pe_ready       (pe_ready),
@@ -197,7 +162,43 @@ module conv #(
                 );
             end
 
-            else if (DUAL == "false") begin : gen5
+            else if (COMPUTE_FACTOR == "quadruple") begin : gen3
+                pe_incha_quadruple #(
+                    .IN_WIDTH              (IN_WIDTH),
+                    .IN_HEIGHT             (IN_HEIGHT),
+                    .IN_CHANNEL            (IN_CHANNEL),
+                    .OUT_CHANNEL           (OUT_CHANNEL),
+                    .OUTPUT_MODE           (OUTPUT_MODE),
+                    .KERNEL_0              (KERNEL_0),
+                    .KERNEL_1              (KERNEL_1),
+                    .DILATION_0            (DILATION_0),
+                    .DILATION_1            (DILATION_1),
+                    .PADDING_0             (PADDING_0),
+                    .PADDING_1             (PADDING_1),
+                    .STRIDE_0              (STRIDE_0),
+                    .STRIDE_1              (STRIDE_1),
+                    .KERNEL_BASE_ADDR      (KERNEL_BASE_ADDR),
+                    .BIAS_BASE_ADDR        (BIAS_BASE_ADDR),
+                    .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
+                    .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
+                ) u_pe_incha_quadruple (
+                    .o_data         (o_data),
+                    .o_valid        (o_valid),
+                    .pe_ready       (pe_ready),
+                    .pe_ack         (pe_ack),
+                    .i_data         (line_buffer_data),
+                    .i_valid        (line_buffer_valid),
+                    .weight_wr_data (weight_wr_data),
+                    .weight_wr_addr (weight_wr_addr),
+                    .weight_wr_en   (weight_wr_en),
+                    .clk            (clk),
+                    .rst_n          (rst_n)
+                );
+            end
+        end
+
+        else if (UNROLL_MODE == "outcha") begin : gen4
+            if (COMPUTE_FACTOR == "single") begin : gen5
                 pe_outcha_single #(
                     .IN_WIDTH              (IN_WIDTH),
                     .IN_HEIGHT             (IN_HEIGHT),
@@ -217,6 +218,40 @@ module conv #(
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
                 ) u_pe_outcha_single (
+                    .o_data         (o_data),
+                    .o_valid        (o_valid),
+                    .pe_ready       (pe_ready),
+                    .pe_ack         (pe_ack),
+                    .i_data         (line_buffer_data),
+                    .i_valid        (line_buffer_valid),
+                    .weight_wr_data (weight_wr_data),
+                    .weight_wr_addr (weight_wr_addr),
+                    .weight_wr_en   (weight_wr_en),
+                    .clk            (clk),
+                    .rst_n          (rst_n)
+                );
+            end
+
+            else if (COMPUTE_FACTOR == "double") begin : gen6
+                pe_outcha_double #(
+                    .IN_WIDTH              (IN_WIDTH),
+                    .IN_HEIGHT             (IN_HEIGHT),
+                    .IN_CHANNEL            (IN_CHANNEL),
+                    .OUT_CHANNEL           (OUT_CHANNEL),
+                    .OUTPUT_MODE           (OUTPUT_MODE),
+                    .KERNEL_0              (KERNEL_0),
+                    .KERNEL_1              (KERNEL_1),
+                    .DILATION_0            (DILATION_0),
+                    .DILATION_1            (DILATION_1),
+                    .PADDING_0             (PADDING_0),
+                    .PADDING_1             (PADDING_1),
+                    .STRIDE_0              (STRIDE_0),
+                    .STRIDE_1              (STRIDE_1),
+                    .KERNEL_BASE_ADDR      (KERNEL_BASE_ADDR),
+                    .BIAS_BASE_ADDR        (BIAS_BASE_ADDR),
+                    .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
+                    .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
+                ) u_pe_outcha_double (
                     .o_data         (o_data),
                     .o_valid        (o_valid),
                     .pe_ready       (pe_ready),

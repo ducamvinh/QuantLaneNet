@@ -132,7 +132,7 @@ for {set i 0} {$i < 8} {incr i} {
 
 # Make concat block's output external
 make_bd_pins_external  [get_bd_pins signal_leds/xlconcat_0/dout]
-set_property name leds [get_bd_ports dout_0]
+set_property name led_8bits [get_bd_ports dout_0]
 
 ############################################### Finish building project ###############################################
 puts "\n########################### Validate and save block design ###########################\n"

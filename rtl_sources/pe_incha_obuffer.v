@@ -1,21 +1,22 @@
 `timescale 1ns / 1ps
 
-module pe_incha_dual_obuffer #(
+module pe_incha_obuffer #(
     parameter DATA_WIDTH = 8,
-    parameter OUT_CHANNEL = 17
+    parameter NUM_INPUTS = 2,
+    parameter OUT_CHANNEL = 8
 )(
     output     [DATA_WIDTH*OUT_CHANNEL-1:0] o_data,
     output reg                              o_valid,
-    input      [DATA_WIDTH-1:0]             i_data_a,
-    input      [DATA_WIDTH-1:0]             i_data_b,
+    input      [DATA_WIDTH*NUM_INPUTS-1:0]  i_data,
     input                                   i_valid,
     input                                   clk,
     input                                   rst_n
 );
 
-    localparam COUNTER_MAX = (OUT_CHANNEL + 1) / 2;
-    localparam OUT_CHANNEL_ODD = COUNTER_MAX * 2 == OUT_CHANNEL ? 0 : 1;
-    localparam OBUFFER_DEPTH = OUT_CHANNEL_ODD ? OUT_CHANNEL - 1 : OUT_CHANNEL;
+    localparam COUNTER_MAX = (OUT_CHANNEL + NUM_INPUTS - 1) / NUM_INPUTS;
+    localparam OBUFFER_DEPTH = OUT_CHANNEL - OUT_CHANNEL % NUM_INPUTS;
+
+    genvar i;
 
     // Out channel counter
     reg [$clog2(COUNTER_MAX)-1:0] cha_cnt;
@@ -32,20 +33,17 @@ module pe_incha_dual_obuffer #(
     reg [DATA_WIDTH-1:0] obuffer[0:OBUFFER_DEPTH-1];
     wire obuffer_en;
 
-    genvar i, j;
-
     generate
         for (i = 0; i < OBUFFER_DEPTH; i = i + 1) begin : gen0
             assign o_data[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH] = obuffer[i];
 
             wire [DATA_WIDTH-1:0] buffer_in;
 
-            if (i == OBUFFER_DEPTH - 2) begin : gen1
-                assign buffer_in = i_data_a;
-            end else if (i == OBUFFER_DEPTH - 1) begin : gen2
-                assign buffer_in = i_data_b;
-            end else begin : gen3
-                assign buffer_in = obuffer[i+2];
+            if (OBUFFER_DEPTH - i <= NUM_INPUTS) begin : gen1
+                localparam J = i % NUM_INPUTS;
+                assign buffer_in = i_data[(J+1)*DATA_WIDTH-1:J*DATA_WIDTH];
+            end else begin : gen2
+                assign buffer_in = obuffer[i+NUM_INPUTS];
             end
 
             always @ (posedge clk) begin
@@ -56,17 +54,21 @@ module pe_incha_dual_obuffer #(
         end
     endgenerate
 
-    // If OUT_CHANNEL is odd
+    // obuffer_valid
     generate
-        if (OUT_CHANNEL_ODD) begin : gen4
-            reg [DATA_WIDTH-1:0] obuffer_extra;
-            
+        if (OUT_CHANNEL % NUM_INPUTS) begin : gen3
             assign obuffer_en = cha_cnt < COUNTER_MAX - 1 && i_valid;
-            assign o_data[DATA_WIDTH*OUT_CHANNEL-1:DATA_WIDTH*(OUT_CHANNEL-1)] = obuffer_extra;
 
-            always @ (posedge clk) begin
-                if (cha_cnt == COUNTER_MAX - 1 && i_valid) begin
-                    obuffer_extra <= i_data_a;
+            for (i = 0; i < OUT_CHANNEL % NUM_INPUTS; i = i + 1) begin : gen4
+                localparam J = OBUFFER_DEPTH + i;
+                
+                reg [DATA_WIDTH-1:0] obuffer_extra;
+                assign o_data[(J+1)*DATA_WIDTH-1:J*DATA_WIDTH] = obuffer_extra;
+
+                always @ (posedge clk) begin
+                    if (cha_cnt == COUNTER_MAX - 1 && i_valid) begin
+                        obuffer_extra <= i_data[(i+1)*DATA_WIDTH-1:i*DATA_WIDTH];
+                    end
                 end
             end
         end else begin : gen5
@@ -81,6 +83,6 @@ module pe_incha_dual_obuffer #(
         end else begin
             o_valid <= cha_cnt == COUNTER_MAX - 1 && i_valid;
         end
-    end 
+    end
 
 endmodule

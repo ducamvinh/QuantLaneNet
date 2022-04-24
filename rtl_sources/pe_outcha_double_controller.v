@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module pe_outcha_dual_controller #(
+module pe_outcha_double_controller #(
     parameter IN_WIDTH = 513,
     parameter IN_HEIGHT = 257,
     parameter KERNEL_0 = 3,

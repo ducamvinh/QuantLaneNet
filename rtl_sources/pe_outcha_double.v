@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module pe_outcha_dual #(
+module pe_outcha_double #(
     // Layer parameters
     parameter IN_WIDTH = 513,
     parameter IN_HEIGHT = 257,
@@ -102,7 +102,7 @@ module pe_outcha_dual #(
     wire cnt_en;
     wire cnt_limit;
 
-    pe_outcha_dual_controller #(
+    pe_outcha_double_controller #(
         .IN_WIDTH   (IN_WIDTH),
         .IN_HEIGHT  (IN_HEIGHT),
         .KERNEL_0   (KERNEL_0),
@@ -378,8 +378,6 @@ module pe_outcha_dual #(
             if (OUTPUT_MODE == "relu") begin : gen6
                 assign obuffer_data_a[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH] = bias_sum_a < 0 ? 0 : ((bias_sum_a[23] || bias_sum_a[22:16] == {7{1'b1}}) ? 127 : (bias_sum_a[23:16] + (bias_sum_a[15] & |bias_sum_a[14:12])));
                 assign obuffer_data_b[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH] = bias_sum_b < 0 ? 0 : ((bias_sum_b[23] || bias_sum_b[22:16] == {7{1'b1}}) ? 127 : (bias_sum_b[23:16] + (bias_sum_b[15] & |bias_sum_b[14:12])));
-                // assign obuffer_data_a[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH] = bias_sum_a < 0 ? 0 : ((bias_sum_a[23] || bias_sum_a[22:16] == {7{1'b1}}) ? 127 : (bias_sum_a[23:16] + bias_sum_a[15]));
-                // assign obuffer_data_b[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH] = bias_sum_b < 0 ? 0 : ((bias_sum_b[23] || bias_sum_b[22:16] == {7{1'b1}}) ? 127 : (bias_sum_b[23:16] + bias_sum_b[15]));
                 assign obuffer_valid = bias_valid_1;
             end
 
@@ -438,7 +436,7 @@ module pe_outcha_dual #(
     endgenerate
 
     // obuffer
-    pe_outcha_dual_obuffer #(
+    pe_outcha_double_obuffer #(
         .DATA_WIDTH (OUTPUT_DATA_WIDTH * OUT_CHANNEL),
         .IN_WIDTH   (IN_WIDTH),
         .IN_HEIGHT  (IN_HEIGHT),

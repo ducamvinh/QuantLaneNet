@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module pe_outcha_dual_obuffer #(
+module pe_outcha_double_obuffer #(
     parameter DATA_WIDTH = 8,
     parameter IN_WIDTH = 513,
     parameter IN_HEIGHT = 257,

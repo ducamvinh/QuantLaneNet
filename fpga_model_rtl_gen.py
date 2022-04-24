@@ -58,9 +58,11 @@ def rtl_gen(model, rtl_path, fifo_factor=1):
                     conv_fifo_rd_en = f'fifo_rd_en_enc_{layer_num-1}'
 
                 if i == 0:
-                    dual = 'true'
+                    compute_factor = 'quadruple'
+                elif i == 1:
+                    compute_factor = 'double'
                 else:
-                    dual = 'false'
+                    compute_factor = 'single'
 
                 f.write(
                     f'\t// Encoder stage {i} conv {j}\n'
@@ -73,7 +75,7 @@ def rtl_gen(model, rtl_path, fifo_factor=1):
                     f'\t\t.IN_WIDTH              ({int(in_size[1])}),\n'
                     f'\t\t.IN_HEIGHT             ({int(in_size[0])}),\n'
                     f'\t\t.OUTPUT_MODE           ("relu"),\n'
-                    f'\t\t.DUAL                  ("{dual}"),\n'
+                    f'\t\t.COMPUTE_FACTOR        ("{compute_factor}"),\n'
                     f'\t\t.KERNEL_0              ({kernel_size[0]}),\n'
                     f'\t\t.KERNEL_1              ({kernel_size[1]}),\n'
                     f'\t\t.PADDING_0             ({padding[0]}),\n'
@@ -206,7 +208,7 @@ def rtl_gen(model, rtl_path, fifo_factor=1):
                     f'\t\t.IN_WIDTH              ({int(_in_size[1])}),\n'
                     f'\t\t.IN_HEIGHT             ({int(_in_size[0])}),\n'
                     f'\t\t.OUTPUT_MODE           ("{output_mode}"),\n'
-                    f'\t\t.DUAL                  ("false"),\n'
+                    f'\t\t.COMPUTE_FACTOR        ("single"),\n'
                     f'\t\t.KERNEL_0              ({kernel_size[0]}),\n'
                     f'\t\t.KERNEL_1              ({kernel_size[1]}),\n'
                     f'\t\t.PADDING_0             ({padding[0]}),\n'
