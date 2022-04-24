@@ -91,10 +91,13 @@ def main():
     gflops = count_ops(TestModel(), torch.rand(size=(1, 3, 256, 512)), verbose=False)[0] / 1e9
     linux_dist = get_os_name('/etc/os-release')
     gpu_name = subprocess.check_output(['nvidia-smi', '--query-gpu=name', '--format=csv,noheader']).decode('utf-8').strip()
-    gpu_clock_mhz = eval(subprocess.check_output(['nvidia-smi', '--query-supported-clocks=graphics', '--format=csv,noheader']).decode('utf-8').split()[0])
+    clocks = subprocess.Popen(['nvidia-smi', '--query', '--display=CLOCK'], stdout=subprocess.PIPE)
+    gpu_clock_mhz = eval(subprocess.check_output(['grep', '--after-context=1', 'Max Clocks'], stdin=clocks.stdout).decode('utf-8').split()[-2])
 
     print(
-        f'\n#######################################\n\n'
+        f'\n'
+        f'#######################################\n'
+        f'\n'
         f'GPU name   : {gpu_name}\n'
         f'GPU clock  : {gpu_clock_mhz:,d} MHz\n'
         f'Linux dist : {linux_dist}\n'

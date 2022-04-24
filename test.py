@@ -17,7 +17,7 @@ import glob
 import cv2
 import os
 
-def test_image(model, img_path, use_offset):
+def test_image(model, img_path, use_offset, device):
     print('[WARNING] Input image should be cropped to composition similar to TuSimple dataset for best accuracy')
     print(f'\tImage path: {img_path}')
 
@@ -33,8 +33,14 @@ def test_image(model, img_path, use_offset):
         print(f'\tProcess time: {((time.time() - start_time) * 1e3):.2f} ms')
         cls, vertical = model.post_process(fpga_output)
     else:
+        if device == 'cuda':
+            torch.cuda.synchronize()
+
         start_time = time.time()
         cls, vertical, offset = model(torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0)
+
+        if device == 'cuda':
+            torch.cuda.synchronize()
         print(f'\tProcess time: {((time.time() - start_time) * 1e3):.2f} ms')
 
     # Display output
@@ -47,7 +53,7 @@ def test_image(model, img_path, use_offset):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-def test_random_image(model, dataset_path, use_offset):
+def test_random_image(model, dataset_path, use_offset, device):
     # Get random image
     img_paths = glob.glob(os.path.join(dataset_path, 'tusimple/*/clips/*/*/*.jpg'))
     if len(img_paths) == 0:
@@ -55,7 +61,7 @@ def test_random_image(model, dataset_path, use_offset):
 
     img_idx = random.randint(0, len(img_paths))
     print(f'\tRandom index: {img_idx}')
-    test_image(model, img_paths[img_idx], use_offset)
+    test_image(model, img_paths[img_idx], use_offset, device)
 
 def test_video(model, video_path, use_offset, device):
     print('[WARNING] Input video should be cropped to composition similar to TuSimple dataset for best accuracy')
@@ -89,8 +95,14 @@ def test_video(model, video_path, use_offset, device):
             cls, vertical = model.post_process(fpga_output)
         else:
             model_input = torch.from_numpy(np.moveaxis(img, 2, 0)).to(device).unsqueeze(0).float() / 255.0
+            if device == 'cuda':
+                torch.cuda.synchronize()
+
             start_time = time.time()
             cls, vertical, offset = model(model_input)
+
+            if device == 'cuda':
+                torch.cuda.synchronize()
             runtime.append(time.time() - start_time)
 
         if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
@@ -239,9 +251,9 @@ def main():
 
     print(f'\n[INFO] Running test: {args.test_mode}...')
     if args.test_mode == 'random_image':
-        test_random_image(model, args.dataset_path, args.offset)
+        test_random_image(model, args.dataset_path, args.offset, args.device)
     elif args.test_mode == 'image':
-        test_image(model, args.image_path, args.offset)
+        test_image(model, args.image_path, args.offset, args.device)
     elif args.test_mode == 'video':
         test_video(model, args.video_path, args.offset, args.device)
     elif args.test_mode == 'evaluate':
