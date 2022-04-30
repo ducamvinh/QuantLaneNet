@@ -37,10 +37,7 @@ def calc_framerate(thread_start_event):
     with torch.no_grad():
         for i in tqdm.tqdm(range(20000)):
             x = torch.rand(size=(1, 3, 256, 512), device='cuda')
-
-            torch.cuda.synchronize()
             start_time = time.time()
-
             y = model(x)
 
             if i >= 10000:
@@ -54,11 +51,16 @@ def calc_power(thread_stop_event):
     power_samples = []
 
     while not thread_stop_event.isSet():
-        power = subprocess.check_output(['nvidia-smi', '--query-gpu=power.draw', '--format=csv,noheader']).decode('utf-8')
-        power_samples.append(eval(power.split()[0]))
+        try:
+            power = subprocess.check_output(['nvidia-smi', '--query-gpu=power.draw', '--format=csv,noheader']).decode('utf-8')
+            power_samples.append(eval(power.split()[0]))
+        except NameError:
+            thread_stop_event.wait()
+            print("\n[INFO] Can't query GPU power")
+            return -1
         time.sleep(1)
 
-    print('Number of power samples:', len(power_samples))
+    print('\n[INFO] Number of power samples:', len(power_samples))
     return sum(power_samples) / len(power_samples)
 
 def get_os_name(os_release_path):
@@ -91,6 +93,13 @@ def main():
     gflops = count_ops(TestModel(), torch.rand(size=(1, 3, 256, 512)), verbose=False)[0] / 1e9
     linux_dist = get_os_name('/etc/os-release')
     gpu_name = subprocess.check_output(['nvidia-smi', '--query-gpu=name', '--format=csv,noheader']).decode('utf-8').strip()
+    throughput = gflops * framerate
+
+    '''
+    - Querying GPU clock frequency using max clock instead of querying actual clock during inference time
+        because multiple tests showed that during inference time, GPU clock is pushed to its max value.
+    - Also querying clock during inference time slightly hinders performance.
+    '''
     clocks = subprocess.Popen(['nvidia-smi', '--query', '--display=CLOCK'], stdout=subprocess.PIPE)
     gpu_clock_mhz = eval(subprocess.check_output(['grep', '--after-context=1', 'Max Clocks'], stdin=clocks.stdout).decode('utf-8').split()[-2])
 
@@ -102,10 +111,10 @@ def main():
         f'GPU clock  : {gpu_clock_mhz:,d} MHz\n'
         f'Linux dist : {linux_dist}\n'
         f'Frame rate : {framerate:.3f} FPS\n'
-        f'Power      : {power:.3f} W\n'
+        f'Power      : {"%.3f W" % power if power >= 0 else "N/A"}\n'
         f'Complexity : {gflops:.3f} GFLOPs\n'
-        f'Throughput : {(gflops * framerate):.3f} GOPS\n'
-        f'Efficiency : {(gflops * framerate / power):.3f} GOPS/W\n'
+        f'Throughput : {throughput:.3f} GOPS\n'
+        f'Efficiency : {"%.3f GOPS/W" % (throughput / power) if power >= 0 else "N/A"}\n'
     )
 
 if __name__ == '__main__':

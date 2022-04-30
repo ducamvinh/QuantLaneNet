@@ -18,8 +18,10 @@ import cv2
 import os
 
 def test_image(model, img_path, use_offset, device):
-    print('[WARNING] Input image should be cropped to composition similar to TuSimple dataset for best accuracy')
-    print(f'\tImage path: {img_path}')
+    print('[INFO] Input image should be cropped to composition similar to TuSimple dataset for best accuracy')
+    if device == 'cuda':
+        print('[INFO] PyTorch model running on CUDA is lazily initialized so runtime of an image may be longer than the runtime average of thousands of images')
+    print(f'[INFO] Image path: {img_path}')
 
     # Load image
     img = cv2.imread(img_path)
@@ -30,18 +32,16 @@ def test_image(model, img_path, use_offset, device):
     if isinstance(model, LaneDetectionModelFPGA):
         start_time = time.time()
         fpga_output = model(img, post_process=False)
-        print(f'\tProcess time: {((time.time() - start_time) * 1e3):.2f} ms')
+        print(f'[INFO] Process time: {((time.time() - start_time) * 1e3):.2f} ms')
         cls, vertical = model.post_process(fpga_output)
     else:
-        if device == 'cuda':
-            torch.cuda.synchronize()
-
+        _input = (torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0).to(device)
         start_time = time.time()
-        cls, vertical, offset = model(torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0)
+        cls, vertical, offset = model(_input)
 
         if device == 'cuda':
             torch.cuda.synchronize()
-        print(f'\tProcess time: {((time.time() - start_time) * 1e3):.2f} ms')
+        print(f'[INFO] Process time: {((time.time() - start_time) * 1e3):.2f} ms')
 
     # Display output
     if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
@@ -60,12 +60,11 @@ def test_random_image(model, dataset_path, use_offset, device):
         raise FileNotFoundError(f'No images found in {dataset_path}')
 
     img_idx = random.randint(0, len(img_paths))
-    print(f'\tRandom index: {img_idx}')
     test_image(model, img_paths[img_idx], use_offset, device)
 
 def test_video(model, video_path, use_offset, device):
-    print('[WARNING] Input video should be cropped to composition similar to TuSimple dataset for best accuracy')
-    print(f'Video path: {video_path}')
+    print('[INFO] Input video should be cropped to composition similar to TuSimple dataset for best accuracy')
+    print(f'[INFO] Video path: {video_path}')
 
     # Video stream
     cap = cv2.VideoCapture(video_path)
@@ -94,12 +93,9 @@ def test_video(model, video_path, use_offset, device):
             runtime.append(time.time() - start_time)
             cls, vertical = model.post_process(fpga_output)
         else:
-            model_input = torch.from_numpy(np.moveaxis(img, 2, 0)).to(device).unsqueeze(0).float() / 255.0
-            if device == 'cuda':
-                torch.cuda.synchronize()
-
+            _input = (torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0).to(device)
             start_time = time.time()
-            cls, vertical, offset = model(model_input)
+            cls, vertical, offset = model(_input)
 
             if device == 'cuda':
                 torch.cuda.synchronize()
@@ -120,9 +116,10 @@ def test_video(model, video_path, use_offset, device):
     runtime = sum(runtime) / len(runtime)
     print(
         f'\n'
-        f'\tAverage model runtime   : {(runtime * 1e3):.2f} ms\n'
-        f'\tAverage model framerate : {(1 / runtime):.2f} FPS\n'
-        f'\tActual video framerate  : {(iterator.format_dict["n"] / iterator.format_dict["elapsed"]):.2f} FPS\n'
+        f'[INFO] Results:\n'
+        f'\t- Average model runtime   : {(runtime * 1e3):.2f} ms\n'
+        f'\t- Average model framerate : {(1 / runtime):.2f} FPS\n'
+        f'\t- Actual video framerate  : {(iterator.format_dict["n"] / iterator.format_dict["elapsed"]):.2f} FPS\n'
     )
 
 def test_evaluate(model, dataset_path, use_offset, device):
@@ -141,9 +138,11 @@ def test_evaluate(model, dataset_path, use_offset, device):
     fp  = 0
     fn  = 0
 
-    iterator = tqdm.tqdm(test_set)
-    test_set_len = len(test_set)
+    print('[INFO] Evaluating model...')
     
+    iterator = tqdm.tqdm(test_set)
+    stop_idx = len(test_set) - 1
+
     for i, (img, cls_true, offset_true, vertical_true, gt) in enumerate(iterator):
         if model_type == 'fpga':
             cls_pred, vertical_pred = model(img, post_process=True)
@@ -160,7 +159,7 @@ def test_evaluate(model, dataset_path, use_offset, device):
         fp  += _fp
         fn  += _fn
 
-        if i % 10 == 0 or i == test_set_len - 1:
+        if i % 10 == 0 or i == stop_idx:
             iterator.set_postfix({
                 'acc': acc / (i + 1) * 100,
                 'fp' : fp  / (i + 1) * 100,
@@ -168,10 +167,10 @@ def test_evaluate(model, dataset_path, use_offset, device):
             })
 
     print(
-        f'\nEvaluated {model_type} model{"" if model_type == "fpga" else (" [WITH] offset" if use_offset else " [WITHOUT] offset")}:\n'
-        f'\tacc = {(acc / len(test_set) * 100):.4f}%\n'
-        f'\tfp  = {(fp  / len(test_set) * 100):.4f}%\n'
-        f'\tfn  = {(fn  / len(test_set) * 100):.4f}%\n'
+        f'\n[INFO] Evaluated {model_type} model{"" if model_type == "fpga" else (" [WITH] offset" if use_offset else " [WITHOUT] offset")}:\n'
+        f'\t- acc = {(acc / len(test_set) * 100):.4f}%\n'
+        f'\t- fp  = {(fp  / len(test_set) * 100):.4f}%\n'
+        f'\t- fn  = {(fn  / len(test_set) * 100):.4f}%\n'
     )
 
 def get_arguments():
@@ -249,7 +248,7 @@ def main():
         model.reset()
         model.write_weights(args.weights_bin_path)
 
-    print(f'\n[INFO] Running test: {args.test_mode}...')
+    print(f'[INFO] Running test: {args.test_mode}')
     if args.test_mode == 'random_image':
         test_random_image(model, args.dataset_path, args.offset, args.device)
     elif args.test_mode == 'image':
