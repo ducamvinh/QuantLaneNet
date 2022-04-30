@@ -19,7 +19,7 @@ import os
 
 def test_image(model, img_path, use_offset, device):
     print('[INFO] Input image should be cropped to composition similar to TuSimple dataset for best accuracy')
-    if device == 'cuda':
+    if device == 'cuda' and not isinstance(model, LaneDetectionModelFPGA):
         print('[INFO] PyTorch model running on CUDA is lazily initialized so runtime of an image may be longer than the runtime average of thousands of images')
     print(f'[INFO] Image path: {img_path}')
 
