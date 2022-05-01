@@ -15,7 +15,7 @@ class TuSimpleDataset(torch.utils.data.Dataset):
         super(TuSimpleDataset, self).__init__()
 
         if device not in ['cpu', 'cuda']:
-            raise ValueError('Expected "cpu" or "cuda" device, instead got "{device}".')
+            raise ValueError(f'Expected "cpu" or "cuda" device, instead got "{device}".')
 
         if evaluate == True and transform is not None:
             raise RuntimeError('Transformed dataset cannot return original ground truth.')
