@@ -17,7 +17,7 @@ def get_arguments():
     parser.add_argument('--video_path',       type=str, default='test_videos/video_0.mp4')
     parser.add_argument('--h2c_device',       type=str, default='/dev/xdma0_h2c_0')
     parser.add_argument('--c2h_device',       type=str, default='/dev/xdma0_c2h_0')
-    parser.add_argument('--xdma_tool_dir',    type=str, default='~/xdma/tools')
+    parser.add_argument('--xdma_tool_dir',    type=str, default='dma_ip_drivers/XDMA/linux-kernel/tools')
 
     args = parser.parse_args()
 

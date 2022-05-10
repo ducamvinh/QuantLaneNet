@@ -33,6 +33,7 @@ module top #(
     localparam OFFSET_WEIGHT = OFFSET_RESET + 4;                        // 0x0006_080C ### 395276
                                                              // HIGH_ADDR: 0x0008_5C52 ### 547922
                                                              // RANGE:     535.08K
+    localparam OFFSET_CLOCK_CNT = 'h0009_0000;
 
     // Soft reset
     reg [3:0] soft_reset_count;
@@ -256,12 +257,40 @@ module top #(
         .clk     (clk)
     );
 
+    // Clock counter
+    localparam CLOCK_CNT_IDLE = 0;
+    localparam CLOCK_CNT_BUSY = 1;
+
+    reg [0:0] clock_cnt_fsm;
+
+    always @ (posedge clk or negedge internal_reset_n) begin
+        if (~internal_reset_n) begin
+            clock_cnt_fsm <= CLOCK_CNT_IDLE;
+        end else begin
+            case (clock_cnt_fsm)
+                CLOCK_CNT_IDLE : clock_cnt_fsm <= first_pixel ? CLOCK_CNT_BUSY : CLOCK_CNT_IDLE;
+                CLOCK_CNT_BUSY : clock_cnt_fsm <= o_valid ? CLOCK_CNT_IDLE : CLOCK_CNT_BUSY;
+            endcase
+        end
+    end
+
+    reg [31:0] clock_cnt;
+
+    always @ (posedge clk) begin
+        if (clock_cnt_fsm == CLOCK_CNT_IDLE) begin
+            clock_cnt <= first_pixel ? 0 : clock_cnt;
+        end else if (clock_cnt_fsm == CLOCK_CNT_BUSY) begin
+            clock_cnt <= o_valid ? clock_cnt : clock_cnt + 1;
+        end
+    end
+
     // axi_rd_data
     always @ (*) begin
         case (axi_rd_addr)
-            OFFSET_OVALID : axi_rd_data <= {{31{1'b0}}, o_valid};
-            OFFSET_BUSY   : axi_rd_data <= {{31{1'b0}}, busy};
-            default       : axi_rd_data <= bram_within_range ? bram_rd_data : {32{1'b0}};
+            OFFSET_OVALID    : axi_rd_data <= {{31{1'b0}}, o_valid};
+            OFFSET_BUSY      : axi_rd_data <= {{31{1'b0}}, busy};
+            OFFSET_CLOCK_CNT : axi_rd_data <= clock_cnt;
+            default          : axi_rd_data <= bram_within_range ? bram_rd_data : {32{1'b0}};
         endcase
     end
 

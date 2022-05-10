@@ -3,7 +3,7 @@ set bitstream_path [file join $current_dir "../vivado_project/LaneDetectionCNN.r
 set mcs_path [file join [file dirname $bitstream_path] "design_1_wrapper.mcs"]
 
 if {![file exists $bitstream_path]} {
-    puts "$bitstream_path not found!"
+    puts "\[ERROR\] $bitstream_path not found!"
     exit
 }
 

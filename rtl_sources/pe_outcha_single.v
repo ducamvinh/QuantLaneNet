@@ -255,14 +255,17 @@ module pe_outcha_single #(
 
     // Layer scale reg
     wire signed [15:0] layer_scale;
+    wire bias_sum_trunc_valid;
     wire dequant_valid;
 
     generate
         if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen3
             reg [15:0] layer_scale_reg;
+            reg bias_sum_trunc_valid_reg;
             reg dequant_valid_reg;
 
             assign layer_scale = layer_scale_reg;
+            assign bias_sum_trunc_valid = bias_sum_trunc_valid_reg;
             assign dequant_valid = dequant_valid_reg;
 
             always @ (posedge clk) begin
@@ -271,13 +274,15 @@ module pe_outcha_single #(
                 end
             end
 
-           always @ (posedge clk or negedge rst_n) begin
-               if (~rst_n) begin
-                   dequant_valid_reg <= 1'b0;
-               end else begin
-                   dequant_valid_reg <= bias_valid_1;
-               end
-           end
+            always @ (posedge clk or negedge rst_n) begin
+                if (~rst_n) begin
+                    bias_sum_trunc_valid_reg <= 1'b0;
+                    dequant_valid_reg <= 1'b0;
+                end else begin
+                    bias_sum_trunc_valid_reg <= bias_valid_1;
+                    dequant_valid_reg <= bias_sum_trunc_valid_reg;
+                end
+            end
         end
     endgenerate
 
@@ -337,13 +342,19 @@ module pe_outcha_single #(
             else if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen6
                 // bias_sum truncate
                 wire signed [BIAS_SUM_WIDTH-16-1:0] bias_sum_int = bias_sum[BIAS_SUM_WIDTH-1:16];
-                wire signed [8+16-1:0] bias_sum_trunc = bias_sum_int >= 127 ? (127 << 16) : (bias_sum_int <= -128 ? (-128 << 16) : bias_sum[8+16-1:0]); 
+                reg signed [8+16-1:0] bias_sum_trunc;
             
+                always @ (posedge clk) begin
+                    if (bias_valid_1) begin
+                        bias_sum_trunc <= bias_sum_int >= 127 ? (127 << 16) : (bias_sum_int <= -128 ? (-128 << 16) : bias_sum[8+16-1:0]);
+                    end
+                end
+
                 // layer_scale mult
                 reg signed [39:0] dequant;
 
                 always @ (posedge clk) begin
-                    if (bias_valid_1) begin
+                    if (bias_sum_trunc_valid) begin
                         dequant <= bias_sum_trunc * layer_scale;
                     end
                 end

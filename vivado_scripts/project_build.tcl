@@ -72,14 +72,14 @@ set_property name pcie_refclk [get_bd_intf_ports CLK_IN_D_0]
 make_bd_intf_pins_external [get_bd_intf_pins xdma_0/pcie_mgt]
 set_property name pci_express_x1 [get_bd_intf_ports pcie_mgt_0]
 
-# FPGA 180 MHz clock
+# FPGA 200 MHz clock
 create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0
 apply_board_connection -board_interface "sys_diff_clock" -ip_intf "clk_wiz_0/CLK_IN1_D" -diagram "design_1" 
-set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {180.000} CONFIG.MMCM_DIVCLK_DIVIDE {5} CONFIG.MMCM_CLKFBOUT_MULT_F {24.750} CONFIG.MMCM_CLKOUT0_DIVIDE_F {5.500} CONFIG.CLKOUT1_JITTER {153.392} CONFIG.CLKOUT1_PHASE_ERROR {190.431}] [get_bd_cells clk_wiz_0]
+set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {200.000}] [get_bd_cells clk_wiz_0]
 
 # Connect AXI interfaces
 apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {reset ( FPGA Reset ) } Manual_Source {New External Port (ACTIVE_HIGH)}}  [get_bd_pins clk_wiz_0/reset]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (180 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (200 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
 
 # Set AXI address map
 set_property offset 0x00000000C0000000 [get_bd_addr_segs {xdma_0/M_AXI/SEG_LaneDetectionCNN_AXI_0_reg0}]

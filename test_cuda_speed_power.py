@@ -1,6 +1,5 @@
-from threading import Thread, Event
+from multiprocessing import Process, Event, Manager
 from pthflops import count_ops
-from queue import Queue
 import subprocess
 import torch
 import time
@@ -26,42 +25,63 @@ class TestModel(LaneDetectionModel):
 
         return torch.cat([cls, vertical], dim=3)
 
-def calc_framerate(thread_start_event):
+def calc_framerate(start_event, return_dict):
+    print('\n[INFO] Initializing model...')
     model = TestModel(dropout=True).to('cuda')
     model.eval()
 
+    num_test = 100000
     elapsed_time_samples = []
-    thread_start_event.set()
+    x = torch.rand(size=(1, 3, 256, 512), device='cuda')
+    
+    # Start calc_power_clock process
+    start_event.set()
 
-    print('[INFO] Running inference on 20000 random inputs...')
+    print(f'[INFO] Running inference {num_test:,d} times...')
     with torch.no_grad():
-        for i in tqdm.tqdm(range(20000)):
-            x = torch.rand(size=(1, 3, 256, 512), device='cuda')
+        for i in tqdm.tqdm(range(num_test)):
             start_time = time.time()
             y = model(x)
 
-            if i >= 10000:
+            if i >= 1000:
                 torch.cuda.synchronize()
                 elapsed_time_samples.append(time.time() - start_time)
 
-    return len(elapsed_time_samples) / sum(elapsed_time_samples)
+    return_dict['framerate'] = len(elapsed_time_samples) / sum(elapsed_time_samples)
 
-def calc_power(thread_stop_event):
-    time.sleep(1)
+def calc_power_clock(stop_event, return_dict):
+    # Check if current GPU support power query
+    if 'N/A' in subprocess.check_output(['nvidia-smi', '--query-gpu=power.draw', '--format=csv,noheader']).decode('utf-8'):
+        power_draw_query = False
+        time.sleep(3)
+    else:
+        power_draw_query = True
+        time.sleep(1)
+    
+    # Start sampling every 1 second
     power_samples = []
+    clock_samples = []
 
-    while not thread_stop_event.isSet():
-        try:
-            power = subprocess.check_output(['nvidia-smi', '--query-gpu=power.draw', '--format=csv,noheader']).decode('utf-8')
-            power_samples.append(eval(power.split()[0]))
-        except NameError:
-            thread_stop_event.wait()
-            print("\n[INFO] Can't query GPU power")
-            return -1
+    while not stop_event.is_set():
+        readings = subprocess.check_output(['nvidia-smi', '--query', '--display=POWER,CLOCK']).decode('utf-8')
+        
+        # Get clock
+        find_idx = readings.find('Graphics')
+        clock_samples.append(eval(readings[find_idx:readings.find('\n', find_idx)].split()[-2]))
+        
+        # Get power
+        if power_draw_query:
+            find_idx = readings.find('Power Draw')
+            power_samples.append(eval(readings[find_idx:readings.find('\n', find_idx)].split()[-2]))
+        else:
+            find_idx = readings.find('Avg', readings.find('Power Samples'))
+            power_samples.append(eval(readings[find_idx:readings.find('\n', find_idx)].split()[-2]))
+
         time.sleep(1)
 
-    print('\n[INFO] Number of power samples:', len(power_samples))
-    return sum(power_samples) / len(power_samples)
+    print('\n[INFO] Number of power/clock samples:', len(power_samples))
+    return_dict['power'] = sum(power_samples) / len(power_samples)
+    return_dict['clock'] = sum(clock_samples) / len(clock_samples)
 
 def get_os_name(os_release_path):
     with open(os_release_path, 'r') as f:
@@ -72,49 +92,45 @@ def get_os_name(os_release_path):
                 return dist_name + ' ' + line.split('"')[1]
 
 def main():
-    que = Queue()
+    # Init return_dict for parallel processes
+    manager = Manager()
+    return_dict = manager.dict()
 
-    thread_start_event = Event()
-    thread_stop_event = Event()
+    # Events
+    start_event = Event()
+    stop_event = Event()
 
-    thread_framerate = Thread(target=lambda q, arg: q.put(calc_framerate(arg)), args=(que, thread_start_event))
-    thread_power = Thread(target=lambda q, arg: q.put(calc_power(arg)), args=(que, thread_stop_event))
+    # Init processes
+    process_framerate = Process(target=calc_framerate, args=(start_event, return_dict))
+    process_power_clock = Process(target=calc_power_clock, args=(stop_event, return_dict))
 
-    thread_framerate.start()
-    thread_start_event.wait()
-    thread_power.start()
+    # Run processes
+    process_framerate.start()
+    start_event.wait()
+    process_power_clock.start()
 
-    thread_framerate.join()
-    thread_stop_event.set()
-    thread_power.join()
+    process_framerate.join()
+    stop_event.set()
+    process_power_clock.join()
 
-    framerate = que.get()
-    power = que.get()
+    # Get values
     gflops = count_ops(TestModel(), torch.rand(size=(1, 3, 256, 512)), verbose=False)[0] / 1e9
+    throughput = gflops * return_dict['framerate']
     linux_dist = get_os_name('/etc/os-release')
     gpu_name = subprocess.check_output(['nvidia-smi', '--query-gpu=name', '--format=csv,noheader']).decode('utf-8').strip()
-    throughput = gflops * framerate
-
-    '''
-    - Querying GPU clock frequency using max clock instead of querying actual clock during inference time
-        because multiple tests showed that during inference time, GPU clock is pushed to its max value.
-    - Also querying clock during inference time slightly hinders performance.
-    '''
-    clocks = subprocess.Popen(['nvidia-smi', '--query', '--display=CLOCK'], stdout=subprocess.PIPE)
-    gpu_clock_mhz = eval(subprocess.check_output(['grep', '--after-context=1', 'Max Clocks'], stdin=clocks.stdout).decode('utf-8').split()[-2])
 
     print(
         f'\n'
         f'#######################################\n'
         f'\n'
         f'GPU name   : {gpu_name}\n'
-        f'GPU clock  : {gpu_clock_mhz:,d} MHz\n'
+        f'GPU clock  : {return_dict["clock"]:,.0f} MHz\n'
         f'Linux dist : {linux_dist}\n'
-        f'Frame rate : {framerate:.3f} FPS\n'
-        f'Power      : {"%.3f W" % power if power >= 0 else "N/A"}\n'
+        f'Frame rate : {return_dict["framerate"]:.3f} FPS\n'
+        f'Power      : {return_dict["power"]:.3f} W\n'
         f'Complexity : {gflops:.3f} GFLOPs\n'
         f'Throughput : {throughput:.3f} GOPS\n'
-        f'Efficiency : {"%.3f GOPS/W" % (throughput / power) if power >= 0 else "N/A"}\n'
+        f'Efficiency : {(throughput / return_dict["power"]):.3f} GOPS/W\n'
     )
 
 if __name__ == '__main__':

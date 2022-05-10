@@ -314,15 +314,29 @@ module pe_incha_single #(
 
             // bias_sum truncate
             wire signed [MACC_OUTPUT_DATA_WIDTH-1:0] bias_sum_int = bias_sum[MACC_OUTPUT_DATA_WIDTH+16-1:16];
-            // 24-bit bias sum truncate (x2^-16)
-            wire signed [8+16-1:0] bias_sum_trunc = bias_sum_int >= 127 ? (127 << 16) : (bias_sum_int <= -128 ? (-128 << 16) : bias_sum[8+16-1:0]); 
-            
+            reg signed [8+16-1:0] bias_sum_trunc;  // 24-bit bias sum truncate (x2^-16)
+            reg bias_sum_trunc_valid;
+
+            always @ (posedge clk) begin
+                if (bias_valid) begin
+                    bias_sum_trunc <= bias_sum_int >= 127 ? (127 << 16) : (bias_sum_int <= -128 ? (-128 << 16) : bias_sum[8+16-1:0]);
+                end
+            end
+
+            always @ (posedge clk or negedge rst_n) begin
+                if (~rst_n) begin
+                    bias_sum_trunc_valid <= 1'b0;
+                end else begin
+                    bias_sum_trunc_valid <= bias_valid;
+                end
+            end
+
             // layer_scale mult
             reg signed [39:0] dequant;  // 24-bit bias sum (x2^-16) x 16-bit layer_scale (x2^-16) = 40-bit product (x2^-32)
             reg               dequant_valid;
 
             always @ (posedge clk) begin
-                if (bias_valid) begin
+                if (bias_sum_trunc_valid) begin
                     dequant <= bias_sum_trunc * layer_scale;
                 end
             end
@@ -331,7 +345,7 @@ module pe_incha_single #(
                 if (~rst_n) begin
                     dequant_valid <= 1'b0;
                 end else begin
-                    dequant_valid <= bias_valid;
+                    dequant_valid <= bias_sum_trunc_valid;
                 end
             end
 

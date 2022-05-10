@@ -17,7 +17,8 @@ set_property PULLUP true [get_ports pcie_perstn]
 set_property PACKAGE_PIN AV35 [get_ports pcie_perstn]
 
 # PCIe clock
-set_property LOC IBUFDS_GTE2_X1Y5 [get_cells {design_1_i/util_ds_buf_0/U0/USE_IBUFDS_GTE2.GEN_IBUFDS_GTE2[0].IBUFDS_GTE2_I}]
+set_property PACKAGE_PIN AB8 [get_ports {pcie_refclk_clk_p}]
+set_property PACKAGE_PIN AB7 [get_ports {pcie_refclk_clk_n}]
 
 # LEDs
 set_property IOSTANDARD LVCMOS18 [get_ports {led_8bits[0]}]

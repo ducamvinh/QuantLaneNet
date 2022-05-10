@@ -11,3 +11,4 @@ vivado_pid*
 *.bit
 test_videos
 *fixed_point*
+*old*
