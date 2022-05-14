@@ -1,5 +1,5 @@
 from multiprocessing import Process, Event, Manager
-from pthflops import count_ops
+from ptflops import get_model_complexity_info
 import subprocess
 import torch
 import time
@@ -114,8 +114,8 @@ def main():
     process_power_clock.join()
 
     # Get values
-    gflops = count_ops(TestModel(), torch.rand(size=(1, 3, 256, 512)), verbose=False)[0] / 1e9
-    throughput = gflops * return_dict['framerate']
+    flops, params = get_model_complexity_info(model=TestModel(), input_res=(3, 256, 512), as_strings=False, print_per_layer_stat=False, verbose=False)
+    throughput = flops / 1e9 * return_dict['framerate']
     linux_dist = get_os_name('/etc/os-release')
     gpu_name = subprocess.check_output(['nvidia-smi', '--query-gpu=name', '--format=csv,noheader']).decode('utf-8').strip()
 
@@ -128,7 +128,8 @@ def main():
         f'Linux dist : {linux_dist}\n'
         f'Frame rate : {return_dict["framerate"]:.3f} FPS\n'
         f'Power      : {return_dict["power"]:.3f} W\n'
-        f'Complexity : {gflops:.3f} GFLOPs\n'
+        f'Parameters : {"%.3f M" % (params / 1e6) if params >= 1e6 else "%.3f k" % (params / 1e3)}\n'
+        f'Complexity : {"%.3f GFLOPs" % (flops / 1e9) if flops >= 1e9 else "%.3f MFLOPs" % (flops / 1e6)}\n'
         f'Throughput : {throughput:.3f} GOPS\n'
         f'Efficiency : {(throughput / return_dict["power"]):.3f} GOPS/W\n'
     )
