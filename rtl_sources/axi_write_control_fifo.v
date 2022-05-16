@@ -20,24 +20,50 @@ module axi_write_control_fifo #(
     genvar i;
 
     // Break wr_data word into bytes
-    wire [7:0] axi_wr_data_bytes[0:3];
-    assign axi_wr_data_bytes[0] = axi_wr_data[7:0];
-    assign axi_wr_data_bytes[1] = axi_wr_data[15:8];
-    assign axi_wr_data_bytes[2] = axi_wr_data[23:16];
-    assign axi_wr_data_bytes[3] = axi_wr_data[31:24];
+    reg [7:0] axi_wr_data_bytes[0:3];
+
+    generate
+        for (i = 0; i < 4; i = i + 1) begin : gen0
+            always @ (posedge clk) begin
+                if (axi_wr_en && axi_wr_strobe[i]) begin
+                    axi_wr_data_bytes[i] <= axi_wr_data[(i+1)*8-1:i*8];
+                end
+            end
+        end
+    endgenerate
 
     // Write enable
-    wire within_range = axi_wr_addr >= AXI_BASE_ADDR && axi_wr_addr - AXI_BASE_ADDR < IN_HEIGHT * IN_WIDTH * 3;
-    wire wr_en = within_range & axi_wr_en & |axi_wr_strobe;
+    // wire within_range = axi_wr_addr >= AXI_BASE_ADDR && axi_wr_addr - AXI_BASE_ADDR < IN_HEIGHT * IN_WIDTH * 3;
+    // wire wr_en = within_range & axi_wr_en & |axi_wr_strobe;
+
+    reg [0:0] dumb_optimized_nets[0:3];
+    
+    always @ (posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            dumb_optimized_nets[0] <= 1'b0;
+            dumb_optimized_nets[1] <= 1'b0;
+            dumb_optimized_nets[2] <= 1'b0;
+            dumb_optimized_nets[3] <= 1'b0;
+        end else begin
+            dumb_optimized_nets[0] <= axi_wr_addr >= AXI_BASE_ADDR;
+            dumb_optimized_nets[1] <= axi_wr_addr - AXI_BASE_ADDR < IN_HEIGHT * IN_WIDTH * 3;
+            dumb_optimized_nets[2] <= axi_wr_en;
+            dumb_optimized_nets[3] <= |axi_wr_strobe;
+        end
+    end
+
+    wire within_range = dumb_optimized_nets[0] && dumb_optimized_nets[1];
+    wire wr_en = within_range && dumb_optimized_nets[2] && dumb_optimized_nets[3];
 
     // Pixel counter
     reg [$clog2(IN_WIDTH*IN_HEIGHT)-1:0] pixel_cnt;
     wire pixel_cnt_limit = pixel_cnt == IN_WIDTH * IN_HEIGHT - 1;
+    wire pixel_cnt_en;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             pixel_cnt <= 0;
-        end else if (fifo_wr_en) begin
+        end else if (pixel_cnt_en) begin
             pixel_cnt <= pixel_cnt_limit ? 0 : pixel_cnt + 1;
         end
     end
@@ -47,7 +73,7 @@ module axi_write_control_fifo #(
     reg       buff_regs_en[0:2];
 
     generate
-        for (i = 0; i < 3; i = i + 1) begin : gen0
+        for (i = 0; i < 3; i = i + 1) begin : gen1
             always @ (posedge clk) begin
                 if (buff_regs_en[i]) begin
                     buff_regs[i] <= axi_wr_data_bytes[i+1];
@@ -83,11 +109,16 @@ module axi_write_control_fifo #(
     end
 
     // Output
+    reg [8*3-1:0] _fifo_wr_data;
+    reg           _fifo_wr_en;
+
+    assign pixel_cnt_en = _fifo_wr_en;
+
     always @ (*) begin
         case (current_state)
             STATE_0: begin
-                fifo_wr_data <= {axi_wr_data_bytes[2], axi_wr_data_bytes[1], axi_wr_data_bytes[0]};
-                fifo_wr_en   <= wr_en;
+                _fifo_wr_data <= {axi_wr_data_bytes[2], axi_wr_data_bytes[1], axi_wr_data_bytes[0]};
+                _fifo_wr_en   <= wr_en;
 
                 buff_regs_en[0] <= 1'b0;
                 buff_regs_en[1] <= 1'b0;
@@ -95,8 +126,8 @@ module axi_write_control_fifo #(
             end
 
             STATE_1: begin
-                fifo_wr_data <= {axi_wr_data_bytes[1], axi_wr_data_bytes[0], buff_regs[2]};
-                fifo_wr_en   <= wr_en;
+                _fifo_wr_data <= {axi_wr_data_bytes[1], axi_wr_data_bytes[0], buff_regs[2]};
+                _fifo_wr_en   <= wr_en;
 
                 buff_regs_en[0] <= 1'b0;
                 buff_regs_en[1] <= wr_en;
@@ -104,8 +135,8 @@ module axi_write_control_fifo #(
             end
 
             STATE_2: begin
-                fifo_wr_data <= {axi_wr_data_bytes[0], buff_regs[2], buff_regs[1]};
-                fifo_wr_en   <= wr_en;
+                _fifo_wr_data <= {axi_wr_data_bytes[0], buff_regs[2], buff_regs[1]};
+                _fifo_wr_en   <= wr_en;
 
                 buff_regs_en[0] <= wr_en;
                 buff_regs_en[1] <= wr_en;
@@ -113,8 +144,8 @@ module axi_write_control_fifo #(
             end
 
             STATE_3: begin
-                fifo_wr_data <= {buff_regs[2], buff_regs[1], buff_regs[0]};
-                fifo_wr_en   <= 1'b1;
+                _fifo_wr_data <= {buff_regs[2], buff_regs[1], buff_regs[0]};
+                _fifo_wr_en   <= 1'b1;
 
                 buff_regs_en[0] <= 1'b0;
                 buff_regs_en[1] <= 1'b0;
@@ -123,6 +154,21 @@ module axi_write_control_fifo #(
         endcase
     end
 
+    always @ (posedge clk) begin
+        if (_fifo_wr_en) begin
+            fifo_wr_data <= _fifo_wr_data;
+        end
+    end
+
+    always @ (posedge clk or negedge rst_n) begin
+        if (~rst_n) begin
+            fifo_wr_en <= 1'b0;
+        end else begin
+            fifo_wr_en <= _fifo_wr_en;
+        end
+    end
+
+    // first pixel
     assign first_pixel = pixel_cnt == 0 && wr_en;
 
 endmodule

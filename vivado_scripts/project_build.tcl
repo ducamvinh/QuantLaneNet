@@ -1,4 +1,27 @@
-set project_dir [file join [file dirname $argv0] "../vivado_project"]
+# Process arguments
+set gui_idx [lsearch -exact $argv "gui"]
+
+# Check error
+if {$argc > 2 || ($argc == 2 && $gui_idx < 0)} {
+    puts "\[ERROR\] Invalid arguments. Expected project path and \"gui\"."
+    exit
+}
+
+# Set project path
+if {($gui_idx >= 0 && $argc == 1) || $argc == 0} {
+    set project_dir [file join [file dirname $argv0] "../vivado_project"]
+} else {
+    set project_dir [lindex $argv [expr {$gui_idx < 0 ? 0 : (-$gui_idx + 1)}]]
+}
+
+# Set run mode
+if {$gui_idx >= 0} {
+    set run_mode "gui"
+} else {
+    set run_mode "terminal"
+}
+
+# Set other paths
 set rtl_dir [file join [file dirname $argv0] "../rtl_sources"]
 set ip_repo_dir [file join $project_dir "ip_repo"]
 
@@ -6,11 +29,8 @@ set ip_repo_dir [file join $project_dir "ip_repo"]
 create_project LaneDetectionCNN $project_dir -part xc7vx485tffg1761-2
 set_property board_part xilinx.com:vc707:part0:1.4 [current_project]
 
-if {$argc != 0 && [lindex $argv 0] == 1} {
-    set run_in_gui 1
+if {$run_mode == "gui"} {
     start_gui
-} else {
-    set run_in_gui 0
 }
 
 ############################################### Create & edit IP ###############################################
@@ -54,7 +74,7 @@ create_bd_design "design_1"
 
 # XDMA
 create_bd_cell -type ip -vlnv xilinx.com:ip:xdma xdma_0
-set_property -dict [list CONFIG.pl_link_cap_max_link_width {X1} CONFIG.pl_link_cap_max_link_speed {5.0_GT/s} CONFIG.axisten_freq {125} CONFIG.pf0_device_id {7021} CONFIG.plltype {QPLL1} CONFIG.PF0_DEVICE_ID_mqdma {9021} CONFIG.PF2_DEVICE_ID_mqdma {9021} CONFIG.PF3_DEVICE_ID_mqdma {9021}] [get_bd_cells xdma_0]
+set_property -dict [list CONFIG.pl_link_cap_max_link_width {X1} CONFIG.pl_link_cap_max_link_speed {5.0_GT/s} CONFIG.axisten_freq {250} CONFIG.pf0_device_id {7021} CONFIG.plltype {QPLL1} CONFIG.PF0_DEVICE_ID_mqdma {9021} CONFIG.PF2_DEVICE_ID_mqdma {9021} CONFIG.PF3_DEVICE_ID_mqdma {9021}] [get_bd_cells xdma_0]
 
 # Clock buffer
 create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf util_ds_buf_0
@@ -79,7 +99,7 @@ set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ {200.000}] [get_bd_ce
 
 # Connect AXI interfaces
 apply_bd_automation -rule xilinx.com:bd_rule:board -config { Board_Interface {reset ( FPGA Reset ) } Manual_Source {New External Port (ACTIVE_HIGH)}}  [get_bd_pins clk_wiz_0/reset]
-apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (125 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (200 MHz)} Clk_xbar {/xdma_0/axi_aclk (125 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
+apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { Clk_master {/xdma_0/axi_aclk (250 MHz)} Clk_slave {/clk_wiz_0/clk_out1 (200 MHz)} Clk_xbar {/xdma_0/axi_aclk (250 MHz)} Master {/xdma_0/M_AXI} Slave {/LaneDetectionCNN_AXI_0/s00_axi} ddr_seg {Auto} intc_ip {New AXI Interconnect} master_apm {0}}  [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
 
 # Set AXI address map
 set_property offset 0x00000000C0000000 [get_bd_addr_segs {xdma_0/M_AXI/SEG_LaneDetectionCNN_AXI_0_reg0}]
@@ -155,7 +175,7 @@ set_property strategy Performance_NetDelay_high [get_runs impl_1]
 
 puts "\n########################### Finished building project ###########################\n"
 
-if {!$run_in_gui} {
+if {$run_mode == "terminal"} {
     start_gui
     open_bd_design {[file join $project_dir "LaneDetectionCNN.srcs/sources_1/bd/design_1/design_1.bd"]}
 }
