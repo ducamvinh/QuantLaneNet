@@ -1,20 +1,22 @@
 `timescale 1ns / 1ps
 
 module top #(
-    parameter AXI_ADDR_WIDTH = $clog2(547922)
+    parameter AXI_ADDR_WIDTH = $clog2('h9_0000 + 1)
 )(
     output                          o_valid,
     output                          busy,
-    output reg [31:0]               axi_rd_data,
-    input      [31:0]               axi_wr_data,
+    output reg [63:0]               axi_rd_data,
+    input      [63:0]               axi_wr_data,
     input      [AXI_ADDR_WIDTH-1:0] axi_wr_addr,
     input      [AXI_ADDR_WIDTH-1:0] axi_rd_addr,
     input                           axi_wr_en,
     input                           axi_rd_en,
-    input      [3:0]                axi_wr_strobe,
+    input      [7:0]                axi_wr_strobe,
     input                           clk,
     input                           rst_n
 );
+
+    genvar i;
 
     // IP params
     localparam IN_WIDTH = 512;
@@ -25,14 +27,13 @@ module top #(
     localparam OUT_HEIGHT = IN_HEIGHT / 8;
 
     // AXI addr map
-    localparam OFFSET_INPUT = 0;                                        // 0x0000_0000 ### 0
-    localparam OFFSET_OUTPUT = IN_WIDTH * IN_HEIGHT * 3;                // 0x0006_0000 ### 393216
-    localparam OFFSET_OVALID = OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;  // 0x0006_0800 ### 395264
-    localparam OFFSET_BUSY = OFFSET_OVALID + 4;                         // 0x0006_0804 ### 395268
-    localparam OFFSET_RESET = OFFSET_BUSY + 4;                          // 0x0006_0808 ### 395272
-    localparam OFFSET_WEIGHT = OFFSET_RESET + 4;                        // 0x0006_080C ### 395276
-                                                             // HIGH_ADDR: 0x0008_5C52 ### 547922
-                                                             // RANGE:     535.08K
+    localparam OFFSET_INPUT = 0;                                        // 0x0000_0000 ### 
+    localparam OFFSET_OUTPUT = IN_WIDTH * IN_HEIGHT * 3;                // 0x0006_0000 ### 
+    localparam OFFSET_OVALID = OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;  // 0x0006_0800 ### 
+    localparam OFFSET_BUSY = OFFSET_OVALID + 8;                         // 0x0006_0808 ### 
+    localparam OFFSET_RESET = OFFSET_BUSY + 8;                          // 0x0006_0810 ### 
+    localparam OFFSET_WEIGHT = OFFSET_RESET + 8;                        // 0x0006_0818 ### 
+                                                             // HIGH_ADDR: 0x0008_5C60 ### 
     localparam OFFSET_CLOCK_CNT = 'h0009_0000;
 
     // Soft reset
@@ -53,105 +54,179 @@ module top #(
         end
     end
 
-    // Weight write control
+    // Input FIFO
+    reg  [7*8-1:0] fifo_input_wr_data;
+    reg            fifo_input_wr_en;
+    wire [7*8-1:0] fifo_input_rd_data;
+    wire           fifo_input_empty;
+    wire           fifo_input_rd_en;
+
+    generate
+        for (i = 0; i < 8; i = i + 1) begin : gen0
+            always @ (posedge clk) begin
+                if (axi_wr_addr < OFFSET_OUTPUT && axi_wr_en && |axi_wr_strobe) begin
+                    fifo_input_wr_data[(i+1)*7-1:i*7] <= axi_wr_data[(i+1)*8-1:i*8+1];
+                end
+            end
+        end
+    endgenerate
+
+    always @ (posedge clk or negedge internal_reset_n) begin
+        if (~internal_reset_n) begin
+            fifo_input_wr_en <= 1'b0;
+        end else begin
+            fifo_input_wr_en <= axi_wr_addr < OFFSET_OUTPUT && axi_wr_en && |axi_wr_strobe;
+        end
+    end
+
+    fifo_single_read #(
+        .DATA_WIDTH (7 * 8),
+        .DEPTH      ((IN_WIDTH * IN_HEIGHT * 3) / 8)
+    ) u_fifo_input (
+        .rd_data     (fifo_input_rd_data),
+        .empty       (fifo_input_empty),
+        .full        (),
+        .almost_full (),
+        .wr_data     (fifo_input_wr_data),
+        .wr_en       (fifo_input_wr_en),
+        .rd_en       (fifo_input_rd_en),
+        .rst_n       (internal_reset_n),
+        .clk         (clk)
+    );
+
+    // Input FIFO translate
+    wire [63:0] fifo_input_rd_data_pad;
+    wire [23:0] model_i_data;
+    wire        model_fifo_empty;
+    wire        model_fifo_rd_en;
+
+    generate
+        for (i = 0; i < 8; i = i + 1) begin : gen1
+            assign fifo_input_rd_data_pad[(i+1)*8-1:i*8] = {1'b0, fifo_input_rd_data[(i+1)*7-1:i*7]};
+        end
+    endgenerate
+
+    fifo_64bits_to_fifo_24bits_input u_translate_input (
+        .o_data       (model_i_data),
+        .o_empty      (model_fifo_empty),
+        .o_fifo_rd_en (fifo_input_rd_en),
+        .i_data       (fifo_input_rd_data_pad),
+        .i_empty      (fifo_input_empty),
+        .i_fifo_rd_en (model_fifo_rd_en),
+        .clk          (clk),
+        .rst_n        (internal_reset_n)
+    );
+
+    // First pixel
+    reg [$clog2(IN_WIDTH*IN_HEIGHT)-1:0] pixel_cnt;
+
+    always @ (posedge clk or negedge internal_reset_n) begin
+        if (~internal_reset_n) begin
+            pixel_cnt <= 0;
+        end else if (model_fifo_rd_en) begin
+            pixel_cnt <= pixel_cnt == IN_HEIGHT * IN_WIDTH - 1 ? 0 : pixel_cnt + 1;
+        end
+    end
+
+    wire first_pixel = pixel_cnt == 0 && model_fifo_rd_en;
+
+    // Weight FIFO
+    wire [63:0] fifo_weight_rd_data;
+    wire        fifo_weight_empty;
+    wire        fifo_weight_rd_en;
+
+    fifo_single_read #(
+        .DATA_WIDTH (64),
+        .DEPTH      (((NUM_WEIGHTS + 4) / 4 * 4) / 4)
+    ) u_fifo_weight (
+        .rd_data     (fifo_weight_rd_data),
+        .empty       (fifo_weight_empty),
+        .full        (),
+        .almost_full (),
+        .wr_data     (axi_wr_data),
+        .wr_en       (axi_wr_addr >= OFFSET_WEIGHT && axi_wr_addr < OFFSET_WEIGHT + NUM_WEIGHTS * 2 && axi_wr_en && |axi_wr_strobe),
+        .rd_en       (fifo_weight_rd_en),
+        .rst_n       (internal_reset_n),
+        .clk         (clk)
+    );
+
+    // Weight FIFO translate
     wire [15:0] weight_wr_data;
     wire [31:0] weight_wr_addr;
     wire        weight_wr_en;
 
-    axi_write_control_weight #(
-        .NUM_WEIGHTS    (NUM_WEIGHTS),
-        .AXI_BASE_ADDR  (OFFSET_WEIGHT),
-        .AXI_ADDR_WIDTH (AXI_ADDR_WIDTH)
-    ) u_weight_wr (
+    fifo_64bits_to_mem_16bits_weight #(
+        .NUM_WEIGHTS (NUM_WEIGHTS)
+    ) u_translate_weight (
         .weight_wr_data (weight_wr_data),
-        .weight_wr_addr (weight_wr_addr), 
+        .weight_wr_addr (weight_wr_addr),
         .weight_wr_en   (weight_wr_en),
-        .axi_wr_data    (axi_wr_data),
-        .axi_wr_addr    (axi_wr_addr),
-        .axi_wr_strobe  (axi_wr_strobe),
-        .axi_wr_en      (axi_wr_en),
-        .clk            (clk), 
+        .fifo_rd_en     (fifo_weight_rd_en),
+        .fifo_rd_data   (fifo_weight_rd_data),
+        .fifo_empty     (fifo_weight_empty),
+        .clk            (clk),
         .rst_n          (internal_reset_n)
-    ); 
-
-    // Input fifo write control
-    wire [8*3-1:0] fifo_wr_data_;
-    wire           fifo_wr_en;
-    wire           first_pixel;
-
-    axi_write_control_fifo #(
-        .IN_WIDTH       (IN_WIDTH),
-        .IN_HEIGHT      (IN_HEIGHT),
-        .AXI_BASE_ADDR  (OFFSET_INPUT),
-        .AXI_ADDR_WIDTH (AXI_ADDR_WIDTH)
-    ) u_fifo_wr (
-        .fifo_wr_data  (fifo_wr_data_),
-        .fifo_wr_en    (fifo_wr_en),
-        .first_pixel   (first_pixel),
-        .axi_wr_data   (axi_wr_data),
-        .axi_wr_addr   (axi_wr_addr),
-        .axi_wr_strobe (axi_wr_strobe),
-        .axi_wr_en     (axi_wr_en),
-        .clk           (clk),
-        .rst_n         (internal_reset_n)
     );
 
-    // Input FIFO
-    wire [7*3-1:0] fifo_wr_data;
-    wire [7*3-1:0] fifo_rd_data;
-    wire           fifo_empty;
-    wire           fifo_rd_en;
+    // Weight pipeline registers
+    reg [15:0] weight_wr_data_pipeline[0:1];
+    reg [31:0] weight_wr_addr_pipeline[0:1];
+    reg [0:0]  weight_wr_en_pipeline[0:1];
 
-    assign fifo_wr_data = {
-        fifo_wr_data_[3*8-1:2*8+1],
-        fifo_wr_data_[2*8-1:1*8+1],
-        fifo_wr_data_[1*8-1:0*8+1]
-    };
+    generate
+        for (i = 0; i < 2; i = i + 1) begin : gen2
+            wire [15:0] wr_data;
+            wire [31:0] wr_addr;
+            wire [0:0]  wr_en;
 
-    fifo_single_read #(
-        .DATA_WIDTH        (7 * 3),
-        .DEPTH             (128),
-        .ALMOST_FULL_THRES (10)
-    ) u_fifo (
-        .rd_data     (fifo_rd_data),
-        .empty       (fifo_empty),
-        .full        (),
-        .almost_full (),
-        .wr_data     (fifo_wr_data),
-        .wr_en       (fifo_wr_en), 
-        .rd_en       (fifo_rd_en),
-        .rst_n       (internal_reset_n), 
-        .clk         (clk)
-    );
+            if (i == 0) begin : gen3
+                assign wr_data = weight_wr_data;
+                assign wr_addr = weight_wr_addr;
+                assign wr_en   = weight_wr_en;
+            end else begin : gen4
+                assign wr_data = weight_wr_data_pipeline[i-1];
+                assign wr_addr = weight_wr_addr_pipeline[i-1];
+                assign wr_en   = weight_wr_en_pipeline[i-1];
+            end
+
+            always @ (posedge clk) begin
+                if (wr_en) begin
+                    weight_wr_data_pipeline[i] <= wr_data;
+                    weight_wr_addr_pipeline[i] <= wr_addr;
+                end
+            end
+
+            always @ (posedge clk or negedge internal_reset_n) begin
+                if (~internal_reset_n) begin
+                    weight_wr_en_pipeline[i] <= 1'b0;
+                end else begin
+                    weight_wr_en_pipeline[i] <= wr_en;
+                end
+            end
+        end
+    endgenerate
 
     // Model
     wire [16*NUM_LANES-1:0] model_o_data_cls;
     wire [16*NUM_LANES-1:0] model_o_data_vertical;
-    wire [23:0]             model_i_data;
     wire                    model_o_valid_cls;
     wire                    model_o_valid_vertical;
     wire                    cls_fifo_almost_full;
     wire                    vertical_fifo_almost_full;
-    
-    assign model_i_data = {
-        {1'b0, fifo_rd_data[3*7-1:2*7]},
-        {1'b0, fifo_rd_data[2*7-1:1*7]},
-        {1'b0, fifo_rd_data[1*7-1:0*7]}
-    };
 
     model u_model (
         .o_data_cls           (model_o_data_cls),
 	    .o_data_vertical      (model_o_data_vertical),
 	    .o_valid_cls          (model_o_valid_cls),
 	    .o_valid_vertical     (model_o_valid_vertical), 
-	    .fifo_rd_en           (fifo_rd_en),
+	    .fifo_rd_en           (model_fifo_rd_en),
 	    .i_data               (model_i_data),
-	    .i_valid              (~fifo_empty),
+	    .i_valid              (~model_fifo_empty),
 	    .cls_almost_full      (cls_fifo_almost_full),
 	    .vertical_almost_full (vertical_fifo_almost_full),
-	    .weight_wr_data       (weight_wr_data),
-	    .weight_wr_addr       (weight_wr_addr),
-	    .weight_wr_en         (weight_wr_en),
+	    .weight_wr_data       (weight_wr_data_pipeline[1]),
+	    .weight_wr_addr       (weight_wr_addr_pipeline[1]),
+	    .weight_wr_en         (weight_wr_en_pipeline[1]),
 	    .clk                  (clk),
 	    .rst_n                (internal_reset_n)
     );
@@ -225,33 +300,22 @@ module top #(
     );
 
     // Post process BRAM
-    wire [8*4-1:0] bram_rd_data;
-    wire [AXI_ADDR_WIDTH-1:0] bram_rd_addr_ = axi_rd_addr - OFFSET_OUTPUT;
-    wire [$clog2(OUT_WIDTH*OUT_HEIGHT)-1:0] bram_rd_addr = bram_rd_addr_[$clog2(OUT_WIDTH*OUT_HEIGHT)+1:2];
-    wire bram_within_range = axi_rd_addr >= OFFSET_OUTPUT && axi_rd_addr - OFFSET_OUTPUT < OUT_WIDTH * OUT_HEIGHT;
-
-    reg [3:0] bram_byte_en;
-
-    always @ (*) begin
-        case (bram_wr_addr[1:0])
-            2'b00: bram_byte_en <= {1'b0, 1'b0, 1'b0, bram_wr_en};
-            2'b01: bram_byte_en <= {1'b0, 1'b0, bram_wr_en, 1'b0};
-            2'b10: bram_byte_en <= {1'b0, bram_wr_en, 1'b0, 1'b0};
-            2'b11: bram_byte_en <= {bram_wr_en, 1'b0, 1'b0, 1'b0};
-        endcase
-    end
+    wire [63:0] bram_rd_data;
+    wire [AXI_ADDR_WIDTH-1:0] bram_rd_addr = axi_rd_addr - OFFSET_OUTPUT;
+    wire bram_within_range = axi_rd_addr >= OFFSET_OUTPUT && axi_rd_addr < OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;
+    wire [7:0] bram_byte_en = bram_wr_en << bram_wr_addr[2:0];
 
     block_ram_multi_word #(
         .DATA_WIDTH      (8),
-        .DEPTH           (OUT_WIDTH * OUT_HEIGHT / 4),
-        .NUM_WORDS       (4),
+        .DEPTH           (OUT_WIDTH * OUT_HEIGHT / 8),
+        .NUM_WORDS       (8),
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("false")
     ) u_bram (
         .rd_data (bram_rd_data),
         .wr_data (bram_wr_data),
-        .rd_addr (bram_rd_addr),
-        .wr_addr (bram_wr_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:2]),
+        .rd_addr (bram_rd_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:3]),
+        .wr_addr (bram_wr_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:3]),
         .wr_en   (bram_byte_en),
         .rd_en   (axi_rd_en & bram_within_range),
         .clk     (clk)
@@ -287,10 +351,10 @@ module top #(
     // axi_rd_data
     always @ (*) begin
         case (axi_rd_addr)
-            OFFSET_OVALID    : axi_rd_data <= {{31{1'b0}}, o_valid};
-            OFFSET_BUSY      : axi_rd_data <= {{31{1'b0}}, busy};
-            OFFSET_CLOCK_CNT : axi_rd_data <= clock_cnt;
-            default          : axi_rd_data <= bram_within_range ? bram_rd_data : {32{1'b0}};
+            OFFSET_OVALID    : axi_rd_data <= {{63{1'b0}}, o_valid};
+            OFFSET_BUSY      : axi_rd_data <= {{63{1'b0}}, busy};
+            OFFSET_CLOCK_CNT : axi_rd_data <= {{32{1'b0}}, clock_cnt};
+            default          : axi_rd_data <= bram_within_range ? bram_rd_data : {64{1'b0}};
         endcase
     end
 

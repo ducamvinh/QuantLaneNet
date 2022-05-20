@@ -38,12 +38,12 @@ class LaneDetectionModelFPGA(object):
     @timeout_decorator.timeout(seconds=1, timeout_exception=TimeoutError)
     def wait_valid(self):
         valid = 0
-        valid_ref = (1).to_bytes(length=4, byteorder='little')
+        valid_ref = (1).to_bytes(length=8, byteorder='little')
 
         while valid != valid_ref:
             with open(self.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
-                valid = f.read(4)
+                valid = f.read(8)
 
     def _inference(self, img):
         # Check image shape

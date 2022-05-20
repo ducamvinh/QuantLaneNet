@@ -76,12 +76,12 @@ def main():
 
         # Wait for output to be valid
         valid = 0
-        valid_ref = (1).to_bytes(length=4, byteorder='little')
+        valid_ref = (1).to_bytes(length=8, byteorder='little')
 
         while valid != valid_ref:
             with open(args.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
-                valid = f.read(4)
+                valid = f.read(8)
 
         # Read output
         with open(args.c2h_device, 'rb') as f:
