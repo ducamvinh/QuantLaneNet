@@ -4,6 +4,7 @@ import subprocess
 import torch
 import time
 import tqdm
+import re
 
 from model.LaneDetectionModel import LaneDetectionModel
 
@@ -52,10 +53,10 @@ def calc_framerate(start_event, return_dict):
 def calc_power_clock(stop_event, return_dict):
     # Check if current GPU support power query
     if 'N/A' in subprocess.check_output(['nvidia-smi', '--query-gpu=power.draw', '--format=csv,noheader']).decode('utf-8'):
-        power_draw_query = False
+        pattern = r'Power Samples[\s\S]+Avg\s+: (\S+) W\s+Clocks\s+Graphics\s+: (\S+)'
         time.sleep(3)
     else:
-        power_draw_query = True
+        pattern = r'Power Draw\s+: (\S+)[\s\S]+\n\s+Clocks\s+Graphics\s+: (\S+)'
         time.sleep(1)
     
     # Start sampling every 1 second
@@ -64,18 +65,10 @@ def calc_power_clock(stop_event, return_dict):
 
     while not stop_event.is_set():
         readings = subprocess.check_output(['nvidia-smi', '--query', '--display=POWER,CLOCK']).decode('utf-8')
-        
-        # Get clock
-        find_idx = readings.find('Graphics')
-        clock_samples.append(eval(readings[find_idx:readings.find('\n', find_idx)].split()[-2]))
-        
-        # Get power
-        if power_draw_query:
-            find_idx = readings.find('Power Draw')
-            power_samples.append(eval(readings[find_idx:readings.find('\n', find_idx)].split()[-2]))
-        else:
-            find_idx = readings.find('Avg', readings.find('Power Samples'))
-            power_samples.append(eval(readings[find_idx:readings.find('\n', find_idx)].split()[-2]))
+        search = re.search(pattern, readings)
+
+        power_samples.append(eval(search.group(1)))
+        clock_samples.append(eval(search.group(2)))  
 
         time.sleep(1)
 
