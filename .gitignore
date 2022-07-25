@@ -5,6 +5,7 @@ checkpoint/model*
 fpga_test*.py
 vivado_project*
 *.log
+vivado_log
 *.jou
 .Xil
 vivado_pid*

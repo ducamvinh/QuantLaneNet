@@ -46,9 +46,9 @@ def convert(dataset_path, checkpoint_path, quantized_weights_path):
 def get_arguments():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--checkpoint_path',        type=str, default='checkpoint')
-    parser.add_argument('--dataset_path',           type=str, default='dataset')
-    parser.add_argument('--quantized_weights_path', type=str, default='quantized_weights_pertensor_symmetric.pth')
+    parser.add_argument('--checkpoint_path',        type=str, default='./checkpoint')
+    parser.add_argument('--dataset_path',           type=str, default='./dataset')
+    parser.add_argument('--quantized_weights_path', type=str, default='./weights/quantized_weights_pertensor_symmetric.pth')
 
     args = parser.parse_args()
 

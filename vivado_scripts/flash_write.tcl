@@ -1,9 +1,25 @@
-set current_dir [file dirname $argv0]
-set bitstream_path [file join $current_dir "../vivado_project/LaneDetectionCNN.runs/impl_1/design_1_wrapper.bit"]
-set mcs_path [file join [file dirname $bitstream_path] "design_1_wrapper.mcs"]
+# Source procs
+set script_dir [file dirname [info script]]
+source "${script_dir}/procs.tcl"
+
+# Check Vivado version
+vivadoVersionCheck "2020.2.2"
+
+# Process arguments
+switch [llength $argv] {
+    0 { set bitstream_path "[file dirname [info script]]/../vivado_project/LaneDetectionCNN.runs/impl_1/design_1_wrapper.bit" }
+    1 { set bitstream_path [lindex $argv 0] }
+    default {
+        puts "\[ERROR\] Too many arguments. Expected: ?<Bitstream (.bit) path>\n"
+        exit    
+    }
+}
+
+set bitstream_path  [file normalize $bitstream_path]
+set mcs_path       "[file dirname $bitstream_path]/design_1_wrapper.mcs"
 
 if {![file exists $bitstream_path]} {
-    puts "\[ERROR\] $bitstream_path not found!"
+    puts "\[ERROR\] Bitstream not found: ${bitstream_path}\n"
     exit
 }
 

@@ -331,7 +331,7 @@ def weight_addr_map(rtl_path):
 def get_arguments():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('--rtl_path', type=str, default='rtl_sources/model.v')
+    parser.add_argument('--rtl_path', type=str, default='./vivado_sources/rtl/model.v')
     parser.add_argument('--fifo_factor', type=int, default=1)
 
     return parser.parse_args()
