@@ -17,13 +17,11 @@ def get_arguments():
     parser.add_argument('--video_path',       type=str, default='./test_videos/video_0.mp4')
     parser.add_argument('--h2c_device',       type=str, default='/dev/xdma0_h2c_0')
     parser.add_argument('--c2h_device',       type=str, default='/dev/xdma0_c2h_0')
-    parser.add_argument('--xdma_tool_dir',    type=str, default='./dma_ip_drivers/XDMA/linux-kernel/tools')
 
     args = parser.parse_args()
 
     args.weights_bin_path = os.path.abspath(args.weights_bin_path)
     args.video_path = os.path.abspath(args.video_path)
-    args.xdma_tool_dir = os.path.abspath(args.xdma_tool_dir)
 
     return args
 
@@ -38,12 +36,12 @@ def main():
     # Write weights
     process = subprocess.run(
         args=[
-            os.path.join(args.xdma_tool_dir, 'dma_to_device'),
-            '--device', args.h2c_device,
-            '--count', '1',
-            '--address', f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
-            '--size', f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
-            '--data infile', args.weights_bin_path
+            './model_fpga/dma_to_device',
+            '--device',        args.h2c_device,
+            '--count',         '1',
+            '--address',       f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
+            '--size',          f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
+            '--data infile',   args.weights_bin_path
         ],
         stdout=subprocess.PIPE, 
         stderr=subprocess.PIPE

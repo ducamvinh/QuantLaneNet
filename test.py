@@ -187,7 +187,6 @@ def get_arguments():
     parser.add_argument('--video_path',             type=str, default='./test_videos/video_0.mp4')
     parser.add_argument('--h2c_device',             type=str, default='/dev/xdma0_h2c_0')
     parser.add_argument('--c2h_device',             type=str, default='/dev/xdma0_c2h_0')
-    parser.add_argument('--xdma_tool_dir',          type=str, default='./dma_ip_drivers/XDMA/linux-kernel/tools')
 
     # Use offset to evaluate software model
     parser.add_argument('--use_offset', dest='offset', action='store_true', help='Use offset output to evaluate software model')
@@ -199,7 +198,6 @@ def get_arguments():
     args.checkpoint_path = os.path.abspath(args.checkpoint_path)
     args.weights_bin_path = os.path.abspath(args.weights_bin_path)
     args.video_path = os.path.abspath(args.video_path)
-    args.xdma_tool_dir = os.path.abspath(args.xdma_tool_dir)
     args.quantized_weights_path = os.path.abspath(args.quantized_weights_path)
 
     if args.model == 'fpga' and args.offset:
@@ -239,12 +237,12 @@ def main():
     else:
         print(
             f'\t- Type           : FPGA\n'
-            f'\t- XDMA tools     : {args.xdma_tool_dir}\n'
-            f'\t- Kernel modules : {args.h2c_device}, {args.c2h_device}\n'
+            f'\t- Kernel modules : {args.h2c_device}\n'
+            f'\t                   {args.c2h_device}\n'
             f'\t- Weights binary : {args.weights_bin_path}\n'
         )
 
-        model = LaneDetectionModelFPGA(h2c_device=args.h2c_device, c2h_device=args.c2h_device, xdma_tool_dir=args.xdma_tool_dir)
+        model = LaneDetectionModelFPGA(h2c_device=args.h2c_device, c2h_device=args.c2h_device)
         model.reset()
         model.write_weights(args.weights_bin_path)
 

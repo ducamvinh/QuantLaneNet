@@ -2,16 +2,14 @@ import timeout_decorator
 import numpy as np
 import subprocess
 import torch
-import os
 
 import model_fpga.fpga_address_map as fpga_address_map
 
 class LaneDetectionModelFPGA(object):
 
-    def __init__(self, h2c_device='/dev/xdma0_h2c_0', c2h_device='/dev/xdma0_c2h_0', xdma_tool_dir='~/xdma/tools'):
+    def __init__(self, h2c_device='/dev/xdma0_h2c_0', c2h_device='/dev/xdma0_c2h_0'):
         self.h2c_device = h2c_device
         self.c2h_device = c2h_device
-        self.xdma_tool_dir = xdma_tool_dir
 
     def reset(self):
         with open(self.h2c_device, 'wb') as f:
@@ -21,12 +19,12 @@ class LaneDetectionModelFPGA(object):
     def write_weights(self, weight_file_path):
         process = subprocess.run(
             args=[
-                os.path.join(self.xdma_tool_dir, 'dma_to_device'),
-                '--device', self.h2c_device,
-                '--count', '1',
-                '--address', f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
-                '--size', f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
-                '--data infile', weight_file_path
+                './model_fpga/dma_to_device',
+                '--device',        self.h2c_device,
+                '--count',         '1',
+                '--address',       f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
+                '--size',          f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
+                '--data infile',   weight_file_path
             ],
             stdout=subprocess.PIPE, 
             stderr=subprocess.PIPE
