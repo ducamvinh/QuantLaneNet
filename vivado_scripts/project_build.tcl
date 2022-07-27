@@ -22,9 +22,9 @@ if {![info exists project_dir]} {
 }
   
 # Set other paths and normalize
-set project_dir [file normalize "${project_dir}"              ]
+set project_dir [file normalize "${project_dir}"                 ]
 set sources_dir [file normalize "${script_dir}/../vivado_sources"]
-set ip_repo_dir [file normalize "${project_dir}/ip_repo"      ]
+set ip_repo_dir [file normalize "${project_dir}/ip_repo"         ]
  
 # Source procs
 source "${script_dir}/procs.tcl"
@@ -152,11 +152,20 @@ create_bd_cell -type hier signal_leds
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconstant signal_leds/xlconstant_0
 set_property -dict [list CONFIG.CONST_VAL "0"] [get_bd_cells signal_leds/xlconstant_0]
 
+set clocks [list            \
+    util_ds_buf_0/IBUF_OUT  \
+    xdma_0/axi_aclk         \
+    clk_wiz_0/clk_out1      \
+]
+
 # Create counters to make clock leds
-for {set i 0} {$i < 3} {incr i} {
+for {set i 0} {$i < [llength $clocks]} {incr i} {
     # Binary counter
     create_bd_cell -type ip -vlnv xilinx.com:ip:c_counter_binary "signal_leds/c_counter_binary_${i}"
-    set_property -dict [list CONFIG.Output_Width "25"] [get_bd_cells "signal_leds/c_counter_binary_${i}"]
+    set_property -dict [list     \
+        CONFIG.Output_Width "25" \
+        CONFIG.AINIT_Value  "0"  \
+    ] [get_bd_cells "signal_leds/c_counter_binary_${i}"]
 
     # Slice block
     create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice "signal_leds/xlslice_${i}"
@@ -167,14 +176,10 @@ for {set i 0} {$i < 3} {incr i} {
         CONFIG.DOUT_WIDTH  "1"   \
     ] [get_bd_cells "signal_leds/xlslice_${i}"]
     
-    # Connect counter to slice block
-    connect_bd_net [get_bd_pins "signal_leds/c_counter_binary_${i}/Q"] [get_bd_pins "signal_leds/xlslice_${i}/Din"]
+    # Connect counter to clock source slice block
+    connect_bd_net [get_bd_pins "signal_leds/c_counter_binary_${i}/CLK"] [get_bd_pins [lindex $clocks $i]]
+    connect_bd_net [get_bd_pins "signal_leds/c_counter_binary_${i}/Q"  ] [get_bd_pins "signal_leds/xlslice_${i}/Din"]
 }
-
-# Connect counter clock sources
-connect_bd_net [get_bd_pins signal_leds/c_counter_binary_0/CLK] [get_bd_pins util_ds_buf_0/IBUF_OUT]
-connect_bd_net [get_bd_pins signal_leds/c_counter_binary_1/CLK] [get_bd_pins xdma_0/axi_aclk]
-connect_bd_net [get_bd_pins signal_leds/c_counter_binary_2/CLK] [get_bd_pins clk_wiz_0/clk_out1]
 
 # Create concat block for leds
 create_bd_cell -type ip -vlnv xilinx.com:ip:xlconcat signal_leds/xlconcat_0
@@ -209,6 +214,10 @@ puts "\n########################### Validate and save block design #############
 # Validate and save block design
 validate_bd_design
 save_bd_design
+
+if {"gui" ni $argv} {
+    close_bd_design [get_bd_designs design_1]
+}
 
 # Create HDL wrapper
 make_wrapper -files [get_files "${project_dir}/LaneDetectionCNN.srcs/sources_1/bd/design_1/design_1.bd"] -top
@@ -253,5 +262,6 @@ if {"launch_run" in $argv} {
 if {"gui" in $argv} {
     regenerate_bd_layout
 } else {
+    close_project
     exit
 }

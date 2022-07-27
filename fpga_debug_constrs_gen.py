@@ -2,30 +2,29 @@ import argparse
 
 def write_constrs(constrs_path):
     debug_list = [
-        { 'name': 'design_1_i/axi_smc_M00_AXI_ARADDR'                           , 'width': 20 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_RDATA'                            , 'width': 64 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_ARVALID'                          , 'width':  1 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_ARREADY'                          , 'width':  1 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_ARADDR'  , 'width': 20 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_RDATA'   , 'width': 64 },
+        # { 'name': 'design_1_i/axi_smc_M00_AXI_ARLEN'   , 'width':  8 },
+        # { 'name': 'design_1_i/axi_smc_M00_AXI_RLAST'   , 'width':  1 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_ARVALID' , 'width':  1 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_ARREADY' , 'width':  1 },
                          
-        { 'name': 'design_1_i/axi_smc_M00_AXI_AWADDR'                           , 'width': 20 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_WDATA'                            , 'width': 64 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_WSTRB'                            , 'width':  8 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_AWVALID'                          , 'width':  1 },
-        { 'name': 'design_1_i/axi_smc_M00_AXI_AWREADY'                          , 'width':  1 },
-
-        # { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/s00_axi_awaddr_latch' , 'width': 20},
-        # { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/s00_axi_araddr_latch' , 'width': 20},
-        # { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/s00_axi_wren'         , 'width':  1},
-        # { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/s00_axi_rden'         , 'width':  1},
+        { 'name': 'design_1_i/axi_smc_M00_AXI_AWADDR'  , 'width': 20 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_WDATA'   , 'width': 64 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_WSTRB'   , 'width':  8 },
+        # { 'name': 'design_1_i/axi_smc_M00_AXI_AWLEN'   , 'width':  8 },
+        # { 'name': 'design_1_i/axi_smc_M00_AXI_WLAST'   , 'width':  1 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_AWVALID' , 'width':  1 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_AWREADY' , 'width':  1 },
 
         { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH' , 'width': 20},
         { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH' , 'width': 20},
         { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN'         , 'width':  1},
         { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN'         , 'width':  1},
 
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt'                                  , 'width': 32},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy'                                       , 'width':  1},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid'                             , 'width':  1},
+        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt'      , 'width': 32},
+        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy'           , 'width':  1},
+        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid' , 'width':  1},
     ]
 
     with open(constrs_path, 'w') as f:
@@ -77,20 +76,20 @@ def write_constrs(constrs_path):
             )
 
             if i > 0:
-                f.write(f'create_debug_port         {"u_ila_0":<17} probe\n')
+                f.write(f'{"create_debug_port":<19} {"u_ila_0":<13} probe\n')
 
             f.write(
-                f'set_property PROBE_TYPE   {"DATA_AND_TRIGGER":<17} [get_debug_ports u_ila_0/probe{i}]\n'
-                f'set_property port_width   {(net["width"]):<17} [get_debug_ports u_ila_0/probe{i}]\n'
+                f'{"set_property":<19} {"PROBE_TYPE":<13} {"DATA_AND_TRIGGER":<17} [get_debug_ports u_ila_0/probe{i}]\n'
+                f'{"set_property":<19} {"port_width":<13} {(net["width"]):<17} [get_debug_ports u_ila_0/probe{i}]\n'
                 f'\n'
                 f'connect_debug_port u_ila_0/probe{i} [get_nets [list \\\n'
             )
 
             if net['width'] > 1:
                 for i in range(net['width']):
-                    f.write(f'    {{{net["name"]}[{i}]}}  \\\n')
+                    f.write(f'\t{{{net["name"]}[{i}]}}  \\\n')
             else:
-                f.write(f'    {{{net["name"]}}}  \\\n')
+                f.write(f'\t{{{net["name"]}}}  \\\n')
 
             f.write(
                 f']]\n'
