@@ -4,7 +4,7 @@ def write_constrs(constrs_path):
     debug_list = [
         { 'name': 'design_1_i/axi_smc_M00_AXI_ARADDR'  , 'width': 20 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_RDATA'   , 'width': 64 },
-        # { 'name': 'design_1_i/axi_smc_M00_AXI_ARLEN'   , 'width':  8 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_ARLEN'   , 'width':  8 },
         # { 'name': 'design_1_i/axi_smc_M00_AXI_RLAST'   , 'width':  1 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_ARVALID' , 'width':  1 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_ARREADY' , 'width':  1 },
@@ -12,7 +12,7 @@ def write_constrs(constrs_path):
         { 'name': 'design_1_i/axi_smc_M00_AXI_AWADDR'  , 'width': 20 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_WDATA'   , 'width': 64 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_WSTRB'   , 'width':  8 },
-        # { 'name': 'design_1_i/axi_smc_M00_AXI_AWLEN'   , 'width':  8 },
+        { 'name': 'design_1_i/axi_smc_M00_AXI_AWLEN'   , 'width':  8 },
         # { 'name': 'design_1_i/axi_smc_M00_AXI_WLAST'   , 'width':  1 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_AWVALID' , 'width':  1 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_AWREADY' , 'width':  1 },

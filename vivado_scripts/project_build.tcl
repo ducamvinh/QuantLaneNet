@@ -2,22 +2,23 @@
 # Process arguments 
 ##################################################################
  
-set script_dir [file dirname [info script]]
-set valid_args [list gui launch_run debug ]
+set script_dir  [file dirname [info script]]
+set valid_args  [list gui launch_run debug ]
+set project_dir ""
 
 foreach arg $argv {
     if {$arg ni $valid_args} {
-        if {[info exists project_dir]} {
+        if {$project_dir eq ""} {
+            set project_dir $arg
+        } else {
             puts "\[ERROR\] Unrecognized argument: \"${arg}\""
             puts "\tExpected: ?gui ?launch_run ?debug ?<Project directory path>\n"
             exit
-        } else {
-            set project_dir $arg
         }
     }
 }
 
-if {![info exists project_dir]} {
+if {$project_dir eq ""} {
     set project_dir "${script_dir}/../vivado_project"
 }
   
@@ -32,6 +33,11 @@ source "${script_dir}/procs.tcl"
 # Check Vivado version
 vivadoVersionCheck "2020.2.2"
 
+# Start GUI
+if {"gui" in $argv} {
+    start_gui
+}
+
 ##################################################################
 # Create project 
 ##################################################################
@@ -39,10 +45,6 @@ vivadoVersionCheck "2020.2.2"
 puts "\n########################### Creating project in ${project_dir} ###########################\n"
 create_project LaneDetectionCNN $project_dir -part xc7vx485tffg1761-2
 set_property board_part [lindex [lsort [get_board_parts *xilinx.com:vc707:part0*]] end] [current_project]
-
-if {"gui" in $argv} {
-    start_gui
-}
 
 ##################################################################
 # Create AXI IP 
@@ -72,11 +74,11 @@ ipx::infer_core -vendor user.org -library user -taxonomy /UserIP "${ip_repo_dir}
 
 # Repackage and save IP
 set_property previous_version_for_upgrade ::: [ipx::current_core]
-set_property core_revision 1 [ipx::current_core]
-ipx::create_xgui_files [ipx::current_core]
-ipx::update_checksums [ipx::current_core]
-ipx::check_integrity [ipx::current_core]
-ipx::save_core [ipx::current_core]
+set_property core_revision 1                  [ipx::current_core]
+ipx::create_xgui_files                        [ipx::current_core]
+ipx::update_checksums                         [ipx::current_core]
+ipx::check_integrity                          [ipx::current_core]
+ipx::save_core                                [ipx::current_core]
 
 # Close edit_ip project and update IP catalog
 close_project -delete

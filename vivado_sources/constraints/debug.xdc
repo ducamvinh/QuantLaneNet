@@ -94,6 +94,19 @@ set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_RDATA[62]}]
 set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_RDATA[63]}]
 
 #############################################################################
+# Mark debug: design_1_i/axi_smc_M00_AXI_ARLEN
+#############################################################################
+
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_ARLEN[7]}]
+
+#############################################################################
 # Mark debug: design_1_i/axi_smc_M00_AXI_ARVALID
 #############################################################################
 
@@ -211,6 +224,19 @@ set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_WSTRB[4]}]
 set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_WSTRB[5]}]
 set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_WSTRB[6]}]
 set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_WSTRB[7]}]
+
+#############################################################################
+# Mark debug: design_1_i/axi_smc_M00_AXI_AWLEN
+#############################################################################
+
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWLEN[7]}]
 
 #############################################################################
 # Mark debug: design_1_i/axi_smc_M00_AXI_AWVALID
@@ -458,14 +484,33 @@ connect_debug_port u_ila_0/probe1 [get_nets [list \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/axi_smc_M00_AXI_ARVALID
+# Connect to debug core: design_1_i/axi_smc_M00_AXI_ARLEN
 #############################################################################
 
 create_debug_port   u_ila_0       probe
 set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe2]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe2]
+set_property        port_width    8                 [get_debug_ports u_ila_0/probe2]
 
 connect_debug_port u_ila_0/probe2 [get_nets [list \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[0]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[1]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[2]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[3]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[4]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[5]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[6]}  \
+	{design_1_i/axi_smc_M00_AXI_ARLEN[7]}  \
+]]
+
+#############################################################################
+# Connect to debug core: design_1_i/axi_smc_M00_AXI_ARVALID
+#############################################################################
+
+create_debug_port   u_ila_0       probe
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe3]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe3]
+
+connect_debug_port u_ila_0/probe3 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_ARVALID}  \
 ]]
 
@@ -474,10 +519,10 @@ connect_debug_port u_ila_0/probe2 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe3]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe3]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe4]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe4]
 
-connect_debug_port u_ila_0/probe3 [get_nets [list \
+connect_debug_port u_ila_0/probe4 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_ARREADY}  \
 ]]
 
@@ -486,10 +531,10 @@ connect_debug_port u_ila_0/probe3 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe4]
-set_property        port_width    20                [get_debug_ports u_ila_0/probe4]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe5]
+set_property        port_width    20                [get_debug_ports u_ila_0/probe5]
 
-connect_debug_port u_ila_0/probe4 [get_nets [list \
+connect_debug_port u_ila_0/probe5 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_AWADDR[0]}  \
 	{design_1_i/axi_smc_M00_AXI_AWADDR[1]}  \
 	{design_1_i/axi_smc_M00_AXI_AWADDR[2]}  \
@@ -517,10 +562,10 @@ connect_debug_port u_ila_0/probe4 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe5]
-set_property        port_width    64                [get_debug_ports u_ila_0/probe5]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe6]
+set_property        port_width    64                [get_debug_ports u_ila_0/probe6]
 
-connect_debug_port u_ila_0/probe5 [get_nets [list \
+connect_debug_port u_ila_0/probe6 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_WDATA[0]}  \
 	{design_1_i/axi_smc_M00_AXI_WDATA[1]}  \
 	{design_1_i/axi_smc_M00_AXI_WDATA[2]}  \
@@ -592,10 +637,10 @@ connect_debug_port u_ila_0/probe5 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe6]
-set_property        port_width    8                 [get_debug_ports u_ila_0/probe6]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe7]
+set_property        port_width    8                 [get_debug_ports u_ila_0/probe7]
 
-connect_debug_port u_ila_0/probe6 [get_nets [list \
+connect_debug_port u_ila_0/probe7 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_WSTRB[0]}  \
 	{design_1_i/axi_smc_M00_AXI_WSTRB[1]}  \
 	{design_1_i/axi_smc_M00_AXI_WSTRB[2]}  \
@@ -607,14 +652,33 @@ connect_debug_port u_ila_0/probe6 [get_nets [list \
 ]]
 
 #############################################################################
+# Connect to debug core: design_1_i/axi_smc_M00_AXI_AWLEN
+#############################################################################
+
+create_debug_port   u_ila_0       probe
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe8]
+set_property        port_width    8                 [get_debug_ports u_ila_0/probe8]
+
+connect_debug_port u_ila_0/probe8 [get_nets [list \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[0]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[1]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[2]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[3]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[4]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[5]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[6]}  \
+	{design_1_i/axi_smc_M00_AXI_AWLEN[7]}  \
+]]
+
+#############################################################################
 # Connect to debug core: design_1_i/axi_smc_M00_AXI_AWVALID
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe7]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe7]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe9]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe9]
 
-connect_debug_port u_ila_0/probe7 [get_nets [list \
+connect_debug_port u_ila_0/probe9 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_AWVALID}  \
 ]]
 
@@ -623,10 +687,10 @@ connect_debug_port u_ila_0/probe7 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe8]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe8]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe10]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe10]
 
-connect_debug_port u_ila_0/probe8 [get_nets [list \
+connect_debug_port u_ila_0/probe10 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_AWREADY}  \
 ]]
 
@@ -635,10 +699,10 @@ connect_debug_port u_ila_0/probe8 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe9]
-set_property        port_width    20                [get_debug_ports u_ila_0/probe9]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe11]
+set_property        port_width    20                [get_debug_ports u_ila_0/probe11]
 
-connect_debug_port u_ila_0/probe9 [get_nets [list \
+connect_debug_port u_ila_0/probe11 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[0]}  \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[1]}  \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[2]}  \
@@ -666,10 +730,10 @@ connect_debug_port u_ila_0/probe9 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe10]
-set_property        port_width    20                [get_debug_ports u_ila_0/probe10]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe12]
+set_property        port_width    20                [get_debug_ports u_ila_0/probe12]
 
-connect_debug_port u_ila_0/probe10 [get_nets [list \
+connect_debug_port u_ila_0/probe12 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[0]}  \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[1]}  \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[2]}  \
@@ -697,10 +761,10 @@ connect_debug_port u_ila_0/probe10 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe11]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe11]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe13]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe13]
 
-connect_debug_port u_ila_0/probe11 [get_nets [list \
+connect_debug_port u_ila_0/probe13 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN}  \
 ]]
 
@@ -709,10 +773,10 @@ connect_debug_port u_ila_0/probe11 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe12]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe12]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe14]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe14]
 
-connect_debug_port u_ila_0/probe12 [get_nets [list \
+connect_debug_port u_ila_0/probe14 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN}  \
 ]]
 
@@ -721,10 +785,10 @@ connect_debug_port u_ila_0/probe12 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe13]
-set_property        port_width    32                [get_debug_ports u_ila_0/probe13]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe15]
+set_property        port_width    32                [get_debug_ports u_ila_0/probe15]
 
-connect_debug_port u_ila_0/probe13 [get_nets [list \
+connect_debug_port u_ila_0/probe15 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[0]}  \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[1]}  \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[2]}  \
@@ -764,10 +828,10 @@ connect_debug_port u_ila_0/probe13 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe14]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe14]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe16]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe16]
 
-connect_debug_port u_ila_0/probe14 [get_nets [list \
+connect_debug_port u_ila_0/probe16 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy}  \
 ]]
 
@@ -776,9 +840,9 @@ connect_debug_port u_ila_0/probe14 [get_nets [list \
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe15]
-set_property        port_width    1                 [get_debug_ports u_ila_0/probe15]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe17]
+set_property        port_width    1                 [get_debug_ports u_ila_0/probe17]
 
-connect_debug_port u_ila_0/probe15 [get_nets [list \
+connect_debug_port u_ila_0/probe17 [get_nets [list \
 	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid}  \
 ]]
