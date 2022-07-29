@@ -17,14 +17,14 @@ def write_constrs(constrs_path):
         { 'name': 'design_1_i/axi_smc_M00_AXI_AWVALID' , 'width':  1 },
         { 'name': 'design_1_i/axi_smc_M00_AXI_AWREADY' , 'width':  1 },
 
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH' , 'width': 20},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH' , 'width': 20},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN'         , 'width':  1},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN'         , 'width':  1},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH' , 'width': 20},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH' , 'width': 20},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN'         , 'width':  1},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN'         , 'width':  1},
 
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt'      , 'width': 32},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy'           , 'width':  1},
-        { 'name': 'design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid' , 'width':  1},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt'      , 'width': 32},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy'           , 'width':  1},
+        { 'name': 'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid' , 'width':  1},
     ]
 
     with open(constrs_path, 'w') as f:

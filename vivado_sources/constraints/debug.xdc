@@ -251,115 +251,115 @@ set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWVALID}]
 set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_AWREADY}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[0]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[1]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[2]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[3]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[4]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[5]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[6]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[7]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[8]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[9]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[10]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[11]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[12]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[13]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[14]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[15]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[16]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[17]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[18]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[19]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[7]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[8]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[9]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[10]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[11]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[12]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[13]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[14]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[15]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[16]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[17]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[18]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[19]}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[0]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[1]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[2]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[3]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[4]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[5]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[6]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[7]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[8]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[9]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[10]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[11]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[12]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[13]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[14]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[15]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[16]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[17]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[18]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[19]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[7]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[8]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[9]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[10]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[11]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[12]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[13]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[14]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[15]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[16]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[17]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[18]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[19]}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[0]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[1]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[2]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[3]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[4]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[5]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[6]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[7]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[8]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[9]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[10]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[11]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[12]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[13]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[14]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[15]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[16]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[17]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[18]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[19]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[20]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[21]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[22]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[23]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[24]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[25]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[26]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[27]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[28]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[29]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[30]}]
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[31]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[7]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[8]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[9]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[10]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[11]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[12]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[13]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[14]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[15]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[16]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[17]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[18]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[19]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[20]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[21]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[22]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[23]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[24]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[25]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[26]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[27]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[28]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[29]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[30]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[31]}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy}]
 
 #############################################################################
-# Mark debug: design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid
+# Mark debug: design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid
 #############################################################################
 
-set_property MARK_DEBUG true [get_nets {design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid}]
 
 ########################################################################
 # Create debug core
@@ -695,7 +695,7 @@ connect_debug_port u_ila_0/probe10 [get_nets [list \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -703,30 +703,30 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    20                [get_debug_ports u_ila_0/probe11]
 
 connect_debug_port u_ila_0/probe11 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[0]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[1]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[2]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[3]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[4]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[5]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[6]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[7]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[8]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[9]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[10]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[11]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[12]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[13]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[14]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[15]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[16]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[17]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[18]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_AWADDR_LATCH[19]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[0]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[1]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[2]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[3]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[4]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[5]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[6]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[7]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[8]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[9]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[10]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[11]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[12]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[13]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[14]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[15]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[16]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[17]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[18]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH[19]}  \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -734,30 +734,30 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    20                [get_debug_ports u_ila_0/probe12]
 
 connect_debug_port u_ila_0/probe12 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[0]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[1]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[2]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[3]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[4]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[5]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[6]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[7]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[8]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[9]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[10]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[11]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[12]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[13]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[14]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[15]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[16]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[17]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[18]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_ARADDR_LATCH[19]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[0]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[1]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[2]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[3]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[4]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[5]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[6]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[7]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[8]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[9]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[10]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[11]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[12]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[13]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[14]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[15]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[16]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[17]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[18]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH[19]}  \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -765,11 +765,11 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    1                 [get_debug_ports u_ila_0/probe13]
 
 connect_debug_port u_ila_0/probe13 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_WREN}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN}  \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -777,11 +777,11 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    1                 [get_debug_ports u_ila_0/probe14]
 
 connect_debug_port u_ila_0/probe14 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/LaneDetectionCNN_S00_AXI_inst/S_AXI_RDEN}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN}  \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -789,42 +789,42 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    32                [get_debug_ports u_ila_0/probe15]
 
 connect_debug_port u_ila_0/probe15 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[0]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[1]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[2]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[3]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[4]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[5]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[6]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[7]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[8]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[9]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[10]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[11]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[12]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[13]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[14]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[15]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[16]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[17]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[18]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[19]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[20]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[21]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[22]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[23]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[24]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[25]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[26]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[27]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[28]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[29]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[30]}  \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/clock_cnt[31]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[0]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[1]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[2]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[3]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[4]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[5]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[6]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[7]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[8]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[9]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[10]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[11]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[12]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[13]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[14]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[15]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[16]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[17]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[18]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[19]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[20]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[21]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[22]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[23]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[24]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[25]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[26]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[27]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[28]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[29]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[30]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[31]}  \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -832,11 +832,11 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    1                 [get_debug_ports u_ila_0/probe16]
 
 connect_debug_port u_ila_0/probe16 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/busy}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy}  \
 ]]
 
 #############################################################################
-# Connect to debug core: design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid
+# Connect to debug core: design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid
 #############################################################################
 
 create_debug_port   u_ila_0       probe
@@ -844,5 +844,5 @@ set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/pro
 set_property        port_width    1                 [get_debug_ports u_ila_0/probe17]
 
 connect_debug_port u_ila_0/probe17 [get_nets [list \
-	{design_1_i/LaneDetectionCNN_AXI_0/inst/u_cnn/u_post/o_valid}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid}  \
 ]]

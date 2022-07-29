@@ -43,7 +43,7 @@ if {"gui" in $argv} {
 ##################################################################
  
 puts "\n########################### Creating project in ${project_dir} ###########################\n"
-create_project LaneDetectionCNN $project_dir -part xc7vx485tffg1761-2
+create_project QuantLaneNet $project_dir -part xc7vx485tffg1761-2
 set_property board_part [lindex [lsort [get_board_parts *xilinx.com:vc707:part0*]] end] [current_project]
 
 ##################################################################
@@ -51,26 +51,26 @@ set_property board_part [lindex [lsort [get_board_parts *xilinx.com:vc707:part0*
 ##################################################################
 
 puts "\n########################### Creating IP ###########################\n"
-create_peripheral user.org user LaneDetectionCNN 1.0 -dir $ip_repo_dir
+create_peripheral user.org user QuantLaneNet 1.0 -dir $ip_repo_dir
 
 ipx::edit_ip_in_project                                 \
     -quiet                                              \
     -upgrade       true                                 \
-    -name          edit_LaneDetectionCNN_v1_0           \
+    -name          edit_QuantLaneNet_v1_0               \
     -directory     $ip_repo_dir                         \
-    "${ip_repo_dir}/LaneDetectionCNN_1.0/component.xml" \
+    "${ip_repo_dir}/QuantLaneNet_1.0/component.xml"     \
 
 add_files                                               \
     -force                                              \
     -norecurse                                          \
-    -copy_to "${ip_repo_dir}/LaneDetectionCNN_1.0/src"  \
+    -copy_to "${ip_repo_dir}/QuantLaneNet_1.0/src"      \
     [glob -directory "${sources_dir}/rtl" "*.v"]        \
 
-set_property top LaneDetectionCNN_AXI_IP [current_fileset]
+set_property top QuantLaneNet_AXI [current_fileset]
 update_compile_order -fileset sources_1
 
 # Infer AXI core from sources
-ipx::infer_core -vendor user.org -library user -taxonomy /UserIP "${ip_repo_dir}/LaneDetectionCNN_1.0/src"
+ipx::infer_core -vendor user.org -library user -taxonomy /UserIP "${ip_repo_dir}/QuantLaneNet_1.0/src"
 
 # Repackage and save IP
 set_property previous_version_for_upgrade ::: [ipx::current_core]
@@ -111,7 +111,7 @@ create_bd_cell -type ip -vlnv xilinx.com:ip:util_ds_buf util_ds_buf_0
 set_property -dict [list CONFIG.C_BUF_TYPE "IBUFDSGTE"] [get_bd_cells util_ds_buf_0]
 
 # Lane detection CNN IP
-create_bd_cell -type ip -vlnv user.org:user:LaneDetectionCNN_AXI_IP LaneDetectionCNN_AXI_0
+create_bd_cell -type ip -vlnv user.org:user:QuantLaneNet_AXI QuantLaneNet_AXI_0
 
 # Connect PCIe nets
 connect_bd_net [get_bd_pins util_ds_buf_0/IBUF_OUT] [get_bd_pins xdma_0/sys_clk]
@@ -138,15 +138,15 @@ apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
     Clk_slave    "/clk_wiz_0/clk_out1"                      \
     Clk_xbar     "Auto"                                     \
     Master       "/xdma_0/M_AXI"                            \
-    Slave        "/LaneDetectionCNN_AXI_0/s00_axi"          \
+    Slave        "/QuantLaneNet_AXI_0/s00_axi"              \
     ddr_seg      "Auto"                                     \
     intc_ip      "New AXI SmartConnect"                     \
     master_apm   "0"                                        \
-} [get_bd_intf_pins LaneDetectionCNN_AXI_0/s00_axi]
+} [get_bd_intf_pins QuantLaneNet_AXI_0/s00_axi]
 
 # Set AXI address map
-set_property offset 0x0 [get_bd_addr_segs "xdma_0/M_AXI/SEG_LaneDetectionCNN_AXI_0_reg0"]
-set_property range 1M [get_bd_addr_segs "xdma_0/M_AXI/SEG_LaneDetectionCNN_AXI_0_reg0"]
+set_property offset 0x0 [get_bd_addr_segs "xdma_0/M_AXI/SEG_QuantLaneNet_AXI_0_reg0"]
+set_property range 1M [get_bd_addr_segs "xdma_0/M_AXI/SEG_QuantLaneNet_AXI_0_reg0"]
 
 ############################################### Create logic for signal leds ###############################################
 
@@ -194,9 +194,9 @@ set led_signals [list              \
     signal_leds/xlslice_2/Dout     \
     xdma_0/user_lnk_up             \
     signal_leds/xlconstant_0/dout  \
-    LaneDetectionCNN_AXI_0/wr_led  \
-    LaneDetectionCNN_AXI_0/rd_led  \
-    LaneDetectionCNN_AXI_0/busy    \
+    QuantLaneNet_AXI_0/wr_led      \
+    QuantLaneNet_AXI_0/rd_led      \
+    QuantLaneNet_AXI_0/busy        \
 ]
 
 for {set i 0} {$i < 8} {incr i} {
@@ -222,8 +222,8 @@ if {"gui" ni $argv} {
 }
 
 # Create HDL wrapper
-make_wrapper -files [get_files "${project_dir}/LaneDetectionCNN.srcs/sources_1/bd/design_1/design_1.bd"] -top
-add_files -norecurse "${project_dir}/LaneDetectionCNN.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v"
+make_wrapper -files [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"] -top
+add_files -norecurse "${project_dir}/QuantLaneNet.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v"
 set_property top design_1_wrapper [current_fileset]
 
 # Add constraints
@@ -231,12 +231,12 @@ add_files                                                         \
     -fileset constrs_1                                            \
     -force                                                        \
     -norecurse                                                    \
-    -copy_to "${project_dir}/LaneDetectionCNN.srcs/constrs_1/new" \
+    -copy_to "${project_dir}/QuantLaneNet.srcs/constrs_1/new"     \
     [glob -directory "${sources_dir}/constraints" "*.xdc"]        \
 
 # Comment out constraint file for debug if not required
 if {"debug" ni $argv} {
-    commentFile "${project_dir}/LaneDetectionCNN.srcs/constrs_1/new/debug.xdc" "#"
+    commentFile "${project_dir}/QuantLaneNet.srcs/constrs_1/new/debug.xdc" "#"
 }
 
 # Change synthesis and implementation strategies
@@ -244,9 +244,9 @@ set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
 set_property strategy Performance_NetDelay_high [get_runs impl_1]
 
 # Generate output products
-set_property synth_checkpoint_mode None [get_files "${project_dir}/LaneDetectionCNN.srcs/sources_1/bd/design_1/design_1.bd"]
-generate_target all [get_files "${project_dir}/LaneDetectionCNN.srcs/sources_1/bd/design_1/design_1.bd"]
-export_ip_user_files -of_objects [get_files "${project_dir}/LaneDetectionCNN.srcs/sources_1/bd/design_1/design_1.bd"] -no_script -sync -force -quiet
+set_property synth_checkpoint_mode None [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
+generate_target all [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
+export_ip_user_files -of_objects [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"] -no_script -sync -force -quiet
 
 puts "\n########################### Finished building project ###########################\n"
 

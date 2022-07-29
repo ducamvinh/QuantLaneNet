@@ -7,7 +7,7 @@ vivadoVersionCheck "2020.2.2"
 
 # Process arguments
 switch [llength $argv] {
-    0 { set bitstream_path "[file dirname [info script]]/../vivado_project/LaneDetectionCNN.runs/impl_1/design_1_wrapper.bit" }
+    0 { set bitstream_path "[file dirname [info script]]/../vivado_project/QuantLaneNet.runs/impl_1/design_1_wrapper.bit" }
     1 { set bitstream_path [lindex $argv 0] }
     default {
         puts "\[ERROR\] Too many arguments. Expected: ?<Bitstream (.bit) path>\n"

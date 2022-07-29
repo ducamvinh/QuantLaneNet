@@ -1,7 +1,7 @@
 
 `timescale 1 ns / 1 ps
 
-	module LaneDetectionCNN_AXI_IP #
+	module QuantLaneNet_AXI #
 	(
 		// Users to add parameters here
 
@@ -83,7 +83,7 @@
 	wire                            s00_axi_wren;
 	wire                            s00_axi_rden;
 
-	LaneDetectionCNN_S00_AXI # ( 
+	QuantLaneNet_S00_AXI # ( 
 		.C_S_AXI_ID_WIDTH(C_S00_AXI_ID_WIDTH),
 		.C_S_AXI_DATA_WIDTH(C_S00_AXI_DATA_WIDTH),
 		.C_S_AXI_ADDR_WIDTH(C_S00_AXI_ADDR_WIDTH),
@@ -92,7 +92,7 @@
 		.C_S_AXI_WUSER_WIDTH(C_S00_AXI_WUSER_WIDTH),
 		.C_S_AXI_RUSER_WIDTH(C_S00_AXI_RUSER_WIDTH),
 		.C_S_AXI_BUSER_WIDTH(C_S00_AXI_BUSER_WIDTH)
-	) LaneDetectionCNN_S00_AXI_inst (
+	) QuantLaneNet_S00_AXI_inst (
 		// User-defined ports
 		.S_AXI_AWADDR_LATCH (s00_axi_awaddr_latch),
 		.S_AXI_ARADDR_LATCH (s00_axi_araddr_latch),
