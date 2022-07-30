@@ -1,9 +1,15 @@
+# Source procs
+set script_dir [file dirname [info script]]
+source -notrace "${script_dir}/procs.tcl"
+
+# Check Vivado version
+vivadoVersionCheck "2020.2.2"
+
 ##################################################################
 # Process arguments 
 ##################################################################
  
-set script_dir  [file dirname [info script]]
-set valid_args  [list gui launch_run debug ]
+set valid_args  [list gui launch_run debug]
 set project_dir ""
 
 foreach arg $argv {
@@ -12,7 +18,7 @@ foreach arg $argv {
             set project_dir $arg
         } else {
             puts "\[ERROR\] Unrecognized argument: \"${arg}\""
-            puts "\tExpected: ?gui ?launch_run ?debug ?<Project directory path>\n"
+            puts "        Expected: -tclargs ?gui ?launch_run ?debug ?<Project directory path>\n"
             exit
         }
     }
@@ -25,13 +31,7 @@ if {$project_dir eq ""} {
 # Set other paths and normalize
 set project_dir [file normalize "${project_dir}"                 ]
 set sources_dir [file normalize "${script_dir}/../vivado_sources"]
-set ip_repo_dir [file normalize "${project_dir}/ip_repo"         ]
- 
-# Source procs
-source "${script_dir}/procs.tcl"
-
-# Check Vivado version
-vivadoVersionCheck "2020.2.2"
+set ip_repo_dir [file normalize "${project_dir}/ip_repo"         ] 
 
 # Start GUI
 if {"gui" in $argv} {
@@ -41,8 +41,8 @@ if {"gui" in $argv} {
 ##################################################################
 # Create project 
 ##################################################################
- 
-puts "\n########################### Creating project in ${project_dir} ###########################\n"
+
+puts "\n##########################################\n# Creating project in ${project_dir}\n##########################################\n"
 create_project QuantLaneNet $project_dir -part xc7vx485tffg1761-2
 set_property board_part [lindex [lsort [get_board_parts *xilinx.com:vc707:part0*]] end] [current_project]
 
@@ -50,7 +50,7 @@ set_property board_part [lindex [lsort [get_board_parts *xilinx.com:vc707:part0*
 # Create AXI IP 
 ##################################################################
 
-puts "\n########################### Creating IP ###########################\n"
+puts "\n##########################################\n# Creating IP\n##########################################\n"
 create_peripheral user.org user QuantLaneNet 1.0 -dir $ip_repo_dir
 
 ipx::edit_ip_in_project                                 \
@@ -89,7 +89,7 @@ update_ip_catalog
 # Create block design in Vivado 
 ##################################################################
 
-puts "\n########################### Creating block design ###########################\n"
+puts "\n##########################################\n# Creating block design\n##########################################\n"
 create_bd_design "design_1"
 
 # XDMA
@@ -211,7 +211,7 @@ set_property name led_8bits [get_bd_ports dout_0]
 # Validate and save block design 
 ##################################################################
 
-puts "\n########################### Validate and save block design ###########################\n"
+puts "\n##########################################\n# Validate and save block design\n##########################################\n"
 
 # Validate and save block design
 validate_bd_design
@@ -248,15 +248,15 @@ set_property synth_checkpoint_mode None [get_files "${project_dir}/QuantLaneNet.
 generate_target all [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
 export_ip_user_files -of_objects [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"] -no_script -sync -force -quiet
 
-puts "\n########################### Finished building project ###########################\n"
+puts "\n##########################################\n# Finished building project\n##########################################\n"
 
 if {"launch_run" in $argv} {
     launch_runs impl_1 -to_step write_bitstream -jobs [numberOfCPUs]
 
     if {"gui" ni $argv} {
-        puts "\n########################## Running Synthesis ##########################\n"
+        puts "\n##########################################\n# Running Synthesis\n##########################################\n"
         wait_on_run -verbose synth_1
-        puts "\n########################## Running Implementation ##########################\n"
+        puts "\n##########################################\n# Running Implementation\n##########################################\n"
         wait_on_run -verbose impl_1
     }
 }
