@@ -4,7 +4,7 @@
 	module QuantLaneNet_AXI #
 	(
 		// Users to add parameters here
-
+		parameter integer LED_BLINK_COUNTER_WIDTH = 25,
 		// User parameters ends
 		// Do not modify the parameters beyond this line
 
@@ -167,7 +167,7 @@
 
 	// Blink LEDs 4 times when there's a read/write request
 	activity_led_blink #(
-    	.COUNTER_WIDTH (25)
+    	.COUNTER_WIDTH (LED_BLINK_COUNTER_WIDTH)
 	) u_led [1:0] (
     	.led_out ({wr_led, rd_led}),
 		.trigger ({s00_axi_wren & |s00_axi_wstrb, s00_axi_rden}),

@@ -70,6 +70,7 @@ if {[file exists $ltx_path]} {
 if {"write_flash" in $argv} {
     puts "\n##########################################\n# Programming FPGA flash\n##########################################\n"
 
+    # Write configuration file
     write_cfgmem                                        \
         -force                                          \
         -format       MCS                               \
@@ -122,6 +123,7 @@ program_hw_devices [lindex [get_hw_devices] 0]
 # Disconnect and exit
 ##################################################################
 
+puts "\n##########################################\n# Finished programming FPGA\n##########################################\n"
 disconnect_hw_server localhost:3121
 close_hw_manager
 exit

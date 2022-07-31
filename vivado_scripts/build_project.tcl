@@ -9,7 +9,7 @@ vivadoVersionCheck "2020.2.2"
 # Process arguments 
 ##################################################################
  
-set valid_args  [list gui launch_run debug]
+set valid_args  [list gui launch_run debug no_exit close_project]
 set project_dir ""
 
 foreach arg $argv {
@@ -18,7 +18,8 @@ foreach arg $argv {
             set project_dir $arg
         } else {
             puts "\[ERROR\] Unrecognized argument: \"${arg}\""
-            puts "        Expected: -tclargs ?gui ?launch_run ?debug ?<Project directory path>\n"
+            puts "[string repeat " " 8 ]Expected: -tclargs ?<Project directory path>"
+            puts "[string repeat " " 27]?[join $valid_args "\n[string repeat " " 27]?"]\n"
             exit
         }
     }
@@ -27,7 +28,7 @@ foreach arg $argv {
 if {$project_dir eq ""} {
     set project_dir "${script_dir}/../vivado_project"
 }
-  
+
 # Set other paths and normalize
 set project_dir [file normalize "${project_dir}"                 ]
 set sources_dir [file normalize "${script_dir}/../vivado_sources"]
@@ -91,6 +92,7 @@ update_ip_catalog
 
 puts "\n##########################################\n# Creating block design\n##########################################\n"
 create_bd_design "design_1"
+set blink_counter_width 26
 
 # XDMA
 create_bd_cell -type ip -vlnv xilinx.com:ip:xdma xdma_0
@@ -112,6 +114,7 @@ set_property -dict [list CONFIG.C_BUF_TYPE "IBUFDSGTE"] [get_bd_cells util_ds_bu
 
 # Lane detection CNN IP
 create_bd_cell -type ip -vlnv user.org:user:QuantLaneNet_AXI QuantLaneNet_AXI_0
+set_property -dict [list CONFIG.LED_BLINK_COUNTER_WIDTH [expr $blink_counter_width - 1]] [get_bd_cells QuantLaneNet_AXI_0]
 
 # Connect PCIe nets
 connect_bd_net [get_bd_pins util_ds_buf_0/IBUF_OUT] [get_bd_pins xdma_0/sys_clk]
@@ -164,18 +167,18 @@ set clocks [list            \
 for {set i 0} {$i < [llength $clocks]} {incr i} {
     # Binary counter
     create_bd_cell -type ip -vlnv xilinx.com:ip:c_counter_binary "signal_leds/c_counter_binary_${i}"
-    set_property -dict [list     \
-        CONFIG.Output_Width "25" \
-        CONFIG.AINIT_Value  "0"  \
+    set_property -dict [list                       \
+        CONFIG.Output_Width   $blink_counter_width \
+        CONFIG.AINIT_Value    0                    \
     ] [get_bd_cells "signal_leds/c_counter_binary_${i}"]
 
     # Slice block
     create_bd_cell -type ip -vlnv xilinx.com:ip:xlslice "signal_leds/xlslice_${i}"
-    set_property -dict [list     \
-        CONFIG.DIN_TO      "24"  \
-        CONFIG.DIN_FROM    "24"  \
-        CONFIG.DIN_WIDTH   "25"  \
-        CONFIG.DOUT_WIDTH  "1"   \
+    set_property -dict [list                                   \
+        CONFIG.DIN_TO         [expr $blink_counter_width - 1]  \
+        CONFIG.DIN_FROM       [expr $blink_counter_width - 1]  \
+        CONFIG.DIN_WIDTH      $blink_counter_width             \
+        CONFIG.DOUT_WIDTH     1                                \
     ] [get_bd_cells "signal_leds/xlslice_${i}"]
     
     # Connect counter to clock source slice block
@@ -240,8 +243,8 @@ if {"debug" ni $argv} {
 }
 
 # Change synthesis and implementation strategies
-set_property strategy Flow_PerfOptimized_high [get_runs synth_1]
-set_property strategy Performance_NetDelay_high [get_runs impl_1]
+set_property strategy "Vivado Synthesis Defaults"           [get_runs synth_1]
+set_property strategy "Performance_ExplorePostRoutePhysOpt" [get_runs impl_1 ]
 
 # Generate output products
 set_property synth_checkpoint_mode None [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
@@ -264,6 +267,11 @@ if {"launch_run" in $argv} {
 if {"gui" in $argv} {
     regenerate_bd_layout
 } else {
-    close_project
-    exit
+    if {"close_project" in $argv || "no_exit" ni $argv} {
+        close_project
+    }
+
+    if {"no_exit" ni $argv} {
+        exit
+    }
 }
