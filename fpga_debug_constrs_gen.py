@@ -59,7 +59,7 @@ def write_constrs(constrs_path):
             f'set_property   C_INPUT_PIPE_STAGES    0             [get_debug_cores u_ila_0]\n'
             f'set_property   C_TRIGIN_EN            false         [get_debug_cores u_ila_0]\n'
             f'set_property   C_TRIGOUT_EN           false         [get_debug_cores u_ila_0]\n'
-            f'set_property   C_DATA_DEPTH           16384         [get_debug_cores u_ila_0]\n'
+            f'set_property   C_DATA_DEPTH           32768         [get_debug_cores u_ila_0]\n'
             f'\n'
         )
 

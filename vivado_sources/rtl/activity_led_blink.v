@@ -9,9 +9,10 @@ module activity_led_blink #(
     input  rst_n
 );
 
-    localparam [COUNTER_WIDTH+1:0] RESET_VALUE = {{3{1'b0}}, {COUNTER_WIDTH-1{1'b1}}};
+    localparam [COUNTER_WIDTH-1:0] RESET_VALUE = {1'b0, {COUNTER_WIDTH-1{1'b1}}};
 
-    reg [COUNTER_WIDTH+1:0] counter;
+    // Counter register with an extra bit to blink twice
+    reg [COUNTER_WIDTH-1:0] counter;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
