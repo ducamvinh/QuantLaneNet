@@ -52,6 +52,25 @@ proc commentFile {path comm_char} {
 }
 
 #############################################################################################
+# Replace a string $search from the file with another string $replace
+#############################################################################################
+
+proc replaceString {path search replace} {
+    set FIN  [open "${path}"         r]
+    set FOUT [open "${path}.replace" w]
+
+    while {[gets $FIN line] >= 0} {
+        regsub -all $search $line $replace line
+        puts $FOUT $line
+    }
+
+    close $FIN
+    close $FOUT
+
+    file rename -force "${path}.replace" $path
+}
+
+#############################################################################################
 # Check Vivado version
 #############################################################################################
 

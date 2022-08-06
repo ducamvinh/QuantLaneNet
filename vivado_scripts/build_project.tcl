@@ -253,7 +253,12 @@ export_ip_user_files -of_objects [get_files "${project_dir}/QuantLaneNet.srcs/so
 
 # Create waveform configuration file for hardware debug
 file mkdir "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1"
-file copy -force "${sources_dir}/wave/hw_ila_data_1.wcfg" "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1"
+file copy -force "${sources_dir}/debug_wave/hw_ila_data_1.wcfg" "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1"
+
+replaceString                                                                    \
+    "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wcfg"  \
+    "INSERT WDB FILE HERE"                                                       \
+    "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wdb"   \
 
 puts "\n##########################################\n# Finished building project\n##########################################\n"
 

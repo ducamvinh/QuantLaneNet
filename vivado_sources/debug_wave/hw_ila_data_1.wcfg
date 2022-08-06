@@ -3,7 +3,8 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="/home/ducamvinh/QuantLaneNet/vivado_project_debug/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wdb" id="1">
+      <!-- <db_ref path="./QuantLaneNet/vivado_project_debug/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wdb" id="1"> -->
+      <db_ref path="INSERT WDB FILE HERE" id="1">
          <top_modules>
          </top_modules>
       </db_ref>

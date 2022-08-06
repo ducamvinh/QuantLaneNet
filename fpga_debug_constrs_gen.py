@@ -1,9 +1,8 @@
 import argparse
 
 def write_constrs(constrs_path):
-    # 'type' for multi-bit buses
-    # 'nets' for one-bit nets (one net or multiple nets grouped together in one debug port)
     debug_ports = [
+        # Type 'bus' for multi-bit buses
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_ARADDR'                                              , 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_RDATA'                                               , 'width': 64 },
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_ARLEN'                                               , 'width':  8 },
@@ -15,6 +14,7 @@ def write_constrs(constrs_path):
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH', 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt'                             , 'width': 32 },
 
+        # Type 'nets' for one-bit nets (one net or multiple nets grouped together in one debug port)
         { 'type': 'nets', 'list': [ 'design_1_i/axi_smc_M00_AXI_RLAST'                                        ,
                                     'design_1_i/axi_smc_M00_AXI_ARVALID'                                      ,
                                     'design_1_i/axi_smc_M00_AXI_ARREADY'                                      ,

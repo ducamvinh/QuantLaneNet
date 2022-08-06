@@ -181,7 +181,7 @@ def get_arguments():
     parser.add_argument('--batch_size',      type=int,   default=4)
     parser.add_argument('--lr',              type=float, default=0.001)
     parser.add_argument('--lr_reduce_gamma', type=float, default=0.7)
-    parser.add_argument('--lr_reduce_step',  type=int,   default=30)
+    parser.add_argument('--lr_reduce_step',  type=int,   default=200)
 
     # Transform
     parser.add_argument('--use_transform', dest='transform', action='store_true')
@@ -191,7 +191,7 @@ def get_arguments():
     # Dropout
     parser.add_argument('--use_dropout', dest='dropout', action='store_true')
     parser.add_argument('--no_dropout',  dest='dropout', action='store_false')
-    parser.set_defaults(dropout=False)
+    parser.set_defaults(dropout=True)
 
     args = parser.parse_args()
 
