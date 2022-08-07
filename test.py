@@ -22,6 +22,7 @@ def test_image(model, img_path, use_offset, device):
     if device == 'cuda' and not isinstance(model, LaneDetectionModelFPGA):
         print('[INFO] PyTorch model running on CUDA is lazily initialized so runtime of an image may be longer than the runtime average of thousands of images')
     print(f'[INFO] Image path: {img_path}')
+    id = os.path.basename(img_path)
 
     # Load image
     img = cv2.imread(img_path)
@@ -49,7 +50,7 @@ def test_image(model, img_path, use_offset, device):
 
     img = visualize(img, cls, vertical, offset)
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    cv2.imshow(img_path, img)
+    cv2.imshow(id, img)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
@@ -65,6 +66,7 @@ def test_random_image(model, dataset_path, use_offset, device):
 def test_video(model, video_path, use_offset, device):
     print('[INFO] Input video should be cropped to composition similar to TuSimple dataset for best accuracy')
     print(f'[INFO] Video path: {video_path}')
+    id = os.path.basename(video_path)
 
     # Video stream
     cap = cv2.VideoCapture(video_path)
@@ -107,7 +109,7 @@ def test_video(model, video_path, use_offset, device):
         # Update video
         img = visualize(img, cls, vertical, offset)
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        cv2.imshow(video_path, img)
+        cv2.imshow(id, img)
         cv2.waitKey(1)
         
     cap.release()

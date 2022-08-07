@@ -28,6 +28,18 @@ def get_arguments():
 def main():
     args = get_arguments()
 
+    # Print info
+    print(
+        f'[INFO] Initializing model...\n'
+        f'\t- Kernel modules : {args.h2c_device}\n'
+        f'\t                   {args.c2h_device}\n'
+        f'\t- Weights binary : {args.weights_bin_path}\n'
+        f'\n'
+        f'[INFO] Input video should be cropped to composition similar to TuSimple dataset for best accuracy\n'
+        f'[INFO] Video path: {args.video_path}'
+    )
+    id = os.path.basename(args.video_path)
+
     # Reset FPGA
     with open(args.h2c_device, 'wb') as f:
         f.seek(fpga_address_map.OFFSET_RESET)
@@ -94,7 +106,7 @@ def main():
         vis = cv2.cvtColor(vis, cv2.COLOR_RGB2BGR)
 
         # Update video window
-        cv2.imshow('video', vis)
+        cv2.imshow(id, vis)
         cv2.waitKey(1)
 
     cap.release()

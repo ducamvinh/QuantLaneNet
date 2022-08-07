@@ -82,8 +82,52 @@ To test the trained model, the './test.py' script can be used. This script is wr
 
 The test script has 4 modes, set with the '--test_mode' argument. Each mode comes with a different set of arguments:
 - **'image'**: run the model on one single image. The path of the image needs to be passed to the '--image_path' argument.
+
+        python3 ./test.py                     \
+            --model             software      \
+            --checkpoint_path   ./checkpoint  \
+            --device            cuda          \ 
+            --test_mode         image         \
+            --image_path        <path to some image>
+
 - **'random_image'**: run the model on a random image from the dataset. The path of the dataset directory needs to be passed to the '--dataset_path' argument.
+
+        python3 ./test.py                     \
+            --model             software      \
+            --checkpoint_path   ./checkpoint  \
+            --device            cuda          \
+            --test_mode         random_image  \
+            --dataset_path      ./dataset
+
 - **'video'**: run the model on a video. The path of the video needs to be passed to the argument '--video_path'
+
+        python3 ./test.py                     \
+            --model             software      \
+            --checkpoint_path   ./checkpoint  \
+            --device            cuda          \
+            --test_mode         video         \
+            --video_path        <path to some video>
+
 - **'evaluate'**: evaluate the model on the TuSimple dataset and output the Accuracy, FP and FN scores. The path of the dataset directory needs to be passed to the '--dataset_path' argument.
 
-Noted that the images and video passed to the model should be cropped to similar composition to those in the TuSimple dataset to get the best accuracy.
+        python3 ./test.py                     \
+            --model             software      \
+            --checkpoint_path   ./checkpoint  \
+            --device            cuda          \
+            --test_mode         evaluate      \
+            --dataset_path      ./dataset
+
+Note that the images and video passed to the model should be cropped to similar composition to those in the TuSimple dataset to get the best accuracy.
+
+## Offset map
+
+As presented in the paper, the model has 2 output branches, 'classification' and 'vertical'. However, I include a third output in the code: 'offset map'. Even though this output barely increases the accuracy of the model, it does help smooth out the output visually. To use it, pass the argument '--use_offset' when run './test.py' on the 'software' or 'quantized' version of the model.
+
+    python3 ./test.py                     \
+        --model             software      \
+        --checkpoint_path   ./checkpoint  \
+        --device            cuda          \
+        --test_mode         random_image  \
+        --dataset_path      ./dataset     \
+        --use_offset
+        
