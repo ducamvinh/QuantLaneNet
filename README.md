@@ -45,12 +45,12 @@ This source code is developed for the TuSimple dataset. The dataset can be downl
 
 ## Train model
 The trained weights are included in the repo under the [./checkpoint](./checkpoint) directory. If you want to train the model from scratch, this can be done by using the [train.py](./train.py) script. This script is written to be run with several arguments:
-- **--device**: 'cuda' or 'cpu', default as 'cpu'.
-- **--dataset_path**: path to root dataset directory mentioned above.
-- **--checkpoint_path**: path to a directory that stores all the checkpoints generated during training. After training, this directory is used to get the trained weights of the model.
-- **--loader_workers**: number of parallel workers to fetch dataset during training to increase speed, default as 1. As recommended by PyTorch, this number should be set to be 2 at most. However, everyone is free to experiment and find the best value for their system.
-- **--epochs**: number of epochs to train. The results from the paper is achieved after running 150 epochs.
-- **--batch_size**: set as 16 in the paper due to the constraint of GPU memory.
+- <code>--device</code>: <code>cuda</code> or <code>cpu</code>, default as <code>cpu</code>.
+- <code>--dataset_path</code>: path to root dataset directory mentioned above.
+- <code>--checkpoint_path</code>: path to a directory that stores all the checkpoints generated during training. After training, this directory is used to get the trained weights of the model.
+- <code>--loader_workers</code>: number of parallel workers to fetch dataset during training to increase speed, default as 1. As recommended by PyTorch, this number should be set to be 2 at most. However, everyone is free to experiment and find the best value for their system.
+- <code>--epochs</code>: number of epochs to train. The results from the paper is achieved after running 150 epochs.
+- <code>--batch_size</code>: set as 16 in the paper due to the constraint of GPU memory.
 
 All codes are written to be run from the repo directory. To train the model, the [train.py](./train.py) script can be run using this example command (can be tweaked as needed):
     
@@ -65,23 +65,23 @@ After every epoch, 3 new files are automatically added to the checkpoint directo
 - eval_xxx.pth
 - loss_xxx.pth
 
-If training is interrupted for some reason, when rerun, the same directory should be passed to the '--checkpoint_path' argument, so that training can resume from the latest checkpoint rather than from the start. This is optimal for training on Google Colab since the time required to train the model usually exceeds the allowed runtime on the platform.
+If training is interrupted for some reason, when rerun, the same directory should be passed to the <code>--checkpoint_path</code> argument, so that training can resume from the latest checkpoint rather than from the start. This is optimal for training on Google Colab since the time required to train the model usually exceeds the allowed runtime on the platform.
 
-Once finished training, further scripts to test the model will require the same directory for their '--checkpoint_path' arguments to get the trained weights. The scripts will be able to find the epoch with the highest accuracy to load into the model, not the final epoch.
+Once finished training, further scripts to test the model will require the same directory for their <code>--checkpoint_path</code> arguments to get the trained weights. The scripts will be able to find the epoch with the highest accuracy to load into the model, not the final epoch.
 
 ## Hardware implementation
 [README_HW.md](./README_HW.md)
 
 ## Test model
-To test the trained model, the [test.py](./test.py) script can be used. This script is written to run several tests on 3 different versions of the model. The type of model can be set by passing one of these values to the '--model' argument:
-- **'software'**: the regular trained PyTorch model. If this model is chosen, two more arguments need to be set for it:
-    - **--checkpoint_path**: path to the trained checkpoint directory.
-    - **--device**: 'cpu' or 'cuda'.
-- **'quantized'**: the 8-bit quantized model ([README_HW.md](./README_HW.md)).
-- **'fpga'**: the hardware model implemented in FPGA ([README_HW.md](./README_HW.md)).
+To test the trained model, the [test.py](./test.py) script can be used. This script is written to run several tests on 3 different versions of the model. The type of model can be set by passing one of these values to the <code>--model</code> argument:
+- <code>software</code>: the regular trained PyTorch model. If this model is chosen, two more arguments need to be set for it:
+    - <code>--checkpoint_path</code>: path to the trained checkpoint directory.
+    - <code>--device</code>: 'cpu' or 'cuda'.
+- <code>quantized</code>: the 8-bit quantized model ([README_HW.md](./README_HW.md)).
+- <code>fpga</code>: the hardware model implemented in FPGA ([README_HW.md](./README_HW.md)).
 
-The test script has 4 modes, set with the '--test_mode' argument. Each mode comes with a different set of arguments:
-- **'image'**: run the model on one single image. The path of the image needs to be passed to the '--image_path' argument.
+The test script has 4 modes, set with the <code>--test_mode</code> argument. Each mode comes with a different set of arguments:
+- <code>image</code>: run the model on one single image. The path of the image needs to be passed to the <code>--image_path</code> argument.
 
         python3 ./test.py                     \
             --model             software      \
@@ -90,7 +90,7 @@ The test script has 4 modes, set with the '--test_mode' argument. Each mode come
             --test_mode         image         \
             --image_path        <path to some image>
 
-- **'random_image'**: run the model on a random image from the dataset. The path of the dataset directory needs to be passed to the '--dataset_path' argument.
+- <code>random_image</code>: run the model on a random image from the dataset. The path of the dataset directory needs to be passed to the <code>--dataset_path</code> argument.
 
         python3 ./test.py                     \
             --model             software      \
@@ -99,7 +99,7 @@ The test script has 4 modes, set with the '--test_mode' argument. Each mode come
             --test_mode         random_image  \
             --dataset_path      ./dataset
 
-- **'video'**: run the model on a video. The path of the video needs to be passed to the argument '--video_path'
+- <code>video</code>: run the model on a video. The path of the video needs to be passed to the argument <code>--video_path</code>
 
         python3 ./test.py                     \
             --model             software      \
@@ -108,7 +108,7 @@ The test script has 4 modes, set with the '--test_mode' argument. Each mode come
             --test_mode         video         \
             --video_path        <path to some video>
 
-- **'evaluate'**: evaluate the model on the TuSimple dataset and output the Accuracy, FP and FN scores. The path of the dataset directory needs to be passed to the '--dataset_path' argument.
+- <code>evaluate</code>: evaluate the model on the TuSimple dataset and output the Accuracy, FP and FN scores. The path of the dataset directory needs to be passed to the <code>--dataset_path</code> argument.
 
         python3 ./test.py                     \
             --model             software      \
@@ -121,7 +121,7 @@ Note that the images and video passed to the model should be cropped to similar 
 
 ## Offset map
 
-As presented in the paper, the model has 2 output branches, 'classification' and 'vertical'. However, I include a third output in the code: 'offset map'. Even though this output barely increases the accuracy of the model, it does help smooth out the output visually. To use it, pass the argument '--use_offset' when run [test.py](./test.py) on the 'software' or 'quantized' version of the model.
+As presented in the paper, the model has 2 output branches, 'classification' and 'vertical'. However, I include a third output in the code: 'offset map'. Even though this output barely increases the accuracy of the model, it does help smooth out the output visually. To use it, pass the argument <code>--use_offset</code> when run [test.py](./test.py) on the <code>software</code> or <code>quantized</code> version of the model.
 
     python3 ./test.py                     \
         --model             software      \
