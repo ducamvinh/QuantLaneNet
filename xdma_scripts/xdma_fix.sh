@@ -1,8 +1,10 @@
 #!/bin/bash
 
+KERNEL=$(uname -r)
+
 # Create signing key
 echo -e "\n[FIX] Creating signing key..."
-cd /lib/modules/$(uname -r)/build/certs
+cd "/lib/modules/$KERNEL/build/certs"
 
 tee x509.genkey > /dev/null << 'EOF'
 [ req ]
@@ -22,8 +24,13 @@ EOF
 
 openssl req -new -nodes -utf8 -sha512 -days 36500 -batch -x509 -config x509.genkey -outform DER -out signing_key.x509 -keyout signing_key.pem
 
-# Create links
+# Create links if not exists
 echo -e "\n[FIX] Creating symlinks..."
-ln -vfs /sys/kernel/btf/vmlinux /usr/lib/modules/$(uname -r)/build/vmlinux
-ln -vfs /boot/System.map-$(uname -r) /usr/lib/modules/$(uname -r)/build/System.map
 
+DEST="/sys/kernel/btf/vmlinux"
+LINK="/usr/lib/modules/$KERNEL/build/vmlinux"
+[[ -e $LINK ]] && echo "Already exists: $LINK" || ln -sv $DEST $LINK
+
+DEST="/boot/System.map-$KERNEL"
+LINK="/usr/lib/modules/$KERNEL/build/System.map"
+[[ -e $LINK ]] && echo "Already exists: $LINK" || ln -sv $DEST $LINK

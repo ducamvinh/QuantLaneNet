@@ -1,6 +1,5 @@
 import timeout_decorator
 import numpy as np
-import subprocess
 import torch
 
 import model_fpga.fpga_address_map as fpga_address_map
@@ -17,21 +16,9 @@ class LaneDetectionModelFPGA(object):
             f.write(bytes([1]))
 
     def write_weights(self, weight_file_path):
-        process = subprocess.run(
-            args=[
-                './model_fpga/dma_to_device',
-                '--device',        self.h2c_device,
-                '--count',         '1',
-                '--address',       f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
-                '--size',          f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
-                '--data infile',   weight_file_path
-            ],
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.PIPE
-        )
-        
-        if process.stderr:
-            raise Exception(process.stderr.decode('utf-8'))
+        with open(self.h2c_device, 'wb') as f:
+            f.seek(fpga_address_map.OFFSET_WEIGHT)
+            np.fromfile(file=weight_file_path, dtype=np.ubyte).tofile(file=f)
 
     @timeout_decorator.timeout(seconds=1, timeout_exception=TimeoutError)
     def wait_valid(self):

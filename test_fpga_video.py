@@ -3,7 +3,6 @@ import model_fpga.fpga_address_map as fpga_address_map
 from data_utils.data_utils import visualize
 
 import numpy as np
-import subprocess
 import argparse
 import time
 import tqdm
@@ -46,21 +45,9 @@ def main():
         f.write(bytes([1]))
 
     # Write weights
-    process = subprocess.run(
-        args=[
-            './model_fpga/dma_to_device',
-            '--device',        args.h2c_device,
-            '--count',         '1',
-            '--address',       f'0x{fpga_address_map.OFFSET_WEIGHT:x}',
-            '--size',          f'0x{(fpga_address_map.NUM_WEIGHTS * 2):x}',
-            '--data infile',   args.weights_bin_path
-        ],
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE
-    )
-    
-    if process.stderr:
-        raise Exception(process.stderr.decode('utf-8'))
+    with open(args.h2c_device, 'wb') as f:
+        f.seek(fpga_address_map.OFFSET_WEIGHT)
+        np.fromfile(file=args.weights_bin_path, dtype=np.ubyte).tofile(file=f)
 
     # Video stream
     cap = cv2.VideoCapture(args.video_path)
