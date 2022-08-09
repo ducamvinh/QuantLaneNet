@@ -72,13 +72,11 @@ def main():
             img.tofile(file=f)
 
         # Wait for output to be valid
-        valid = 0
-        valid_ref = (1).to_bytes(length=8, byteorder='little')
-
-        while valid != valid_ref:
+        while True: 
             with open(args.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
-                valid = f.read(8)
+                if f.read(8) == b'\x01\x00\x00\x00\x00\x00\x00\x00':  # 64-bit "00000...001" little endian
+                    break
 
         # Read output
         with open(args.c2h_device, 'rb') as f:

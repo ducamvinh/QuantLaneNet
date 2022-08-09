@@ -21,14 +21,12 @@ class LaneDetectionModelFPGA(object):
             np.fromfile(file=weight_file_path, dtype=np.ubyte).tofile(file=f)
 
     @timeout_decorator.timeout(seconds=1, timeout_exception=TimeoutError)
-    def wait_valid(self):
-        valid = 0
-        valid_ref = (1).to_bytes(length=8, byteorder='little')
-
-        while valid != valid_ref:
+    def poll_valid(self):
+        while True: 
             with open(self.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
-                valid = f.read(8)
+                if f.read(8) == b'\x01\x00\x00\x00\x00\x00\x00\x00':  # 64-bit "00000...001" little endian
+                    break
 
     def _inference(self, img):
         # Check image shape
@@ -44,7 +42,7 @@ class LaneDetectionModelFPGA(object):
 
         # Wait for valid signal with a timeout
         try:
-            self.wait_valid()
+            self.poll_valid()
         except TimeoutError:
             raise TimeoutError('Valid polling timed out')
 

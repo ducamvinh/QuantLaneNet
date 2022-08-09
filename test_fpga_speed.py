@@ -20,11 +20,12 @@ def main():
 
     runtime = []
     num_test = 100000
-    x = np.random.randint(low=0, high=256, size=(256, 512, 3), dtype=np.ubyte)
 
     print(f'\n[INFO] Running inference {num_test:,d} times...')
 
     for _ in tqdm.tqdm(range(num_test)):
+        x = np.random.randint(low=0, high=256, size=(256, 512, 3), dtype=np.ubyte)
+
         # Write image to FPGA
         start_time = time.time()
         with open(args.h2c_device, 'wb') as f:
@@ -32,13 +33,11 @@ def main():
             x.tofile(file=f)
 
         # Wait for output to be valid
-        valid = 0
-        valid_ref = (1).to_bytes(length=8, byteorder='little')
-
-        while valid != valid_ref:
+        while True: 
             with open(args.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
-                valid = f.read(8)
+                if f.read(8) == b'\x01\x00\x00\x00\x00\x00\x00\x00':  # 64-bit "00000...001" little endian
+                    break
 
         # Read output
         with open(args.c2h_device, 'rb') as f:
