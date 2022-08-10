@@ -11,14 +11,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="27851fs"></ZoomEndTime>
-      <Cursor1Time time="774fs"></Cursor1Time>
+      <ZoomEndTime time="11181fs"></ZoomEndTime>
+      <Cursor1Time time="0fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="423"></NameColumnWidth>
-      <ValueColumnWidth column_width="150"></ValueColumnWidth>
+      <NameColumnWidth column_width="449"></NameColumnWidth>
+      <ValueColumnWidth column_width="122"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="5" />
+   <WVObjectSize size="6" />
    <wave_markers>
    </wave_markers>
    <wvobject type="group" fp_name="group22">
@@ -181,6 +181,15 @@
       <obj_property name="label">User Signals</obj_property>
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt">
+         <obj_property name="DisplayName">FullPathName</obj_property>
+         <obj_property name="ElementShortName">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[16:0]</obj_property>
+         <obj_property name="ObjectShortName">pixel_cnt[16:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="label">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[16:0]</obj_property>
+         <obj_property name="LABELRADIX">true</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      </wvobject>
       <wvobject type="array" fp_name="design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt">
          <obj_property name="DisplayName">FullPathName</obj_property>
          <obj_property name="ElementShortName">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[31:0]</obj_property>
@@ -202,6 +211,37 @@
          <obj_property name="ElementShortName">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid</obj_property>
          <obj_property name="ObjectShortName">o_valid</obj_property>
          <obj_property name="Radix">HEXRADIX</obj_property>
+         <obj_property name="LABELRADIX">true</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject type="group" fp_name="group30">
+      <obj_property name="label">Output BRAM</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject type="array" fp_name="design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[10:0]</obj_property>
+         <obj_property name="ObjectShortName">bram_wr_addr[10:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+         <obj_property name="label">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[10:0]</obj_property>
+         <obj_property name="LABELRADIX">true</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      </wvobject>
+      <wvobject type="array" fp_name="design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[3:0]</obj_property>
+         <obj_property name="ObjectShortName">bram_wr_data[3:0]</obj_property>
+         <obj_property name="Radix">HEXRADIX</obj_property>
+         <obj_property name="label">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[3:0]</obj_property>
+         <obj_property name="LABELRADIX">true</obj_property>
+         <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
+      </wvobject>
+      <wvobject type="logic" fp_name="design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en">
+         <obj_property name="DisplayName">label</obj_property>
+         <obj_property name="ElementShortName">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en</obj_property>
+         <obj_property name="ObjectShortName">bram_wr_en</obj_property>
+         <obj_property name="label">design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en</obj_property>
          <obj_property name="LABELRADIX">true</obj_property>
          <obj_property name="WaveformStyle">STYLE_DIGITAL</obj_property>
       </wvobject>

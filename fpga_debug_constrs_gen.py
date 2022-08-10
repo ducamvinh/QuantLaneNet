@@ -1,6 +1,26 @@
 import argparse
 
 def write_constrs(constrs_path):
+
+    ###############################################################################
+    # ILA debug depth
+    ###############################################################################
+
+    # Chose one
+    # debug_depth = 1024
+    # debug_depth = 2048
+    # debug_depth = 4096
+    # debug_depth = 8192
+    debug_depth = 16384
+    # debug_depth = 32768
+    # debug_depth = 65536
+    # debug_depth = 131072
+
+    ###############################################################################
+    # Nets to debug
+    ###############################################################################
+
+    # Select nets to debug
     debug_ports = [
         # Type 'bus' for multi-bit buses
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_ARADDR'                                              , 'width': 20 },
@@ -12,7 +32,9 @@ def write_constrs(constrs_path):
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_AWLEN'                                               , 'width':  8 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH', 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH', 'width': 20 },
+        { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt'                             , 'width': 17 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt'                             , 'width': 32 },
+        { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr'                   , 'width': 11 },
 
         # Type 'nets' for one-bit nets (one net or multiple nets grouped together in one debug port)
         { 'type': 'nets', 'list': [ 'design_1_i/axi_smc_M00_AXI_RLAST'                                        ,
@@ -24,8 +46,18 @@ def write_constrs(constrs_path):
                                     'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN' ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN' ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy'                           , 
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid'                 ]},
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid'                 ,
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en'              ,
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[0]'         ,
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[1]'         ,
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[2]'         ,
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[3]'         ,
+        ]},
     ]
+
+    ###############################################################################
+    # Generate xdc
+    ###############################################################################
 
     # Write xdc file
     with open(constrs_path, 'w') as f:
@@ -52,20 +84,20 @@ def write_constrs(constrs_path):
             f'########################################################################\n'
             f'\n'
             f'create_debug_core                     u_ila_0 ila\n'
-            f'set_property   ALL_PROBE_SAME_MU      true          [get_debug_cores u_ila_0]\n'
-            f'set_property   ALL_PROBE_SAME_MU_CNT  1             [get_debug_cores u_ila_0]\n'
-            f'set_property   C_ADV_TRIGGER          false         [get_debug_cores u_ila_0]\n'
-            f'set_property   C_EN_STRG_QUAL         false         [get_debug_cores u_ila_0]\n'
-            f'set_property   C_INPUT_PIPE_STAGES    0             [get_debug_cores u_ila_0]\n'
-            f'set_property   C_TRIGIN_EN            false         [get_debug_cores u_ila_0]\n'
-            f'set_property   C_TRIGOUT_EN           false         [get_debug_cores u_ila_0]\n'
-            f'set_property   C_DATA_DEPTH           32768         [get_debug_cores u_ila_0]\n'
+            f'set_property   ALL_PROBE_SAME_MU      {"true":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   ALL_PROBE_SAME_MU_CNT  {"1":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   C_ADV_TRIGGER          {"false":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   C_EN_STRG_QUAL         {"false":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   C_INPUT_PIPE_STAGES    {"0":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   C_TRIGIN_EN            {"false":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   C_TRIGOUT_EN           {"false":<13} [get_debug_cores u_ila_0]\n'
+            f'set_property   C_DATA_DEPTH           {debug_depth:<13} [get_debug_cores u_ila_0]\n'
             f'\n'
         )
 
         f.write(
-            f'set_property port_width 1 [get_debug_ports u_ila_0/clk]\n'
-            f'connect_debug_port u_ila_0/clk [get_nets [list design_1_i/clk_wiz_0/inst/clk_out1]]\n'
+            f'set_property        port_width 1  [get_debug_ports u_ila_0/clk]\n'
+            f'connect_debug_port  u_ila_0/clk   [get_nets [list design_1_i/clk_wiz_0/inst/clk_out1]]\n'
         )
 
         for i, port in enumerate(debug_ports):

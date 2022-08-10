@@ -280,6 +280,28 @@ set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/Quant
 # Mark debug: Port 9
 #############################################################################
 
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[7]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[8]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[9]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[10]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[11]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[12]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[13]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[14]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[15]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[16]}]
+
+#############################################################################
+# Mark debug: Port 10
+#############################################################################
+
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[0]}]
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[1]}]
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[2]}]
@@ -314,7 +336,23 @@ set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[31]}]
 
 #############################################################################
-# Mark debug: Port 10
+# Mark debug: Port 11
+#############################################################################
+
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[3]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[4]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[5]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[6]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[7]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[8]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[9]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[10]}]
+
+#############################################################################
+# Mark debug: Port 12
 #############################################################################
 
 set_property MARK_DEBUG true [get_nets {design_1_i/axi_smc_M00_AXI_RLAST}]
@@ -327,6 +365,11 @@ set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/Quant
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN}]
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy}]
 set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[0]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[1]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[2]}]
+set_property MARK_DEBUG true [get_nets {design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[3]}]
 
 ########################################################################
 # Create debug core
@@ -340,10 +383,10 @@ set_property   C_EN_STRG_QUAL         false         [get_debug_cores u_ila_0]
 set_property   C_INPUT_PIPE_STAGES    0             [get_debug_cores u_ila_0]
 set_property   C_TRIGIN_EN            false         [get_debug_cores u_ila_0]
 set_property   C_TRIGOUT_EN           false         [get_debug_cores u_ila_0]
-set_property   C_DATA_DEPTH           32768         [get_debug_cores u_ila_0]
+set_property   C_DATA_DEPTH           16384         [get_debug_cores u_ila_0]
 
-set_property port_width 1 [get_debug_ports u_ila_0/clk]
-connect_debug_port u_ila_0/clk [get_nets [list design_1_i/clk_wiz_0/inst/clk_out1]]
+set_property        port_width 1  [get_debug_ports u_ila_0/clk]
+connect_debug_port  u_ila_0/clk   [get_nets [list design_1_i/clk_wiz_0/inst/clk_out1]]
 
 #############################################################################
 # Connect to debug core: Port 0
@@ -681,9 +724,37 @@ connect_debug_port u_ila_0/probe8 [get_nets [list \
 
 create_debug_port   u_ila_0       probe
 set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe9]
-set_property        port_width    32                [get_debug_ports u_ila_0/probe9]
+set_property        port_width    17                [get_debug_ports u_ila_0/probe9]
 
 connect_debug_port u_ila_0/probe9 [get_nets [list \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[0]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[1]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[2]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[3]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[4]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[5]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[6]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[7]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[8]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[9]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[10]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[11]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[12]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[13]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[14]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[15]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt[16]}  \
+]]
+
+#############################################################################
+# Connect to debug core: Port 10
+#############################################################################
+
+create_debug_port   u_ila_0       probe
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe10]
+set_property        port_width    32                [get_debug_ports u_ila_0/probe10]
+
+connect_debug_port u_ila_0/probe10 [get_nets [list \
 	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[0]}  \
 	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[1]}  \
 	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt[2]}  \
@@ -719,14 +790,36 @@ connect_debug_port u_ila_0/probe9 [get_nets [list \
 ]]
 
 #############################################################################
-# Connect to debug core: Port 10
+# Connect to debug core: Port 11
 #############################################################################
 
 create_debug_port   u_ila_0       probe
-set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe10]
-set_property        port_width    10                [get_debug_ports u_ila_0/probe10]
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe11]
+set_property        port_width    11                [get_debug_ports u_ila_0/probe11]
 
-connect_debug_port u_ila_0/probe10 [get_nets [list \
+connect_debug_port u_ila_0/probe11 [get_nets [list \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[0]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[1]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[2]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[3]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[4]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[5]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[6]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[7]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[8]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[9]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr[10]}  \
+]]
+
+#############################################################################
+# Connect to debug core: Port 12
+#############################################################################
+
+create_debug_port   u_ila_0       probe
+set_property        PROBE_TYPE    DATA_AND_TRIGGER  [get_debug_ports u_ila_0/probe12]
+set_property        port_width    15                [get_debug_ports u_ila_0/probe12]
+
+connect_debug_port u_ila_0/probe12 [get_nets [list \
 	{design_1_i/axi_smc_M00_AXI_RLAST}  \
 	{design_1_i/axi_smc_M00_AXI_ARVALID}  \
 	{design_1_i/axi_smc_M00_AXI_ARREADY}  \
@@ -737,4 +830,9 @@ connect_debug_port u_ila_0/probe10 [get_nets [list \
 	{design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN}  \
 	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy}  \
 	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[0]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[1]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[2]}  \
+	{design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[3]}  \
 ]]
