@@ -9,7 +9,7 @@ vivadoVersionCheck "2020.2.2"
 # Process arguments 
 ##################################################################
  
-set valid_args  [list gui launch_run debug no_exit close_project]
+set valid_args  [list gui launch_run debug no_exit close_project launch_both]
 set project_dir ""
 
 foreach arg $argv {
@@ -125,20 +125,10 @@ set_property name pcie_refclk [get_bd_intf_ports CLK_IN_D_0]
 make_bd_intf_pins_external [get_bd_intf_pins xdma_0/pcie_mgt]
 set_property name pci_express_x1 [get_bd_intf_ports pcie_mgt_0]
 
-# FPGA 200 MHz clock
-create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0
-apply_board_connection -board_interface "sys_diff_clock" -ip_intf "clk_wiz_0/CLK_IN1_D" -diagram "design_1" 
-set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ "200.000"] [get_bd_cells clk_wiz_0]
-
 # Connect AXI interfaces
-apply_bd_automation -rule xilinx.com:bd_rule:board -config { \
-    Board_Interface "reset (FPGA Reset)"                     \
-    Manual_Source   "New External Port (ACTIVE_HIGH)"        \
-} [get_bd_pins clk_wiz_0/reset]
-
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
     Clk_master   "/xdma_0/axi_aclk"                         \
-    Clk_slave    "/clk_wiz_0/clk_out1"                      \
+    Clk_slave    "Auto"                                     \
     Clk_xbar     "Auto"                                     \
     Master       "/xdma_0/M_AXI"                            \
     Slave        "/QuantLaneNet_AXI_0/s00_axi"              \
@@ -160,7 +150,6 @@ set_property -dict [list CONFIG.CONST_VAL "0"] [get_bd_cells signal_leds/xlconst
 set clocks [list            \
     util_ds_buf_0/IBUF_OUT  \
     xdma_0/axi_aclk         \
-    clk_wiz_0/clk_out1      \
 ]
 
 # Create counters to make clock leds
@@ -194,8 +183,8 @@ set_property -dict [list CONFIG.NUM_PORTS "8"] [get_bd_cells signal_leds/xlconca
 set led_signals [list              \
     signal_leds/xlslice_0/Dout     \
     signal_leds/xlslice_1/Dout     \
-    signal_leds/xlslice_2/Dout     \
     xdma_0/user_lnk_up             \
+    signal_leds/xlconstant_0/dout  \
     signal_leds/xlconstant_0/dout  \
     QuantLaneNet_AXI_0/wr_led      \
     QuantLaneNet_AXI_0/rd_led      \
@@ -230,46 +219,74 @@ add_files -norecurse "${project_dir}/QuantLaneNet.gen/sources_1/bd/design_1/hdl/
 set_property top design_1_wrapper [current_fileset]
 
 # Add constraints
+create_fileset -constrset "constrs_debug"
+
 add_files                                                         \
-    -fileset constrs_1                                            \
+    -fileset "constrs_1"                                          \
     -force                                                        \
     -norecurse                                                    \
     -copy_to "${project_dir}/QuantLaneNet.srcs/constrs_1/new"     \
+    "${sources_dir}/constraints/constraints.xdc"                  \
+
+add_files                                                         \
+    -fileset "constrs_debug"                                      \
+    -force                                                        \
+    -norecurse                                                    \
+    -copy_to "${project_dir}/QuantLaneNet.srcs/constrs_debug/new" \
     [glob -directory "${sources_dir}/constraints" "*.xdc"]        \
-
-# Comment out constraint file for debug if not required
-if {"debug" ni $argv} {
-    commentFile "${project_dir}/QuantLaneNet.srcs/constrs_1/new/debug.xdc" "#"
-}
-
-# Change synthesis and implementation strategies
-set_property strategy "Vivado Synthesis Defaults"           [get_runs synth_1]
-set_property strategy "Performance_ExplorePostRoutePhysOpt" [get_runs impl_1 ]
 
 # Generate output products
 set_property synth_checkpoint_mode None [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
 generate_target all [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
 export_ip_user_files -of_objects [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"] -no_script -sync -force -quiet
 
-# Create waveform configuration file for hardware debug
-# file mkdir "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1"
-# file copy -force "${sources_dir}/debug_wave/hw_ila_data_1.wcfg" "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1"
+# Change strategies for main run
+set_property strategy "Vivado Synthesis Defaults"           [get_runs synth_1]
+set_property strategy "Performance_ExplorePostRoutePhysOpt" [get_runs impl_1 ]
 
-# replaceString                                                                    \
-#     "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wcfg"  \
-#     "INSERT WDB FILE HERE"                                                       \
-#     "${project_dir}/QuantLaneNet.hw/hw_1/wave/hw_ila_data_1/hw_ila_data_1.wdb"   \
+# Create run for design with debug core
+set release [lindex [split [version -short] "."] 0]
+
+create_run synth_debug                        \
+    -constrset  "constrs_debug"               \
+    -flow       "Vivado Synthesis ${release}" \
+    -strategy   "Flow_PerfOptimized_high"     \
+
+create_run impl_debug                                  \
+    -parent_run  "synth_debug"                         \
+    -flow        "Vivado Implementation ${release}"    \
+    -strategy    "Performance_ExplorePostRoutePhysOpt" \
 
 puts "\n##########################################\n# Finished building project\n##########################################\n"
 
-if {"launch_run" in $argv} {
-    launch_runs impl_1 -to_step write_bitstream -jobs [numberOfCPUs]
+if {"launch_run" in $argv && "launch_both" ni $argv} {
+    if {"debug" in $argv} {
+        set mode "debug"
+        set name "With ILA debug core"
+    } else {
+        set mode "1"
+        set name "Regular"
+    }
+
+    launch_runs "impl_${mode}" -to_step write_bitstream -jobs [numberOfCPUs]
 
     if {"gui" ni $argv} {
-        puts "\n##########################################\n# Running Synthesis\n##########################################\n"
-        wait_on_run -verbose synth_1
-        puts "\n##########################################\n# Running Implementation\n##########################################\n"
-        wait_on_run -verbose impl_1
+        puts "\n##########################################\n# Running Synthesis (${name})\n##########################################\n"
+        wait_on_run -verbose "synth_${mode}"
+        puts "\n##########################################\n# Running Implementation (${name})\n##########################################\n"
+        wait_on_run -verbose "impl_${mode}"
+    }
+
+} elseif {"launch_both" in $argv} {
+    foreach {mode name} {"1" "Regular" "debug" "With ILA debug core"} {
+        launch_runs "impl_${mode}" -to_step write_bitstream -jobs [numberOfCPUs]
+
+        if {"gui" ni $argv} {
+            puts "\n##########################################\n# Running Synthesis (${name})\n##########################################\n"
+            wait_on_run -verbose "synth_${mode}"
+            puts "\n##########################################\n# Running Implementation (${name})\n##########################################\n"
+            wait_on_run -verbose "impl_${mode}"
+        }
     }
 }
 

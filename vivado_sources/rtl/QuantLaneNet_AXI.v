@@ -82,6 +82,7 @@
 	wire [C_S00_AXI_ADDR_WIDTH-1:0] s00_axi_araddr_latch;
 	wire                            s00_axi_wren;
 	wire                            s00_axi_rden;
+	wire                            ip_wready;
 
 	QuantLaneNet_S00_AXI # ( 
 		.C_S_AXI_ID_WIDTH(C_S00_AXI_ID_WIDTH),
@@ -98,6 +99,7 @@
 		.S_AXI_ARADDR_LATCH (s00_axi_araddr_latch),
 		.S_AXI_WREN         (s00_axi_wren),
 		.S_AXI_RDEN         (s00_axi_rden),
+		.IP_WREADY          (ip_wready),
 		// User-defined ports end
 
 		.S_AXI_ACLK(s00_axi_aclk),
@@ -154,6 +156,7 @@
 	) u_cnn (
     	.o_valid       (o_valid),
     	.busy          (busy),
+		.wready        (ip_wready),
     	.axi_rd_data   (s00_axi_rdata),
     	.axi_wr_data   (s00_axi_wdata),
     	.axi_wr_addr   (s00_axi_awaddr_latch),

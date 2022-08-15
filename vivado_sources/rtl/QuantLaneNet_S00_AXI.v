@@ -31,6 +31,7 @@
 		output wire [C_S_AXI_ADDR_WIDTH-1 : 0] S_AXI_ARADDR_LATCH,
 		output wire                            S_AXI_WREN,
 		output wire                            S_AXI_RDEN,
+		input  wire                            IP_WREADY,
 		// User ports ends
 		// Do not modify the ports beyond this line
 
@@ -258,7 +259,7 @@
 	    end 
 	  else
 	    begin    
-	      if (~axi_awready && S_AXI_AWVALID && ~axi_awv_awr_flag && ~axi_arv_arr_flag)
+	      if (~axi_awready && S_AXI_AWVALID && ~axi_awv_awr_flag && ~axi_arv_arr_flag && IP_WREADY)
 	        begin
 	          // slave is ready to accept an address and
 	          // associated control signals
@@ -356,7 +357,7 @@
 	    end 
 	  else
 	    begin    
-	      if ( ~axi_wready && S_AXI_WVALID && axi_awv_awr_flag)
+	      if ( ~axi_wready && S_AXI_WVALID && axi_awv_awr_flag && IP_WREADY)
 	        begin
 	          // slave can accept the write data
 	          axi_wready <= 1'b1;

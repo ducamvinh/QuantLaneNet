@@ -5,6 +5,7 @@ module top #(
 )(
     output                          o_valid,
     output                          busy,
+    output                          wready,
     output reg [63:0]               axi_rd_data,
     input      [63:0]               axi_wr_data,
     input      [AXI_ADDR_WIDTH-1:0] axi_wr_addr,
@@ -60,6 +61,7 @@ module top #(
     wire [7*8-1:0] fifo_input_rd_data;
     wire           fifo_input_empty;
     wire           fifo_input_rd_en;
+    wire           fifo_input_almost_full;
 
     generate
         for (i = 0; i < 8; i = i + 1) begin : gen0
@@ -80,13 +82,14 @@ module top #(
     end
 
     fifo_single_read #(
-        .DATA_WIDTH (7 * 8),
-        .DEPTH      ((IN_WIDTH * IN_HEIGHT * 3) / 8)
+        .DATA_WIDTH        (7 * 8),
+        .DEPTH             (2048),
+        .ALMOST_FULL_THRES (512)
     ) u_fifo_input (
         .rd_data     (fifo_input_rd_data),
         .empty       (fifo_input_empty),
         .full        (),
-        .almost_full (),
+        .almost_full (fifo_input_almost_full),
         .wr_data     (fifo_input_wr_data),
         .wr_en       (fifo_input_wr_en),
         .rd_en       (fifo_input_rd_en),
@@ -134,15 +137,17 @@ module top #(
     wire [63:0] fifo_weight_rd_data;
     wire        fifo_weight_empty;
     wire        fifo_weight_rd_en;
+    wire        fifo_weight_almost_full;
 
     fifo_single_read #(
-        .DATA_WIDTH (64),
-        .DEPTH      (((NUM_WEIGHTS + 4) / 4 * 4) / 4)
+        .DATA_WIDTH        (64),
+        .DEPTH             (1024),
+        .ALMOST_FULL_THRES (512)
     ) u_fifo_weight (
         .rd_data     (fifo_weight_rd_data),
         .empty       (fifo_weight_empty),
         .full        (),
-        .almost_full (),
+        .almost_full (fifo_weight_almost_full),
         .wr_data     (axi_wr_data),
         .wr_en       (axi_wr_addr >= OFFSET_WEIGHT && axi_wr_addr < OFFSET_WEIGHT + NUM_WEIGHTS * 2 && axi_wr_en && |axi_wr_strobe),
         .rd_en       (fifo_weight_rd_en),
@@ -371,5 +376,8 @@ module top #(
             internal_busy <= 1'b0;
         end
     end
+
+    // Write ready
+    assign wready = ~(fifo_input_almost_full | fifo_weight_almost_full);
 
 endmodule

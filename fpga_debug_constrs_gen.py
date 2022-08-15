@@ -10,8 +10,8 @@ def write_constrs(constrs_path):
     # debug_depth = 1024
     # debug_depth = 2048
     # debug_depth = 4096
-    # debug_depth = 8192
-    debug_depth = 16384
+    debug_depth = 8192
+    # debug_depth = 16384
     # debug_depth = 32768
     # debug_depth = 65536
     # debug_depth = 131072
@@ -34,7 +34,6 @@ def write_constrs(constrs_path):
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH', 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt'                             , 'width': 17 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/clock_cnt'                             , 'width': 32 },
-        { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_addr'                   , 'width': 11 },
 
         # Type 'nets' for one-bit nets (one net or multiple nets grouped together in one debug port)
         { 'type': 'nets', 'list': [ 'design_1_i/axi_smc_M00_AXI_RLAST'                                        ,
@@ -47,11 +46,6 @@ def write_constrs(constrs_path):
                                     'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN' ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy'                           , 
                                     'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid'                 ,
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_en'              ,
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[0]'         ,
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[1]'         ,
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[2]'         ,
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/bram_wr_data[3]'         ,
         ]},
     ]
 
@@ -97,7 +91,7 @@ def write_constrs(constrs_path):
 
         f.write(
             f'set_property        port_width 1  [get_debug_ports u_ila_0/clk]\n'
-            f'connect_debug_port  u_ila_0/clk   [get_nets [list design_1_i/clk_wiz_0/inst/clk_out1]]\n'
+            f'connect_debug_port  u_ila_0/clk   [get_nets [list design_1_i/xdma_0_axi_aclk]]\n'
         )
 
         for i, port in enumerate(debug_ports):
