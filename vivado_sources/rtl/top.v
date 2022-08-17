@@ -83,7 +83,7 @@ module top #(
 
     fifo_single_read #(
         .DATA_WIDTH        (7 * 8),
-        .DEPTH             (2048),
+        .DEPTH             (1024),
         .ALMOST_FULL_THRES (512)
     ) u_fifo_input (
         .rd_data     (fifo_input_rd_data),

@@ -10,8 +10,8 @@ def write_constrs(constrs_path):
     # debug_depth = 1024
     # debug_depth = 2048
     # debug_depth = 4096
-    debug_depth = 8192
-    # debug_depth = 16384
+    # debug_depth = 8192
+    debug_depth = 16384
     # debug_depth = 32768
     # debug_depth = 65536
     # debug_depth = 131072
@@ -25,11 +25,11 @@ def write_constrs(constrs_path):
         # Type 'bus' for multi-bit buses
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_ARADDR'                                              , 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_RDATA'                                               , 'width': 64 },
-        { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_ARLEN'                                               , 'width':  8 },
+        # { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_ARLEN'                                               , 'width':  8 },
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_AWADDR'                                              , 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_WDATA'                                               , 'width': 64 },
-        { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_WSTRB'                                               , 'width':  8 },
-        { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_AWLEN'                                               , 'width':  8 },
+        # { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_WSTRB'                                               , 'width':  8 },
+        # { 'type': 'bus' , 'name':   'design_1_i/axi_smc_M00_AXI_AWLEN'                                               , 'width':  8 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_AWADDR_LATCH', 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_ARADDR_LATCH', 'width': 20 },
         { 'type': 'bus' , 'name':   'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/pixel_cnt'                             , 'width': 17 },
@@ -46,6 +46,30 @@ def write_constrs(constrs_path):
                                     'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN' ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy'                           , 
                                     'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid'                 ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[0]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[1]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[2]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[3]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[4]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[5]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[6]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_ARLEN[7]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[0]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[1]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[2]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[3]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[4]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[5]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[6]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_AWLEN[7]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[0]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[1]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[2]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[3]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[4]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[5]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[6]'                                     ,
+                                    'design_1_i/axi_smc_M00_AXI_WSTRB[7]'                                     ,
         ]},
     ]
 
