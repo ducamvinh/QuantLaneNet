@@ -214,8 +214,7 @@ if {"gui" ni $argv} {
 }
 
 # Create HDL wrapper
-make_wrapper -files [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"] -top
-add_files -norecurse "${project_dir}/QuantLaneNet.gen/sources_1/bd/design_1/hdl/design_1_wrapper.v"
+add_files -norecurse [make_wrapper -files [get_files *design_1.bd] -top]
 set_property top design_1_wrapper [current_fileset]
 
 # Add constraints
@@ -235,11 +234,6 @@ add_files                                                         \
     -copy_to "${project_dir}/QuantLaneNet.srcs/constrs_debug/new" \
     [glob -directory "${sources_dir}/constraints" "*.xdc"]        \
 
-# Generate output products
-set_property synth_checkpoint_mode None [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
-generate_target all [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"]
-export_ip_user_files -of_objects [get_files "${project_dir}/QuantLaneNet.srcs/sources_1/bd/design_1/design_1.bd"] -no_script -sync -force -quiet
-
 # Change strategies for main run
 set_property strategy "Vivado Synthesis Defaults"           [get_runs synth_1]
 set_property strategy "Performance_ExplorePostRoutePhysOpt" [get_runs impl_1 ]
@@ -256,6 +250,11 @@ create_run impl_debug                                  \
     -parent_run  "synth_debug"                         \
     -flow        "Vivado Implementation ${release}"    \
     -strategy    "Performance_ExplorePostRoutePhysOpt" \
+
+# Generate output products
+set_property synth_checkpoint_mode None                         [get_files *design_1.bd]
+generate_target all                                             [get_files *design_1.bd]
+export_ip_user_files -no_script -sync -force -quiet -of_objects [get_files *design_1.bd]
 
 puts "\n##########################################\n# Finished building project\n##########################################\n"
 
