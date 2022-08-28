@@ -350,7 +350,7 @@ set_property   C_TRIGOUT_EN           false         [get_debug_cores u_ila_0]
 set_property   C_DATA_DEPTH           16384         [get_debug_cores u_ila_0]
 
 set_property        port_width 1  [get_debug_ports u_ila_0/clk]
-connect_debug_port  u_ila_0/clk   [get_nets [list design_1_i/xdma_0_axi_aclk]]
+connect_debug_port  u_ila_0/clk   [get_nets -of_objects [get_clocks -of_objects [get_cells -hier *axi*]]]
 
 #############################################################################
 # Connect to debug core: Port 0
