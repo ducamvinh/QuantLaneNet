@@ -58,7 +58,7 @@ def visualize(img, cls, vertical, offset, show_grid=False, num_lanes=4, input_si
     vertical = vertical_convert(vertical)
 
     output_size = (input_size[0] // 8, input_size[1] // 8)
-    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255)]
+    colors = ((255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255))
 
     for i in range(num_lanes):
         x_grid = np.arange(start=0, stop=input_size[1], step=8)
@@ -76,7 +76,7 @@ def visualize(img, cls, vertical, offset, show_grid=False, num_lanes=4, input_si
         _vertical = vertical[:, :, i]
         __cls[_vertical.transpose().squeeze() < 0.5, :] = 0
 
-        for x, y in zip(x_grid[__cls == 1], y_grid[__cls == 1]):
+        for x, y in zip(x_grid[__cls == 1].astype(np.int), y_grid[__cls == 1].astype(np.int)):
             cv2.circle(img=img, center=(x, y), radius=3, color=colors[i], thickness=-1)
 
     if show_grid:
@@ -131,7 +131,7 @@ def get_og_format(cls, vertical, offset, h_samples, input_size=(256, 512)):
     return lanes
 
 def visualize_og_format(img, lanes, h_samples):
-    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255)]
+    colors = ((255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255))
     img = np.moveaxis(img.detach().clone().cpu().squeeze().numpy(), 0, 2)
     img = cv2.resize(src=img, dsize=(1280, 720), interpolation=cv2.INTER_LINEAR)
 
