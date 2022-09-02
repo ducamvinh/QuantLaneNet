@@ -66,7 +66,7 @@ def main():
         img = cv2.cvtColor(cv2.resize(frame, (512, 256)), cv2.COLOR_BGR2RGB)
 
         # Write image to FPGA
-        start_time = time.time()
+        start_time = time.perf_counter()
         with open(args.h2c_device, 'wb') as f:
             f.seek(fpga_address_map.OFFSET_INPUT)
             img.tofile(file=f)
@@ -83,7 +83,7 @@ def main():
             f.seek(fpga_address_map.OFFSET_OUTPUT)
             hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64) 
 
-        runtime.append(time.time() - start_time)
+        runtime.append(time.perf_counter() - start_time)
 
         # Post-process output and draw dots
         cls, vertical = LaneDetectionModelFPGA.post_process(np.expand_dims(np.reshape(hw_output, (32, 64)), 0))

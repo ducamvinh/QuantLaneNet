@@ -132,7 +132,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
             print(f'\n\tEvaluating {loader_name} set...')
 
             cuda_synchronize(device)
-            start_time = time.time()
+            start_time = time.perf_counter()
 
             with torch.no_grad():
                 for data in loader:
@@ -151,7 +151,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
                 fn  /= len(loader)
 
                 cuda_synchronize(device)
-                elapsed = time.time() - start_time
+                elapsed = time.perf_counter() - start_time
 
                 print(f'\t{loader_name} eval: acc = {acc:.04f}, fp = {fp:.04f}, fn = {fn:.04f}')
                 print(f'\tElapsed time: {elapsed:.2f}s')

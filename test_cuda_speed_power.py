@@ -41,12 +41,12 @@ def calc_framerate(start_event, return_dict):
     print(f'[INFO] Running inference {num_test:,d} times...')
     with torch.no_grad():
         for i in tqdm.tqdm(range(num_test)):
-            start_time = time.time()
+            start_time = time.perf_counter()
             y = model(x)
 
             if i >= 1000:
                 torch.cuda.synchronize()
-                elapsed_time_samples.append(time.time() - start_time)
+                elapsed_time_samples.append(time.perf_counter() - start_time)
 
     return_dict['framerate'] = len(elapsed_time_samples) / sum(elapsed_time_samples)
 

@@ -31,18 +31,18 @@ def test_image(model, img_path, use_offset, device):
 
     # Run inference
     if isinstance(model, LaneDetectionModelFPGA):
-        start_time = time.time()
+        start_time = time.perf_counter()
         fpga_output = model(img, post_process=False)
-        print(f'[INFO] Process time: {((time.time() - start_time) * 1e3):.2f} ms')
+        print(f'[INFO] Process time: {((time.perf_counter() - start_time) * 1e3):.2f} ms')
         cls, vertical = model.post_process(fpga_output)
     else:
         _input = (torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0).to(device)
-        start_time = time.time()
+        start_time = time.perf_counter()
         cls, vertical, offset = model(_input)
 
         if device == 'cuda':
             torch.cuda.synchronize()
-        print(f'[INFO] Process time: {((time.time() - start_time) * 1e3):.2f} ms')
+        print(f'[INFO] Process time: {((time.perf_counter() - start_time) * 1e3):.2f} ms')
 
     # Display output
     if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
@@ -90,18 +90,18 @@ def test_video(model, video_path, use_offset, device):
 
         # Run inference
         if isinstance(model, LaneDetectionModelFPGA):
-            start_time = time.time()
+            start_time = time.perf_counter()
             fpga_output = model(img, post_process=False)
-            runtime.append(time.time() - start_time)
+            runtime.append(time.perf_counter() - start_time)
             cls, vertical = model.post_process(fpga_output)
         else:
             _input = (torch.from_numpy(np.moveaxis(img, 2, 0)).unsqueeze(0).float() / 255.0).to(device)
-            start_time = time.time()
+            start_time = time.perf_counter()
             cls, vertical, offset = model(_input)
 
             if device == 'cuda':
                 torch.cuda.synchronize()
-            runtime.append(time.time() - start_time)
+            runtime.append(time.perf_counter() - start_time)
 
         if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
             offset = offset_dummy
