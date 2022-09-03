@@ -118,12 +118,14 @@ set_property -dict [list CONFIG.LED_BLINK_COUNTER_WIDTH [expr $blink_counter_wid
 
 # Connect PCIe nets
 connect_bd_net [get_bd_pins util_ds_buf_0/IBUF_OUT] [get_bd_pins xdma_0/sys_clk]
-make_bd_pins_external [get_bd_pins xdma_0/sys_rst_n]
-set_property name pcie_perstn [get_bd_ports sys_rst_n_0]
-make_bd_intf_pins_external [get_bd_intf_pins util_ds_buf_0/CLK_IN_D]
-set_property name pcie_refclk [get_bd_intf_ports CLK_IN_D_0]
-make_bd_intf_pins_external [get_bd_intf_pins xdma_0/pcie_mgt]
-set_property name pci_express_x1 [get_bd_intf_ports pcie_mgt_0]
+
+make_bd_pins_external      [get_bd_pins       xdma_0/sys_rst_n      ]
+make_bd_intf_pins_external [get_bd_intf_pins  util_ds_buf_0/CLK_IN_D]
+make_bd_intf_pins_external [get_bd_intf_pins  xdma_0/pcie_mgt       ]
+
+set_property name "pcie_perstn"    [get_bd_ports      -of_objects [get_bd_nets      -of_objects [get_bd_pins       xdma_0/sys_rst_n      ]]]
+set_property name "pcie_refclk"    [get_bd_intf_ports -of_objects [get_bd_intf_nets -of_objects [get_bd_intf_pins  util_ds_buf_0/CLK_IN_D]]]
+set_property name "pci_express_x1" [get_bd_intf_ports -of_objects [get_bd_intf_nets -of_objects [get_bd_intf_pins  xdma_0/pcie_mgt       ]]]
 
 # Connect AXI interfaces
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
@@ -196,8 +198,8 @@ for {set i 0} {$i < 8} {incr i} {
 }
 
 # Make concat block's output external
-make_bd_pins_external  [get_bd_pins signal_leds/xlconcat_0/dout]
-set_property name led_8bits [get_bd_ports dout_0]
+make_bd_pins_external [get_bd_pins signal_leds/xlconcat_0/dout]
+set_property name "led_8bits" [get_bd_ports -of_objects [get_bd_nets -of_objects [get_bd_pins signal_leds/* -filter {DIR == O}]]]
 
 ##################################################################
 # Validate and save block design 
