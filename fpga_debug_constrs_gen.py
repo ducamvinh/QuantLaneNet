@@ -115,7 +115,7 @@ def write_constrs(constrs_path):
 
         f.write(
             f'set_property        port_width 1  [get_debug_ports u_ila_0/clk]\n'
-            f'connect_debug_port  u_ila_0/clk   [get_nets -of_objects [get_clocks -of_objects [get_cells -hier *axi*]]]\n'
+            f'connect_debug_port  u_ila_0/clk   [get_nets -of_objects [get_clocks -of_objects [get_cells -hier *clock_cnt*]]]\n'
         )
 
         for i, port in enumerate(debug_ports):
