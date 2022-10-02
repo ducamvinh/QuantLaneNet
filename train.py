@@ -1,4 +1,4 @@
-from model.LaneDetectionModel import LaneDetectionModel
+from model.QuantLaneNet import QuantLaneNet
 from evaluation.TuSimpleEval import TuSimpleEval
 from data_utils.TuSimpleDataset import TuSimpleDataset
 from loss.loss_dict import LossDict
@@ -40,7 +40,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
     test_loader  = torch.utils.data.DataLoader(dataset=test_set,  batch_size=batch_size, shuffle=False, num_workers=loader_workers)
 
     # Initialize model
-    model = LaneDetectionModel(dropout=use_dropout).to(device)
+    model = QuantLaneNet(dropout=use_dropout).to(device)
 
     # Get optimizer and scheduler
     optimizer = torch.optim.Adam(params=model.parameters(), lr=lr)

@@ -6,9 +6,9 @@ import time
 import tqdm
 import re
 
-from model.LaneDetectionModel import LaneDetectionModel
+from model.QuantLaneNet import QuantLaneNet
 
-class TestModel(LaneDetectionModel):
+class TestModel(QuantLaneNet):
 
     def __init__(self, input_size=(256, 512), num_lanes=4, dropout=True):
         super(TestModel, self).__init__(input_size=input_size, num_lanes=num_lanes, dropout=dropout)

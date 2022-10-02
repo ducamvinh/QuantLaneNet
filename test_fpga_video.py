@@ -1,4 +1,4 @@
-from model_fpga.LaneDetectionModelFPGA import LaneDetectionModelFPGA
+from model_fpga.QuantLaneNetFPGA import QuantLaneNetFPGA
 import model_fpga.fpga_address_map as fpga_address_map
 from data_utils.data_utils import visualize
 
@@ -86,7 +86,7 @@ def main():
         runtime.append(time.perf_counter() - start_time)
 
         # Post-process output and draw dots
-        cls, vertical = LaneDetectionModelFPGA.post_process(np.expand_dims(np.reshape(hw_output, (32, 64)), 0))
+        cls, vertical = QuantLaneNetFPGA.post_process(np.expand_dims(np.reshape(hw_output, (32, 64)), 0))
         vis = visualize(img, cls, vertical, offset_dummy)
         vis = cv2.cvtColor(vis, cv2.COLOR_RGB2BGR)
 

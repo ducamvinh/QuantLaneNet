@@ -1,12 +1,12 @@
-from model.LaneDetectionModel import LaneDetectionModel
+from model.QuantLaneNet import QuantLaneNet
 import torch
 
 torch.backends.quantized.engine = 'qnnpack'
 
-class LaneDetectionModelQuantized(LaneDetectionModel):
+class QuantLaneNetQuantized(QuantLaneNet):
 
     def __init__(self, input_size=(256, 512), num_lanes=4, dropout=True):
-        super(LaneDetectionModelQuantized, self).__init__(input_size=input_size, num_lanes=num_lanes, dropout=dropout)
+        super(QuantLaneNetQuantized, self).__init__(input_size=input_size, num_lanes=num_lanes, dropout=dropout)
         self.quant    = torch.quantization.QuantStub()
         self.dequant1 = torch.quantization.DeQuantStub()
         self.dequant2 = torch.quantization.DeQuantStub()

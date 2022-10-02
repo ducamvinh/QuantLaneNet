@@ -3,7 +3,7 @@ import argparse
 import torch
 import os
 
-from model_quantized.LaneDetectionModelQuantized import LaneDetectionModelQuantized
+from model_quantized.QuantLaneNetQuantized import QuantLaneNetQuantized
 from model_quantized.quantize_utils import convert_quantized_model
 
 def write_weights(model, weights_bin_path):
@@ -109,7 +109,7 @@ def main():
 
     # Load quantized model
     print(f'[INFO] Loading quantized model from {args.quantized_weights_path}')
-    model = LaneDetectionModelQuantized().to('cpu')
+    model = QuantLaneNetQuantized().to('cpu')
     model = convert_quantized_model(model)
     model.load_state_dict(torch.load(args.quantized_weights_path, map_location='cpu'))
 

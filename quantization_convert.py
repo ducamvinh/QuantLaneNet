@@ -1,4 +1,4 @@
-from model_quantized.LaneDetectionModelQuantized import LaneDetectionModelQuantized
+from model_quantized.QuantLaneNetQuantized import QuantLaneNetQuantized
 from data_utils.TuSimpleDataset import TuSimpleDataset
 from checkpoint_info import get_best_model
 
@@ -16,7 +16,7 @@ def convert(dataset_path, checkpoint_path, quantized_weights_path):
 
     # Load model
     checkpoint = torch.load(os.path.join(checkpoint_path, f'checkpoint_{get_best_model(checkpoint_path)}.pth'), map_location='cpu')
-    model = LaneDetectionModelQuantized()
+    model = QuantLaneNetQuantized()
     model.load_state_dict(checkpoint['model_state'], strict=False)
     model.eval()
 

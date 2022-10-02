@@ -1,4 +1,4 @@
-from model.LaneDetectionModel import LaneDetectionModel
+from model.QuantLaneNet import QuantLaneNet
 from data_utils.TuSimpleDataset import TuSimpleDataset
 from evaluation.TuSimpleEval import TuSimpleEval
 
@@ -26,7 +26,7 @@ def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device=
     best_model = get_best_model(checkpoint_path)
     checkpoint = torch.load(os.path.join(checkpoint_path, f'checkpoint_{best_model}.pth'), map_location=device)
 
-    model = LaneDetectionModel().to(device)
+    model = QuantLaneNet().to(device)
     model.load_state_dict(checkpoint['model_state'], strict=False)
     model.eval()
 

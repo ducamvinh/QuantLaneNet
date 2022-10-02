@@ -4,7 +4,7 @@ import torch
 
 import model_fpga.fpga_address_map as fpga_address_map
 
-class LaneDetectionModelFPGA(object):
+class QuantLaneNetFPGA(object):
 
     def __init__(self, h2c_device='/dev/xdma0_h2c_0', c2h_device='/dev/xdma0_c2h_0'):
         self.h2c_device = h2c_device

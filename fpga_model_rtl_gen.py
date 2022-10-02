@@ -1,4 +1,4 @@
-from model_quantized.LaneDetectionModelQuantized import LaneDetectionModelQuantized
+from model_quantized.QuantLaneNetQuantized import QuantLaneNetQuantized
 from model_quantized.quantize_utils import convert_quantized_model
 import argparse
 
@@ -340,7 +340,7 @@ def main():
     args = get_arguments()
 
     # Initialize model
-    model = LaneDetectionModelQuantized().to('cpu')
+    model = QuantLaneNetQuantized().to('cpu')
     model = convert_quantized_model(model)
 
     # Write RTL file

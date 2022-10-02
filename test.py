@@ -1,6 +1,6 @@
-from model_fpga.LaneDetectionModelFPGA import LaneDetectionModelFPGA
-from model_quantized.LaneDetectionModelQuantized import LaneDetectionModelQuantized
-from model.LaneDetectionModel import LaneDetectionModel
+from model_fpga.QuantLaneNetFPGA import QuantLaneNetFPGA
+from model_quantized.QuantLaneNetQuantized import QuantLaneNetQuantized
+from model.QuantLaneNet import QuantLaneNet
 from model_quantized.quantize_utils import convert_quantized_model
 from checkpoint_info import get_best_model
 from data_utils.TuSimpleDataset import TuSimpleDataset
@@ -19,7 +19,7 @@ import os
 
 def test_image(model, img_path, use_offset, device):
     print('[INFO] Input image should be cropped to composition similar to TuSimple dataset for best accuracy')
-    if device == 'cuda' and not isinstance(model, LaneDetectionModelFPGA):
+    if device == 'cuda' and not isinstance(model, QuantLaneNetFPGA):
         print('[INFO] PyTorch model running on CUDA is lazily initialized so runtime of an image may be longer than the runtime average of thousands of images')
     print(f'[INFO] Image path: {img_path}')
     id = os.path.basename(img_path)
@@ -30,7 +30,7 @@ def test_image(model, img_path, use_offset, device):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     # Run inference
-    if isinstance(model, LaneDetectionModelFPGA):
+    if isinstance(model, QuantLaneNetFPGA):
         start_time = time.perf_counter()
         fpga_output = model(img, post_process=False)
         print(f'[INFO] Process time: {((time.perf_counter() - start_time) * 1e3):.2f} ms')
@@ -45,7 +45,7 @@ def test_image(model, img_path, use_offset, device):
         print(f'[INFO] Process time: {((time.perf_counter() - start_time) * 1e3):.2f} ms')
 
     # Display output
-    if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
+    if isinstance(model, QuantLaneNetFPGA) or not use_offset:
         offset = np.ones(shape=(32, 64, 4), dtype=np.float32) * (3.5 / 8)
 
     img = visualize(img, cls, vertical, offset)
@@ -89,7 +89,7 @@ def test_video(model, video_path, use_offset, device):
         img = cv2.cvtColor(cv2.resize(frame, (512, 256)), cv2.COLOR_BGR2RGB)
 
         # Run inference
-        if isinstance(model, LaneDetectionModelFPGA):
+        if isinstance(model, QuantLaneNetFPGA):
             start_time = time.perf_counter()
             fpga_output = model(img, post_process=False)
             runtime.append(time.perf_counter() - start_time)
@@ -103,7 +103,7 @@ def test_video(model, video_path, use_offset, device):
                 torch.cuda.synchronize()
             runtime.append(time.perf_counter() - start_time)
 
-        if isinstance(model, LaneDetectionModelFPGA) or not use_offset:
+        if isinstance(model, QuantLaneNetFPGA) or not use_offset:
             offset = offset_dummy
 
         # Update video
@@ -125,10 +125,10 @@ def test_video(model, video_path, use_offset, device):
     )
 
 def test_evaluate(model, dataset_path, use_offset, device):
-    if isinstance(model, LaneDetectionModelFPGA):
+    if isinstance(model, QuantLaneNetFPGA):
         model_type = 'fpga'
         device = 'cpu'
-    elif isinstance(model, LaneDetectionModelQuantized):
+    elif isinstance(model, QuantLaneNetQuantized):
         model_type = 'quantized'
     else:
         model_type = 'software'
@@ -223,7 +223,7 @@ def main():
         )
 
         checkpoint = torch.load(checkpoint_path, map_location=args.device)
-        model = LaneDetectionModel().to(args.device)
+        model = QuantLaneNet().to(args.device)
         model.load_state_dict(checkpoint['model_state'], strict=False)
         model.eval()
     elif args.model == 'quantized':
@@ -233,7 +233,7 @@ def main():
             f'\t- Weights  : {args.quantized_weights_path}\n'
         )
 
-        model = LaneDetectionModelQuantized().to(args.device)
+        model = QuantLaneNetQuantized().to(args.device)
         model = convert_quantized_model(model)
         model.load_state_dict(torch.load(args.quantized_weights_path, map_location=args.device))
     else:
@@ -244,7 +244,7 @@ def main():
             f'\t- Weights binary : {args.weights_bin_path}\n'
         )
 
-        model = LaneDetectionModelFPGA(h2c_device=args.h2c_device, c2h_device=args.c2h_device)
+        model = QuantLaneNetFPGA(h2c_device=args.h2c_device, c2h_device=args.c2h_device)
         model.reset()
         model.write_weights(args.weights_bin_path)
 

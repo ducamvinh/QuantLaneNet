@@ -2,11 +2,11 @@ from model.ConvBatchnormReLU import ConvBatchnormReLU
 from model.EncoderStage import EncoderStage
 import torch
 
-class LaneDetectionModel(torch.nn.Module):
+class QuantLaneNet(torch.nn.Module):
 
     def __init__(self, input_size=(256, 512), num_lanes=4, dropout=True):
         
-        super(LaneDetectionModel, self).__init__()
+        super(QuantLaneNet, self).__init__()
 
         self.input_size = input_size
         self.output_size = (self.input_size[0] // 8, self.input_size[1] // 8)
