@@ -12,7 +12,7 @@ module macc_8bit_single #(
     rst_n
 );
 
-    localparam ADDER_LAYERS = $clog2(NUM_INPUTS);
+    localparam ADDER_LAYERS      = $clog2(NUM_INPUTS);
     localparam OUTPUT_DATA_WIDTH = 16 + ADDER_LAYERS;
 
     output [OUTPUT_DATA_WIDTH-1:0] o_data;
@@ -32,7 +32,8 @@ module macc_8bit_single #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             mult_valid_o <= 1'b0;
-        end else begin
+        end
+        else begin
             mult_valid_o <= i_valid;
         end
     end
@@ -51,7 +52,7 @@ module macc_8bit_single #(
                 .y (mult),
                 .a (i_data_a[(i+1)*8-1:i*8]),
                 .b (i_data_b[(i+1)*8-1:i*8])
-            );    
+            );
         end
     endgenerate
 

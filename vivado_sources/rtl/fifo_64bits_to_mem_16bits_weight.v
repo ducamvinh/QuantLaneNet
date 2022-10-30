@@ -26,7 +26,8 @@ module fifo_64bits_to_mem_16bits_weight #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             current_state <= IDLE;
-        end else begin
+        end
+        else begin
             current_state <= next_state;
         end
     end
@@ -51,7 +52,8 @@ module fifo_64bits_to_mem_16bits_weight #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             addr_cnt <= 0;
-        end else if (current_state != IDLE) begin
+        end
+        else if (current_state != IDLE) begin
             addr_cnt <= addr_cnt == COUNTER_LIMIT - 1 ? 0 : addr_cnt + 1;
         end
     end

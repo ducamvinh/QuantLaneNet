@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
 
 module block_ram_single_port #(
-    parameter DATA_WIDTH = 32,
-    parameter DEPTH = 2**16,
-    parameter RAM_STYLE = "auto",
+    parameter DATA_WIDTH      = 32,
+    parameter DEPTH           = 2**16,
+    parameter RAM_STYLE       = "auto",
     parameter OUTPUT_REGISTER = "false"
 )(
     output [DATA_WIDTH-1:0]    rd_data,
@@ -30,7 +30,8 @@ module block_ram_single_port #(
     always @ (posedge clk) begin
         if (rd_en) begin
             rd_data_reg <= ram[rd_addr];
-        end else begin
+        end
+        else begin
             rd_data_reg <= rd_data_reg;
         end
     end

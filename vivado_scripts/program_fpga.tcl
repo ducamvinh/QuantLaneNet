@@ -6,7 +6,7 @@ source -notrace "${script_dir}/procs.tcl"
 vivadoVersionCheck "2020.2.2"
 
 ##################################################################
-# Process arguments 
+# Process arguments
 ##################################################################
 
 set valid_args     [list write_flash]

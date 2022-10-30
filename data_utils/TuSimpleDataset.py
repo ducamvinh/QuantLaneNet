@@ -31,7 +31,7 @@ class TuSimpleDataset(torch.utils.data.Dataset):
         label_paths = sorted(glob.glob(f'{dir_path}/tusimple/{type_s}/*.json'))
         if not label_paths:
             raise RuntimeError('Label paths not found')
-        
+
         if self.evaluate:
             self.gt_list = []
 
@@ -50,7 +50,7 @@ class TuSimpleDataset(torch.utils.data.Dataset):
             for line in lines_iter:
                 data = json.loads(line)
                 h_samples = data['h_samples']
-    
+
                 # Sort the list of lanes into theta_list
                 theta_list = []
                 for lane_idx, lane in enumerate(data['lanes']):
@@ -127,7 +127,7 @@ class TuSimpleDataset(torch.utils.data.Dataset):
 
         sampled_x = []
         sampled_y = []
-        
+
         for i in range(self.num_lanes):
             if not x[i]:
                 sampled_x.append([])
@@ -187,7 +187,7 @@ class TuSimpleDataset(torch.utils.data.Dataset):
                 _offset[row, col] = xs[j]
 
             offset[i, ys_c, xs_c] = ((_offset - x_grid) / 8)[ys_c, xs_c]
-        
+
         # Move to device
         img = torch.from_numpy(np.moveaxis(img, 2, 0)).to(self.device)
         confidence = torch.from_numpy(confidence).to(self.device)
@@ -201,4 +201,3 @@ class TuSimpleDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return len(self.processed_list)
-        

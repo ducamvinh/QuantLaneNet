@@ -20,7 +20,8 @@ module pe_controller (
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             current_state <= IDLE;
-        end else begin
+        end
+        else begin
             current_state <= next_state;
         end
     end

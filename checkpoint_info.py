@@ -38,7 +38,7 @@ def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device=
     fn  = 0
 
     if not with_offset:
-        offset_dummy = torch.ones(size=(1, 4, 32, 64), dtype=torch.float32) * (3.5 / 8)  
+        offset_dummy = torch.ones(size=(1, 4, 32, 64), dtype=torch.float32) * (3.5 / 8)
 
     for img, cls_true, offset_true, vertical_true, gt in tqdm.tqdm(test_set):
         cls_pred, vertical_pred, offset_pred = model(img.unsqueeze(0).float() / 255)
@@ -54,9 +54,9 @@ def evaluate_best_model(dataset_path, checkpoint_path, with_offset=True, device=
 
     print(
         f'\nEvaluate best model (epoch {int(best_model) + 1}) [{"WITH" if with_offset else "WITHOUT"}] offset:\n'
-        f'\tacc = {acc / len(test_set)}\n'
-        f'\tfp  = {fp  / len(test_set)}\n'
-        f'\tfn  = {fn  / len(test_set)}\n'
+        f'    acc = {acc / len(test_set)}\n'
+        f'    fp  = {fp  / len(test_set)}\n'
+        f'    fn  = {fn  / len(test_set)}\n'
     )
 
 def show_training_curves(checkpoint_path):
@@ -73,7 +73,7 @@ def show_training_curves(checkpoint_path):
         num_keys = len(val_dict.keys())
         num_rows = int(np.ceil(num_keys / 2))
         fig, axs = plt.subplots(nrows=num_rows, ncols=2, figsize=(10, 3 * num_rows))
-        
+
         for i, name in enumerate(val_dict):
             # Clip the values below 10
             axs[i // 2, i % 2].plot([min(10, x) for x in val_dict[name]])
@@ -124,7 +124,7 @@ def main():
 
         print(f'Best checkpoint: epoch {int(best_model) + 1}')
         for name in checkpoint_eval:
-            print(f'\t{name}: {checkpoint_eval[name]}')
+            print(f'    {name}: {checkpoint_eval[name]}')
 
     if args.eval_best:
         evaluate_best_model(dataset_path=args.dataset_path, checkpoint_path=args.checkpoint_path, with_offset=args.offset, device=args.device)
@@ -134,4 +134,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

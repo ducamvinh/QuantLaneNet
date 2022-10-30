@@ -44,7 +44,7 @@ def write_constrs(constrs_path):
                                     'design_1_i/axi_smc_M00_AXI_AWREADY'                                      ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_WREN' ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/QuantLaneNet_S00_AXI_inst/S_AXI_RDEN' ,
-                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy'                           , 
+                                    'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/busy'                           ,
                                     'design_1_i/QuantLaneNet_AXI_0/inst/u_cnn/u_post/o_valid'                 ,
                                     'design_1_i/axi_smc_M00_AXI_ARLEN[0]'                                     ,
                                     'design_1_i/axi_smc_M00_AXI_ARLEN[1]'                                     ,
@@ -144,10 +144,10 @@ def write_constrs(constrs_path):
 
             if port['type'] == 'bus':
                 for i in range(port['width']):
-                    f.write(f'\t{{{port["name"]}[{i}]}}  \\\n')
+                    f.write(f'    {{{port["name"]}[{i}]}}  \\\n')
             elif port['type'] == 'nets':
                 for net in port['list']:
-                    f.write(f'\t{{{net}}}  \\\n')
+                    f.write(f'    {{{net}}}  \\\n')
 
             f.write(
                 f']]\n'
@@ -160,7 +160,7 @@ def get_arguments():
 
 def main():
     args = get_arguments()
-    write_constrs(args.debug_path)    
+    write_constrs(args.debug_path)
 
 if __name__ == '__main__':
     main()

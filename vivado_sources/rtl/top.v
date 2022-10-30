@@ -20,37 +20,40 @@ module top #(
     genvar i;
 
     // IP params
-    localparam IN_WIDTH = 512;
-    localparam IN_HEIGHT = 256;
-    localparam NUM_LANES = 4;
+    localparam IN_WIDTH    = 512;
+    localparam IN_HEIGHT   = 256;
+    localparam NUM_LANES   = 4;
     localparam NUM_WEIGHTS = 76323;
-    localparam OUT_WIDTH = IN_WIDTH / 8;
-    localparam OUT_HEIGHT = IN_HEIGHT / 8;
+    localparam OUT_WIDTH   = IN_WIDTH / 8;
+    localparam OUT_HEIGHT  = IN_HEIGHT / 8;
 
     // AXI addr map
-    localparam OFFSET_INPUT = 0;                                        // 0x0000_0000 ### 
-    localparam OFFSET_OUTPUT = IN_WIDTH * IN_HEIGHT * 3;                // 0x0006_0000 ### 
-    localparam OFFSET_OVALID = OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;  // 0x0006_0800 ### 
-    localparam OFFSET_BUSY = OFFSET_OVALID + 8;                         // 0x0006_0808 ### 
-    localparam OFFSET_RESET = OFFSET_BUSY + 8;                          // 0x0006_0810 ### 
-    localparam OFFSET_WEIGHT = OFFSET_RESET + 8;                        // 0x0006_0818 ### 
-                                                             // HIGH_ADDR: 0x0008_5C60 ### 
+    localparam OFFSET_INPUT  = 0;                                       // 0x0000_0000 ###
+    localparam OFFSET_OUTPUT = IN_WIDTH * IN_HEIGHT * 3;                // 0x0006_0000 ###
+    localparam OFFSET_OVALID = OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;  // 0x0006_0800 ###
+    localparam OFFSET_BUSY   = OFFSET_OVALID + 8;                       // 0x0006_0808 ###
+    localparam OFFSET_RESET  = OFFSET_BUSY + 8;                         // 0x0006_0810 ###
+    localparam OFFSET_WEIGHT = OFFSET_RESET + 8;                        // 0x0006_0818 ###
+                                                                        // HIGH_ADDR: 0x0008_5C60 ###
     localparam OFFSET_CLOCK_CNT = 'h0009_0000;
 
     // Soft reset
-    reg [3:0] soft_reset_count;
-    wire internal_reset_n = soft_reset_count == 0 && rst_n;
+    reg  [3:0] soft_reset_count;
+    wire       internal_reset_n = soft_reset_count == 0 && rst_n;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             soft_reset_count <= 0;
-        end else if (soft_reset_count == 0) begin
+        end
+        else if (soft_reset_count == 0) begin
             if (axi_wr_en && axi_wr_strobe[0] && axi_wr_data[0] && axi_wr_addr == OFFSET_RESET) begin
                 soft_reset_count <= soft_reset_count + 1;
-            end else begin
+            end
+            else begin
                 soft_reset_count <= soft_reset_count;
             end
-        end else begin
+        end
+        else begin
             soft_reset_count <= soft_reset_count + 1;
         end
     end
@@ -76,7 +79,8 @@ module top #(
     always @ (posedge clk or negedge internal_reset_n) begin
         if (~internal_reset_n) begin
             fifo_input_wr_en <= 1'b0;
-        end else begin
+        end
+        else begin
             fifo_input_wr_en <= axi_wr_addr < OFFSET_OUTPUT && axi_wr_en && |axi_wr_strobe;
         end
     end
@@ -126,7 +130,8 @@ module top #(
     always @ (posedge clk or negedge internal_reset_n) begin
         if (~internal_reset_n) begin
             pixel_cnt <= 0;
-        end else if (model_fifo_rd_en) begin
+        end
+        else if (model_fifo_rd_en) begin
             pixel_cnt <= pixel_cnt == IN_HEIGHT * IN_WIDTH - 1 ? 0 : pixel_cnt + 1;
         end
     end
@@ -174,9 +179,9 @@ module top #(
     );
 
     // Weight pipeline registers
-    reg [15:0] weight_wr_data_pipeline[0:1];
-    reg [31:0] weight_wr_addr_pipeline[0:1];
-    reg [0:0]  weight_wr_en_pipeline[0:1];
+    reg [15:0] weight_wr_data_pipeline [0:1];
+    reg [31:0] weight_wr_addr_pipeline [0:1];
+    reg [0:0]  weight_wr_en_pipeline   [0:1];
 
     generate
         for (i = 0; i < 2; i = i + 1) begin : gen2
@@ -188,7 +193,8 @@ module top #(
                 assign wr_data = weight_wr_data;
                 assign wr_addr = weight_wr_addr;
                 assign wr_en   = weight_wr_en;
-            end else begin : gen4
+            end
+            else begin : gen4
                 assign wr_data = weight_wr_data_pipeline[i-1];
                 assign wr_addr = weight_wr_addr_pipeline[i-1];
                 assign wr_en   = weight_wr_en_pipeline[i-1];
@@ -204,7 +210,8 @@ module top #(
             always @ (posedge clk or negedge internal_reset_n) begin
                 if (~internal_reset_n) begin
                     weight_wr_en_pipeline[i] <= 1'b0;
-                end else begin
+                end
+                else begin
                     weight_wr_en_pipeline[i] <= wr_en;
                 end
             end
@@ -221,19 +228,19 @@ module top #(
 
     model u_model (
         .o_data_cls           (model_o_data_cls),
-	    .o_data_vertical      (model_o_data_vertical),
-	    .o_valid_cls          (model_o_valid_cls),
-	    .o_valid_vertical     (model_o_valid_vertical), 
-	    .fifo_rd_en           (model_fifo_rd_en),
-	    .i_data               (model_i_data),
-	    .i_valid              (~model_fifo_empty),
-	    .cls_almost_full      (cls_fifo_almost_full),
-	    .vertical_almost_full (vertical_fifo_almost_full),
-	    .weight_wr_data       (weight_wr_data_pipeline[1]),
-	    .weight_wr_addr       (weight_wr_addr_pipeline[1]),
-	    .weight_wr_en         (weight_wr_en_pipeline[1]),
-	    .clk                  (clk),
-	    .rst_n                (internal_reset_n)
+        .o_data_vertical      (model_o_data_vertical),
+        .o_valid_cls          (model_o_valid_cls),
+        .o_valid_vertical     (model_o_valid_vertical),
+        .fifo_rd_en           (model_fifo_rd_en),
+        .i_data               (model_i_data),
+        .i_valid              (~model_fifo_empty),
+        .cls_almost_full      (cls_fifo_almost_full),
+        .vertical_almost_full (vertical_fifo_almost_full),
+        .weight_wr_data       (weight_wr_data_pipeline[1]),
+        .weight_wr_addr       (weight_wr_addr_pipeline[1]),
+        .weight_wr_en         (weight_wr_en_pipeline[1]),
+        .clk                  (clk),
+        .rst_n                (internal_reset_n)
     );
 
     // Output FIFOs
@@ -289,7 +296,7 @@ module top #(
         .DATA_WIDTH (16),
         .FRAC_BITS  (8)
     ) u_post (
-        .bram_wr_data        (bram_wr_data), 
+        .bram_wr_data        (bram_wr_data),
         .bram_wr_addr        (bram_wr_addr),
         .bram_wr_en          (bram_wr_en),
         .fifo_rd_en_cls      (cls_fifo_rd_en),
@@ -299,16 +306,16 @@ module top #(
         .i_data_vertical     (vertical_fifo_rd_data),
         .i_valid_cls         (~cls_fifo_empty),
         .i_valid_vertical    (~vertical_fifo_empty),
-        .first_pixel         (first_pixel), 
+        .first_pixel         (first_pixel),
         .clk                 (clk),
         .rst_n               (internal_reset_n)
     );
 
     // Post process BRAM
-    wire [63:0] bram_rd_data;
-    wire [AXI_ADDR_WIDTH-1:0] bram_rd_addr = axi_rd_addr - OFFSET_OUTPUT;
-    wire bram_within_range = axi_rd_addr >= OFFSET_OUTPUT && axi_rd_addr < OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;
-    wire [7:0] bram_byte_en = bram_wr_en << bram_wr_addr[2:0];
+    wire [63:0]               bram_rd_data;
+    wire [AXI_ADDR_WIDTH-1:0] bram_rd_addr      = axi_rd_addr - OFFSET_OUTPUT;
+    wire                      bram_within_range = axi_rd_addr >= OFFSET_OUTPUT && axi_rd_addr < OFFSET_OUTPUT + OUT_WIDTH * OUT_HEIGHT;
+    wire [7:0]                bram_byte_en      = bram_wr_en << bram_wr_addr[2:0];
 
     block_ram_multi_word #(
         .DATA_WIDTH      (8),
@@ -335,7 +342,8 @@ module top #(
     always @ (posedge clk or negedge internal_reset_n) begin
         if (~internal_reset_n) begin
             clock_cnt_fsm <= CLOCK_CNT_IDLE;
-        end else begin
+        end
+        else begin
             case (clock_cnt_fsm)
                 CLOCK_CNT_IDLE : clock_cnt_fsm <= first_pixel ? CLOCK_CNT_BUSY : CLOCK_CNT_IDLE;
                 CLOCK_CNT_BUSY : clock_cnt_fsm <= o_valid ? CLOCK_CNT_IDLE : CLOCK_CNT_BUSY;
@@ -348,7 +356,8 @@ module top #(
     always @ (posedge clk) begin
         if (clock_cnt_fsm == CLOCK_CNT_IDLE) begin
             clock_cnt <= first_pixel ? 0 : clock_cnt;
-        end else if (clock_cnt_fsm == CLOCK_CNT_BUSY) begin
+        end
+        else if (clock_cnt_fsm == CLOCK_CNT_BUSY) begin
             clock_cnt <= o_valid ? clock_cnt : clock_cnt + 1;
         end
     end
@@ -370,9 +379,11 @@ module top #(
     always @ (posedge clk or negedge internal_reset_n) begin
         if (~internal_reset_n) begin
             internal_busy <= 1'b0;
-        end else if (internal_busy == 1'b0 && first_pixel == 1'b1) begin
+        end
+        else if (internal_busy == 1'b0 && first_pixel == 1'b1) begin
             internal_busy <= 1'b1;
-        end else if (internal_busy == 1'b1 && o_valid == 1'b1) begin
+        end
+        else if (internal_busy == 1'b1 && o_valid == 1'b1) begin
             internal_busy <= 1'b0;
         end
     end

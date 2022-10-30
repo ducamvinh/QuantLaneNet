@@ -2,34 +2,34 @@
 
 module conv #(
     // Layer parameters
-    parameter IN_WIDTH = 512,
-    parameter IN_HEIGHT = 256,
-    // parameter OUTPUT_MODE = "relu",
-    // parameter OUTPUT_MODE = "sigmoid",
-    parameter OUTPUT_MODE = "dequant",
-    parameter UNROLL_MODE = "incha",
-    // parameter UNROLL_MODE = "outcha",
+    parameter IN_WIDTH       = 512,
+    parameter IN_HEIGHT      = 256,
+    // parameter OUTPUT_MODE    = "relu",
+    // parameter OUTPUT_MODE    = "sigmoid",
+    parameter OUTPUT_MODE    = "dequant",
+    parameter UNROLL_MODE    = "incha",
+    // parameter UNROLL_MODE    = "outcha",
     // parameter COMPUTE_FACTOR = "single",
     // parameter COMPUTE_FACTOR = "double",
     parameter COMPUTE_FACTOR = "quadruple",
 
     // Conv parameters
     // Conv parameters
-    parameter KERNEL_0 = 3,
-    parameter KERNEL_1 = 3,
-    parameter DILATION_0 = 2,
-    parameter DILATION_1 = 2,
-    parameter PADDING_0 = 2,
-    parameter PADDING_1 = 2,
-    parameter STRIDE_0 = 1,
-    parameter STRIDE_1 = 1,
-    parameter IN_CHANNEL = 32,
+    parameter KERNEL_0    = 3,
+    parameter KERNEL_1    = 3,
+    parameter DILATION_0  = 2,
+    parameter DILATION_1  = 2,
+    parameter PADDING_0   = 2,
+    parameter PADDING_1   = 2,
+    parameter STRIDE_0    = 1,
+    parameter STRIDE_1    = 1,
+    parameter IN_CHANNEL  = 32,
     parameter OUT_CHANNEL = 32,
 
     // Weight addr map
-    parameter KERNEL_BASE_ADDR = 17176,
-    parameter BIAS_BASE_ADDR = KERNEL_BASE_ADDR + KERNEL_0 * KERNEL_1 * IN_CHANNEL * OUT_CHANNEL,
-    parameter MACC_COEFF_BASE_ADDR = BIAS_BASE_ADDR + OUT_CHANNEL,
+    parameter KERNEL_BASE_ADDR      = 17176,
+    parameter BIAS_BASE_ADDR        = KERNEL_BASE_ADDR + KERNEL_0 * KERNEL_1 * IN_CHANNEL * OUT_CHANNEL,
+    parameter MACC_COEFF_BASE_ADDR  = BIAS_BASE_ADDR + OUT_CHANNEL,
     parameter LAYER_SCALE_BASE_ADDR = MACC_COEFF_BASE_ADDR + 1
 )(
     o_data,
@@ -81,7 +81,7 @@ module conv #(
     ) u_line_buffer (
         .o_data           (line_buffer_data),
         .o_valid          (line_buffer_valid),
-        .fifo_rd_en       (fifo_rd_en), 
+        .fifo_rd_en       (fifo_rd_en),
         .i_data           (i_data),
         .i_valid          (i_valid),
         .fifo_almost_full (fifo_almost_full),
@@ -127,7 +127,7 @@ module conv #(
                     .rst_n          (rst_n)
                 );
             end
-            
+
             else if (COMPUTE_FACTOR == "double") begin : gen2
                 pe_incha_double #(
                     .IN_WIDTH              (IN_WIDTH),

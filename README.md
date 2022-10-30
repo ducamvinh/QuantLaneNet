@@ -53,12 +53,12 @@ The trained weights are included in the repo under the [./checkpoint](./checkpoi
 - <code>--batch_size</code>: set as 16 in the paper due to the constraint of GPU memory.
 
 All codes are written to be run from the repo directory. To train the model, the [train.py](./train.py) script can be run using this example command (can be tweaked as needed):
-    
+
     python3 ./train.py                    \
         --dataset_path      ./dataset     \
         --checkpoint_path   ./checkpoint  \
         --batch_size        16            \
-        --epochs            150           
+        --epochs            150
 
 After every epoch, 3 new files are automatically added to the checkpoint directory, with 'xxx' being the epoch number:
 - checkpoint_xxx.pth
@@ -86,7 +86,7 @@ The test script has 4 modes, set with the <code>--test_mode</code> argument. Eac
         python3 ./test.py                     \
             --model             software      \
             --checkpoint_path   ./checkpoint  \
-            --device            cuda          \ 
+            --device            cuda          \
             --test_mode         image         \
             --image_path        <path to some image>
 
@@ -130,4 +130,3 @@ As presented in the paper, the model has 2 output branches, 'classification' and
         --test_mode         random_image  \
         --dataset_path      ./dataset     \
         --use_offset
-        

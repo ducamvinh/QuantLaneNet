@@ -2,28 +2,28 @@
 
 module pe_incha_quadruple #(
     // Layer parameters
-    parameter IN_WIDTH = 513,
-    parameter IN_HEIGHT = 257,
-    parameter IN_CHANNEL = 3,
+    parameter IN_WIDTH    = 513,
+    parameter IN_HEIGHT   = 257,
+    parameter IN_CHANNEL  = 3,
     parameter OUT_CHANNEL = 8,
     // parameter OUTPUT_MODE = "relu",
     parameter OUTPUT_MODE = "dequant",
     // parameter OUTPUT_MODE = "sigmoid",
 
     // Conv parameters
-    parameter KERNEL_0 = 3,
-    parameter KERNEL_1 = 3,
+    parameter KERNEL_0   = 3,
+    parameter KERNEL_1   = 3,
     parameter DILATION_0 = 2,
     parameter DILATION_1 = 2,
-    parameter PADDING_0 = 2,
-    parameter PADDING_1 = 2,
-    parameter STRIDE_0 = 1,
-    parameter STRIDE_1 = 1,
+    parameter PADDING_0  = 2,
+    parameter PADDING_1  = 2,
+    parameter STRIDE_0   = 1,
+    parameter STRIDE_1   = 1,
 
     // Weight addr map
-    parameter KERNEL_BASE_ADDR = 23,
-    parameter BIAS_BASE_ADDR = KERNEL_BASE_ADDR + KERNEL_0 * KERNEL_1 * IN_CHANNEL * OUT_CHANNEL,
-    parameter MACC_COEFF_BASE_ADDR = BIAS_BASE_ADDR + OUT_CHANNEL,
+    parameter KERNEL_BASE_ADDR      = 23,
+    parameter BIAS_BASE_ADDR        = KERNEL_BASE_ADDR + KERNEL_0 * KERNEL_1 * IN_CHANNEL * OUT_CHANNEL,
+    parameter MACC_COEFF_BASE_ADDR  = BIAS_BASE_ADDR + OUT_CHANNEL,
     parameter LAYER_SCALE_BASE_ADDR = MACC_COEFF_BASE_ADDR + 1
 )(
     o_data,
@@ -39,7 +39,7 @@ module pe_incha_quadruple #(
     rst_n
 );
 
-    localparam KERNEL_PTS = KERNEL_0 * KERNEL_1;
+    localparam KERNEL_PTS        = KERNEL_0 * KERNEL_1;
     localparam OUTPUT_DATA_WIDTH = OUTPUT_MODE == "relu" ? 8 : 16;
 
     output [OUTPUT_DATA_WIDTH*OUT_CHANNEL-1:0] o_data;
@@ -53,7 +53,7 @@ module pe_incha_quadruple #(
     input                                      weight_wr_en;
     input                                      clk;
     input                                      rst_n;
-    
+
     genvar i;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -61,11 +61,11 @@ module pe_incha_quadruple #(
 
     // Kernel
     localparam NUM_KERNEL_WEIGHTS = KERNEL_PTS * IN_CHANNEL * OUT_CHANNEL;
-    localparam QUOTIENT_WIDTH = $clog2(KERNEL_PTS * IN_CHANNEL * 2) > $clog2(OUT_CHANNEL / 2) ? $clog2(KERNEL_PTS * IN_CHANNEL * 2) : $clog2(OUT_CHANNEL / 2);
+    localparam QUOTIENT_WIDTH     = $clog2(KERNEL_PTS * IN_CHANNEL * 2) > $clog2(OUT_CHANNEL / 2) ? $clog2(KERNEL_PTS * IN_CHANNEL * 2) : $clog2(OUT_CHANNEL / 2);
 
-    wire [31:0] kernel_addr = weight_wr_addr - KERNEL_BASE_ADDR;
+    wire [31:0]                 kernel_addr     = weight_wr_addr - KERNEL_BASE_ADDR;
     wire [QUOTIENT_WIDTH*2-1:0] kernel_addr_adj = kernel_addr[QUOTIENT_WIDTH*2-1:0];
-    wire kernel_wr_en = weight_wr_en && weight_wr_addr >= KERNEL_BASE_ADDR && weight_wr_addr < KERNEL_BASE_ADDR + NUM_KERNEL_WEIGHTS;
+    wire                        kernel_wr_en    = weight_wr_en && weight_wr_addr >= KERNEL_BASE_ADDR && weight_wr_addr < KERNEL_BASE_ADDR + NUM_KERNEL_WEIGHTS;
 
     wire [QUOTIENT_WIDTH-1:0]          kernel_ram_addr;
     wire [QUOTIENT_WIDTH-1:0]          kernel_word_en_num;
@@ -90,9 +90,9 @@ module pe_incha_quadruple #(
     );
 
     // Bias
-    wire [31:0] bias_wr_addr_ = weight_wr_addr - BIAS_BASE_ADDR;
-    wire [$clog2(OUT_CHANNEL)-2:0] bias_wr_addr = bias_wr_addr_[$clog2(OUT_CHANNEL)-1:1];
-    wire bias_wr_en = weight_wr_en && weight_wr_addr >= BIAS_BASE_ADDR && weight_wr_addr < BIAS_BASE_ADDR + OUT_CHANNEL;
+    wire [31:0]                    bias_wr_addr_ = weight_wr_addr - BIAS_BASE_ADDR;
+    wire [$clog2(OUT_CHANNEL)-2:0] bias_wr_addr  = bias_wr_addr_[$clog2(OUT_CHANNEL)-1:1];
+    wire                           bias_wr_en    = weight_wr_en && weight_wr_addr >= BIAS_BASE_ADDR && weight_wr_addr < BIAS_BASE_ADDR + OUT_CHANNEL;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,7 +131,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             kernel_cnt <= 0;
-        end else if (cnt_en) begin
+        end
+        else if (cnt_en) begin
             kernel_cnt <= cnt_limit ? 0 : kernel_cnt + 1;
         end
     end
@@ -167,7 +168,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             bias_cnt <= 0;
-        end else if (bias_cnt_en) begin
+        end
+        else if (bias_cnt_en) begin
             bias_cnt <= bias_cnt_limit ? 0 : bias_cnt + 1;
         end
     end
@@ -188,7 +190,7 @@ module pe_incha_quadruple #(
         .rd_en_a   (1'b1),
         .rd_en_b   (1'b1),
         .wr_en_a   (bias_wr_en ? (bias_wr_addr_[0] ? 2'b10 : 2'b01) : 2'b00),
-        .wr_en_b   (2'b00), 
+        .wr_en_b   (2'b00),
         .clk       (clk)
     );
 
@@ -216,6 +218,7 @@ module pe_incha_quadruple #(
 
     // MACC signals
     localparam MACC_OUTPUT_DATA_WIDTH = 16 + $clog2(KERNEL_PTS * IN_CHANNEL);
+
     wire [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out[0:3];
     wire                              macc_valid_o;
     reg                               macc_valid_i;
@@ -223,7 +226,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             macc_valid_i <= 1'b0;
-        end else begin
+        end
+        else begin
             macc_valid_i <= cnt_en;
         end
     end
@@ -239,7 +243,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             macc_valid_i_pipeline <= 1'b0;
-        end else begin
+        end
+        else begin
             macc_valid_i_pipeline <= macc_valid_i;
         end
     end
@@ -258,11 +263,13 @@ module pe_incha_quadruple #(
             for (i = 2; i >= 0; i = i - 1) begin : gen1
                 if ((OUT_CHANNEL % 4) <= (i + 1)) begin : gen2
                     assign macc_kernel_in[i] = kernel_cnt_zero ? 0 : kernel[i+1];
-                end else begin : gen3
+                end
+                else begin : gen3
                     assign macc_kernel_in[i] = kernel[i+1];
                 end
             end
-        end else begin : gen4
+        end
+        else begin : gen4
             for (i = 0; i < 3; i = i + 1) begin : gen5
                 assign macc_kernel_in[i] = kernel[i+1];
             end
@@ -288,7 +295,7 @@ module pe_incha_quadruple #(
     // MACC out reg
     reg signed [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_reg[0:3];
     reg                                     macc_valid_o_reg;
-    
+
     always @ (posedge clk) begin
         if (macc_valid_o) begin
             macc_data_out_reg[0] <= macc_data_out[0];
@@ -301,7 +308,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             macc_valid_o_reg <= 1'b0;
-        end else begin
+        end
+        else begin
             macc_valid_o_reg <= macc_valid_o;
         end
     end
@@ -322,7 +330,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             coeff_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             coeff_valid <= macc_valid_o_reg;
         end
     end
@@ -336,7 +345,8 @@ module pe_incha_quadruple #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             bias_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             bias_valid <= coeff_valid;
         end
     end
@@ -378,7 +388,8 @@ module pe_incha_quadruple #(
                 if (~rst_n) begin
                     bias_sum_trunc_valid_reg <= 1'b0;
                     dequant_valid_reg <= 1'b0;
-                end else begin
+                end
+                else begin
                     bias_sum_trunc_valid_reg <= bias_valid;
                     dequant_valid_reg <= bias_sum_trunc_valid_reg;
                 end
@@ -401,7 +412,7 @@ module pe_incha_quadruple #(
                 // bias_sum truncate
                 wire signed [MACC_OUTPUT_DATA_WIDTH-1:0] bias_sum_int = bias_sum[i][MACC_OUTPUT_DATA_WIDTH+16-1:16];
                 reg signed [8+16-1:0] bias_sum_trunc;
-            
+
                 always @ (posedge clk) begin
                     if (bias_valid) begin
                         bias_sum_trunc <= bias_sum_int >= 127 ? (127 << 16) : (bias_sum_int <= -128 ? (-128 << 16) : bias_sum[i][8+16-1:0]);

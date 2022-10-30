@@ -1,10 +1,10 @@
 `timescale 1ns / 1ps
 
 module block_ram_multi_word_dual_port #(
-    parameter DATA_WIDTH = 8,
-    parameter DEPTH = 64,
-    parameter NUM_WORDS = 4,
-    parameter RAM_STYLE = "auto",
+    parameter DATA_WIDTH      = 8,
+    parameter DEPTH           = 64,
+    parameter NUM_WORDS       = 4,
+    parameter RAM_STYLE       = "auto",
     parameter OUTPUT_REGISTER = "false"
 )(
     output [DATA_WIDTH*NUM_WORDS-1:0] rd_data_a,
@@ -41,7 +41,7 @@ module block_ram_multi_word_dual_port #(
             rd_data_a_reg <= ram[addr_a];
         end
     end
-    
+
     // PORTB
     reg [DATA_WIDTH*NUM_WORDS-1:0] rd_data_b_reg;
 

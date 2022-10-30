@@ -5,7 +5,7 @@ import torch
 class QuantLaneNet(torch.nn.Module):
 
     def __init__(self, input_size=(256, 512), num_lanes=4, dropout=True):
-        
+
         super(QuantLaneNet, self).__init__()
 
         self.input_size = input_size

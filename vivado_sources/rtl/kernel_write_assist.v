@@ -2,8 +2,8 @@
 
 module kernel_write_assist #(
     parameter DIVIDEND_WIDTH = 20,
-    parameter DIVISOR = 288,
-    parameter DATA_WIDTH = 16
+    parameter DIVISOR        = 288,
+    parameter DATA_WIDTH     = 16
 )(
     output [DIVIDEND_WIDTH/2-1:0]            quotient,
     output [DIVIDEND_WIDTH/2-1:0]            remainder,
@@ -34,7 +34,8 @@ module kernel_write_assist #(
                 assign dividend_cur = {1'b0, dividend};
                 assign quotient_cur = 0;
                 assign valid_cur = i_valid;
-            end else begin : gen2
+            end
+            else begin : gen2
                 assign dividend_cur = {1'b0, dividend_reg[i-1]};
                 assign quotient_cur = quotient_reg[i-1];
                 assign valid_cur = valid_reg[i-1];
@@ -45,9 +46,10 @@ module kernel_write_assist #(
                     if (sub < 0) begin
                         dividend_reg[i] <= dividend_cur[DIVIDEND_WIDTH-1:0];
                         quotient_reg[i] <= quotient_cur << 1;
-                    end else begin
+                    end
+                    else begin
                         dividend_reg[i] <= sub[DIVIDEND_WIDTH-1:0];
-                        quotient_reg[i] <= (quotient_cur << 1) | 1'b1; 
+                        quotient_reg[i] <= (quotient_cur << 1) | 1'b1;
                     end
                 end
             end
@@ -55,7 +57,8 @@ module kernel_write_assist #(
             always @ (posedge clk or negedge rst_n) begin
                 if (~rst_n) begin
                     valid_reg[i] <= 1'b0;
-                end else begin
+                end
+                else begin
                     valid_reg[i] <= valid_cur;
                 end
             end
@@ -72,8 +75,8 @@ module kernel_write_assist #(
                     data_reg[i] <= i == 0 ? i_data : data_reg[i-1];
                 end
             end
-
-        end else begin : gen5
+        end
+        else begin : gen5
             assign o_data = 0;
         end
     endgenerate

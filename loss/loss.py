@@ -8,7 +8,7 @@ class ClassificationLoss(torch.nn.Module):
         self.bce_loss = torch.nn.BCELoss()
 
     def forward(self, cls_pred, vertical_pred, cls_true, vertical_true):
-        
+
         _cls_true = cls_true.clone()
         _cls_pred = torch.sigmoid(cls_pred.clone())
         _vertical_true = vertical_true.clone()
@@ -83,7 +83,7 @@ class OffsetLoss(torch.nn.Module):
 
 def main():
     loss_funct = ClassificationLoss(device='cpu')
-    
+
     cls_true = torch.ones(size=(4, 4, 32, 64), dtype=torch.float32)
     cls_pred = torch.zeros(size=(4, 4, 32, 64), dtype=torch.float32)
     vertical_true = torch.ones(size=(4, 4, 32, 1), dtype=torch.float32)
@@ -94,4 +94,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

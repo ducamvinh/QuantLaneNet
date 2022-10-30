@@ -60,7 +60,7 @@ def get_arguments():
 
 def main():
     args = get_arguments()
-    
+
     convert(
         dataset_path=args.dataset_path,
         checkpoint_path=args.checkpoint_path,

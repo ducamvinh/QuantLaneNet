@@ -29,7 +29,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
     else:
         composed = None
 
-    # Get dataset    
+    # Get dataset
     train_set = TuSimpleDataset(dir_path=dataset_path, train=True,  evaluate=False, device=device, verbose=True,  transform=composed)
     val_set   = TuSimpleDataset(dir_path=dataset_path, train=True,  evaluate=True,  device=device, verbose=False, transform=None)
     test_set  = TuSimpleDataset(dir_path=dataset_path, train=False, evaluate=True,  device=device, verbose=True,  transform=None)
@@ -86,7 +86,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
             # Forward pass
             optimizer.zero_grad()
             cls_pred, vertical_pred, offset_pred = model(img.float() / 255)
-            
+
             results = dict(
                 cls_pred=cls_pred, cls_true=cls_true,
                 offset_pred=offset_pred, offset_true=offset_true,
@@ -117,7 +117,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
 
             if step == len(train_loader) - 1:
                 torch.save(postfix, f'{checkpoint_path}/loss_{(epoch):03d}.pth')
-                
+
         scheduler.step()
 
         # Evaluation
@@ -129,7 +129,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
             fp  = 0
             fn  = 0
 
-            print(f'\n\tEvaluating {loader_name} set...')
+            print(f'\n    Evaluating {loader_name} set...')
 
             cuda_synchronize(device)
             start_time = time.perf_counter()
@@ -153,8 +153,8 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
                 cuda_synchronize(device)
                 elapsed = time.perf_counter() - start_time
 
-                print(f'\t{loader_name} eval: acc = {acc:.04f}, fp = {fp:.04f}, fn = {fn:.04f}')
-                print(f'\tElapsed time: {elapsed:.2f}s')
+                print(f'    {loader_name} eval: acc = {acc:.04f}, fp = {fp:.04f}, fn = {fn:.04f}')
+                print(f'    Elapsed time: {elapsed:.2f}s')
 
                 eval_results[f'{loader_name}_acc'] = acc
                 eval_results[f'{loader_name}_fp']  = fp
@@ -228,4 +228,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    

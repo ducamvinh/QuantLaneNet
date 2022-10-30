@@ -23,7 +23,7 @@ class EncoderStage(torch.nn.Module):
         x = self.conv_same_1(x)
         if self.dropout:
             x = torch.nn.functional.dropout2d(x, p=0.2, training=self.training, inplace=False)
-        
+
         # conv_same_2
         x = self.conv_same_2(x)
         if self.dropout:

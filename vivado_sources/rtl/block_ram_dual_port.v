@@ -1,9 +1,9 @@
 `timescale 1ns / 1ps
 
 module block_ram_dual_port #(
-    parameter DATA_WIDTH = 32,
-    parameter DEPTH = 2**16,
-    parameter RAM_STYLE = "auto",
+    parameter DATA_WIDTH      = 32,
+    parameter DEPTH           = 2**16,
+    parameter RAM_STYLE       = "auto",
     parameter OUTPUT_REGISTER = "false"
 )(
     output [DATA_WIDTH-1:0]    rd_data_a,

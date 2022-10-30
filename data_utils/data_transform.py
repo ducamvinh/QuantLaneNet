@@ -73,11 +73,11 @@ class MyHorizontalFlip(object):
 
     def __call__(self, sample):
         prob = 1 if np.random.rand() < self.p else 0
-        
+
         if prob:
             img = sample[0]
             height, width = img.shape[:-1]
-            
+
             M = np.float32([[-1, 0, width - 1], [0, 1, 0]])
             return affine_translation(sample=sample, M=M)
         else:

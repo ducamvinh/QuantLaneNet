@@ -41,7 +41,8 @@ module adder_tree #(
             for (j = 0; j < _NUM_INPUTS; j = j + 1) begin : gen1
                 if (i == 0) begin : gen2
                     assign adder_layer_in[j] = i_data[(j+1)*INPUT_WIDTH-1:j*INPUT_WIDTH];
-                end else begin : gen3
+                end
+                else begin : gen3
                     assign adder_layer_in[j] = adder_stage_out[i-1][(j+1)*INPUT_WIDTH-1:j*INPUT_WIDTH];
                 end
             end
@@ -50,17 +51,19 @@ module adder_tree #(
             for (j = 0; j < _NUM_OUTPUTS; j = j + 1) begin : gen4
                 if (j * 2 + 1 != _NUM_INPUTS) begin : gen5
                     assign adder_layer_out[j] = adder_layer_in[j*2] + adder_layer_in[j*2+1];
-                end else begin : gen6
+                end
+                else begin : gen6
                     assign adder_layer_out[j] = {adder_layer_in[j*2][INPUT_WIDTH-1], adder_layer_in[j*2]};
                 end
             end
 
             // Determine valid in
             wire adder_layer_out_reg_en;
-            
+
             if (i == 0) begin : gen7
                 assign adder_layer_out_reg_en = i_valid;
-            end else begin : gen8
+            end
+            else begin : gen8
                 assign adder_layer_out_reg_en = adder_valid[i-1];
             end
 
@@ -80,7 +83,8 @@ module adder_tree #(
             always @ (posedge clk or negedge rst_n) begin
                 if (~rst_n) begin
                     adder_valid[i] <= 1'b0;
-                end else begin
+                end
+                else begin
                     adder_valid[i] <= adder_layer_out_reg_en;
                 end
             end
@@ -91,7 +95,7 @@ module adder_tree #(
     assign o_valid = adder_valid[ADDER_LAYERS-1];
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
-   
+
     function integer num_inputs;
         input integer start_num_inputs;
         input integer stage;

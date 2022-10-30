@@ -1,8 +1,8 @@
 `timescale 1ns / 1ps
 
 module fifo_dual_read #(
-    parameter DATA_WIDTH = 16 * 8,
-    parameter DEPTH = 512 * 5,
+    parameter DATA_WIDTH        = 16 * 8,
+    parameter DEPTH             = 512 * 5,
     parameter ALMOST_FULL_THRES = 10
 )(
     output [DATA_WIDTH-1:0] rd_data_a,
@@ -80,11 +80,11 @@ module fifo_dual_read #(
         endcase
     end
 
-    wire signed [ADDR_WIDTH:0] wr_addr = {1'b0, wr_addr_};
-    wire signed [ADDR_WIDTH:0] closest_rd_addr = {1'b0, closest_rd_addr_};
-    wire signed [ADDR_WIDTH+1:0] addr_diff_1 = closest_rd_addr - wr_addr;
-    wire signed [ADDR_WIDTH+1:0] addr_diff_2 = DEPTH + addr_diff_1;
-    wire signed [ADDR_WIDTH+1:0] addr_diff_3 = closest_rd_addr_overlap ? addr_diff_1 : addr_diff_2;
+    wire signed [ADDR_WIDTH:0]   wr_addr         = {1'b0, wr_addr_};
+    wire signed [ADDR_WIDTH:0]   closest_rd_addr = {1'b0, closest_rd_addr_};
+    wire signed [ADDR_WIDTH+1:0] addr_diff_1     = closest_rd_addr - wr_addr;
+    wire signed [ADDR_WIDTH+1:0] addr_diff_2     = DEPTH + addr_diff_1;
+    wire signed [ADDR_WIDTH+1:0] addr_diff_3     = closest_rd_addr_overlap ? addr_diff_1 : addr_diff_2;
 
     assign almost_full = addr_diff_3 <= ALMOST_FULL_THRES && addr_diff_3 != 0;
 

@@ -1,16 +1,16 @@
 `timescale 1ns / 1ps
 
 module pe_outcha_double_controller #(
-    parameter IN_WIDTH = 513,
-    parameter IN_HEIGHT = 257,
-    parameter KERNEL_0 = 3,
-    parameter KERNEL_1 = 3,
+    parameter IN_WIDTH   = 513,
+    parameter IN_HEIGHT  = 257,
+    parameter KERNEL_0   = 3,
+    parameter KERNEL_1   = 3,
     parameter DILATION_0 = 2,
     parameter DILATION_1 = 2,
-    parameter PADDING_0 = 2,
-    parameter PADDING_1 = 2,
-    parameter STRIDE_0 = 1,
-    parameter STRIDE_1 = 1
+    parameter PADDING_0  = 2,
+    parameter PADDING_1  = 2,
+    parameter STRIDE_0   = 1,
+    parameter STRIDE_1   = 1
 )(
     output reg data_latch_a,
     output reg data_latch_b,
@@ -25,7 +25,7 @@ module pe_outcha_double_controller #(
 
     // If num output pixels is odd
     localparam OUT_HEIGHT = (IN_HEIGHT + 2 * PADDING_0 - DILATION_0 * (KERNEL_0 - 1) - 1) / STRIDE_0 + 1;
-    localparam OUT_WIDTH = (IN_WIDTH + 2 * PADDING_1 - DILATION_1 * (KERNEL_1 - 1) - 1) / STRIDE_1 + 1;
+    localparam OUT_WIDTH  = (IN_WIDTH + 2 * PADDING_1 - DILATION_1 * (KERNEL_1 - 1) - 1) / STRIDE_1 + 1;
     localparam OUT_PIXELS = OUT_HEIGHT * OUT_WIDTH;
 
     wire last_odd;
@@ -38,11 +38,13 @@ module pe_outcha_double_controller #(
             always @ (posedge clk or negedge rst_n) begin
                 if (~rst_n) begin
                     out_pixel_cnt <= 0;
-                end else if (pe_ack) begin
+                end
+                else if (pe_ack) begin
                     out_pixel_cnt <= last_odd ? 0 : out_pixel_cnt + 1;
                 end
             end
-        end else begin : gen1
+        end
+        else begin : gen1
             assign last_odd = 1'b0;
         end
     endgenerate
@@ -59,7 +61,8 @@ module pe_outcha_double_controller #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             current_state <= IDLE;
-        end else begin
+        end
+        else begin
             current_state <= next_state;
         end
     end
@@ -72,10 +75,12 @@ module pe_outcha_double_controller #(
                 if (i_valid) begin
                     if (cnt_limit) begin
                         next_state <= last_odd ? IDLE : GOTA;
-                    end else begin
+                    end
+                    else begin
                         next_state <= last_odd ? BUSY : BUSY_GOTA;
                     end
-                end else begin
+                end
+                else begin
                     next_state <= cnt_limit ? IDLE : BUSY;
                 end
             end

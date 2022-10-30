@@ -17,9 +17,11 @@ module activity_led_blink #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             counter <= RESET_VALUE;
-        end else if (counter != RESET_VALUE || trigger) begin
+        end
+        else if (counter != RESET_VALUE || trigger) begin
             counter <= counter + 1;
-        end else begin
+        end
+        else begin
             counter <= counter;
         end
     end

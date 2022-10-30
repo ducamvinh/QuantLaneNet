@@ -15,7 +15,7 @@ class QuantLaneNetQuantized(QuantLaneNet):
     def forward(self, x):
         # Quant
         x = self.quant(x)
-        
+
         # Encoder stages
         x1 = self.encoder_stage_1(x)
         x2 = self.encoder_stage_2(x1)
@@ -28,4 +28,3 @@ class QuantLaneNetQuantized(QuantLaneNet):
 
         # Dequant
         return self.dequant1(cls), self.dequant2(vertical), self.dequant3(offset)
-        

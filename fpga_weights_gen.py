@@ -61,7 +61,7 @@ def write_weights(model, weights_bin_path):
                 layer_scale_list.append(y_scale)
 
             last_layer = conv
-            
+
     print(
         f'Num kernel      : {len(kernel_list)}\n'
         f'Num bias        : {len(bias_list)}\n'
@@ -69,7 +69,7 @@ def write_weights(model, weights_bin_path):
         f'Num layer_scale : {len(layer_scale_list)}\n'
         f'Total weights   : {len(kernel_list) + len(bias_list) + len(macc_coeff_list) + len(layer_scale_list)}'
     )
-    
+
     # Write to file
     byte_array = bytearray()
     bias_qformat = {'m': 8, 'n': 8, 'signed': 1}
@@ -80,7 +80,7 @@ def write_weights(model, weights_bin_path):
 
     for val in bias_list:
         byte_array.extend(int(f'{FixedPoint(val, **bias_qformat):04x}', 16).to_bytes(length=2, byteorder='little'))
-        
+
     for val in macc_coeff_list + layer_scale_list:
         byte_array.extend(int(f'{FixedPoint(val, **scale_qformat):04x}', 16).to_bytes(length=2, byteorder='little'))
 
@@ -93,7 +93,7 @@ def write_weights(model, weights_bin_path):
 
 def get_arguments():
     parser = argparse.ArgumentParser()
-    
+
     parser.add_argument('--weights_bin_path', type=str, default='./weights/fpga_weights.bin')
     parser.add_argument('--quantized_weights_path', type=str, default='./weights/quantized_weights_pertensor_symmetric.pth')
 

@@ -29,7 +29,8 @@ module mult_8bit_dual (
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             stage_1_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             stage_1_valid <= i_valid;
         end
     end
@@ -47,7 +48,8 @@ module mult_8bit_dual (
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             stage_2_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             stage_2_valid <= stage_1_valid;
         end
     end
@@ -63,7 +65,8 @@ module mult_8bit_dual (
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             o_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             o_valid <= stage_2_valid;
         end
     end

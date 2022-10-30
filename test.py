@@ -111,7 +111,7 @@ def test_video(model, video_path, use_offset, device):
         img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
         cv2.imshow(id, img)
         cv2.waitKey(1)
-        
+
     cap.release()
     cv2.destroyAllWindows()
 
@@ -119,9 +119,9 @@ def test_video(model, video_path, use_offset, device):
     print(
         f'\n'
         f'[INFO] Results:\n'
-        f'\t- Average model runtime   : {(runtime * 1e3):.2f} ms\n'
-        f'\t- Average model framerate : {(1 / runtime):.2f} FPS\n'
-        f'\t- Actual video framerate  : {(iterator.format_dict["n"] / iterator.format_dict["elapsed"]):.2f} FPS\n'
+        f'    - Average model runtime   : {(runtime * 1e3):.2f} ms\n'
+        f'    - Average model framerate : {(1 / runtime):.2f} FPS\n'
+        f'    - Actual video framerate  : {(iterator.format_dict["n"] / iterator.format_dict["elapsed"]):.2f} FPS\n'
     )
 
 def test_evaluate(model, dataset_path, use_offset, device):
@@ -141,7 +141,7 @@ def test_evaluate(model, dataset_path, use_offset, device):
     fn  = 0
 
     print('[INFO] Evaluating model...')
-    
+
     iterator = tqdm.tqdm(test_set)
     stop_idx = len(test_set) - 1
 
@@ -149,7 +149,7 @@ def test_evaluate(model, dataset_path, use_offset, device):
         if model_type == 'fpga':
             cls_pred, vertical_pred = model(img, post_process=True)
         else:
-            cls_pred, vertical_pred, offset_pred = model(img.unsqueeze(0).float() / 255.0)        
+            cls_pred, vertical_pred, offset_pred = model(img.unsqueeze(0).float() / 255.0)
 
         if model_type == 'fpga' or not use_offset:
             offset_dummy = torch.ones_like(cls_pred) * (3.5 /8)
@@ -170,9 +170,9 @@ def test_evaluate(model, dataset_path, use_offset, device):
 
     print(
         f'\n[INFO] Evaluated {model_type} model{"" if model_type == "fpga" else (" [WITH] offset" if use_offset else " [WITHOUT] offset")}:\n'
-        f'\t- acc = {(acc / len(test_set) * 100):.4f}%\n'
-        f'\t- fp  = {(fp  / len(test_set) * 100):.4f}%\n'
-        f'\t- fn  = {(fn  / len(test_set) * 100):.4f}%\n'
+        f'    - acc = {(acc / len(test_set) * 100):.4f}%\n'
+        f'    - fp  = {(fp  / len(test_set) * 100):.4f}%\n'
+        f'    - fn  = {(fn  / len(test_set) * 100):.4f}%\n'
     )
 
 def get_arguments():
@@ -217,9 +217,9 @@ def main():
     if args.model == 'software':
         checkpoint_path = os.path.join(args.checkpoint_path, f'checkpoint_{get_best_model(args.checkpoint_path)}.pth')
         print(
-            f'\t- Type       : Software\n'
-            f'\t- Platform   : {args.device.upper()}\n'
-            f'\t- Checkpoint : {checkpoint_path}\n'
+            f'    - Type       : Software\n'
+            f'    - Platform   : {args.device.upper()}\n'
+            f'    - Checkpoint : {checkpoint_path}\n'
         )
 
         checkpoint = torch.load(checkpoint_path, map_location=args.device)
@@ -228,9 +228,9 @@ def main():
         model.eval()
     elif args.model == 'quantized':
         print(
-            f'\t- Type     : Quantized\n'
-            f'\t- Platform : {args.device.upper()}\n'
-            f'\t- Weights  : {args.quantized_weights_path}\n'
+            f'    - Type     : Quantized\n'
+            f'    - Platform : {args.device.upper()}\n'
+            f'    - Weights  : {args.quantized_weights_path}\n'
         )
 
         model = QuantLaneNetQuantized().to(args.device)
@@ -238,10 +238,10 @@ def main():
         model.load_state_dict(torch.load(args.quantized_weights_path, map_location=args.device))
     else:
         print(
-            f'\t- Type           : FPGA\n'
-            f'\t- Kernel modules : {args.h2c_device}\n'
-            f'\t                   {args.c2h_device}\n'
-            f'\t- Weights binary : {args.weights_bin_path}\n'
+            f'    - Type           : FPGA\n'
+            f'    - Kernel modules : {args.h2c_device}\n'
+            f'                       {args.c2h_device}\n'
+            f'    - Weights binary : {args.weights_bin_path}\n'
         )
 
         model = QuantLaneNetFPGA(h2c_device=args.h2c_device, c2h_device=args.c2h_device)

@@ -1,10 +1,10 @@
 `timescale 1ns / 1ps
 
 module block_ram_multi_word #(
-    parameter DATA_WIDTH = 8,
-    parameter DEPTH = 64,
-    parameter NUM_WORDS = 4,
-    parameter RAM_STYLE = "auto",
+    parameter DATA_WIDTH      = 8,
+    parameter DEPTH           = 64,
+    parameter NUM_WORDS       = 4,
+    parameter RAM_STYLE       = "auto",
     parameter OUTPUT_REGISTER = "false"
 )(
     output [DATA_WIDTH*NUM_WORDS-1:0] rd_data,
@@ -37,7 +37,8 @@ module block_ram_multi_word #(
     always @ (posedge clk) begin
         if (rd_en) begin
             rd_data_reg <= ram[rd_addr];
-        end else begin
+        end
+        else begin
             rd_data_reg <= rd_data_reg;
         end
     end

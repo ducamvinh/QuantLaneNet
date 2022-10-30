@@ -142,4 +142,3 @@ def visualize_og_format(img, lanes, h_samples):
                 cv2.circle(img=img, center=(x, y), radius=5, color=colors[i], thickness=-1)
 
     return img
-    

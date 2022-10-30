@@ -2,7 +2,7 @@
 
 module macc_8bit_single_1_to_n #(
     parameter NUM_INPUTS = 9,
-    parameter NUM_MACC = 5
+    parameter NUM_MACC   = 5
 )(
     o_data,
     o_valid,
@@ -13,7 +13,7 @@ module macc_8bit_single_1_to_n #(
     rst_n
 );
 
-    localparam ADDER_LAYERS = $clog2(NUM_INPUTS);
+    localparam ADDER_LAYERS      = $clog2(NUM_INPUTS);
     localparam OUTPUT_DATA_WIDTH = 16 + ADDER_LAYERS;
 
     output [OUTPUT_DATA_WIDTH*NUM_MACC-1:0] o_data;
@@ -36,7 +36,7 @@ module macc_8bit_single_1_to_n #(
                 wire [8*NUM_INPUTS-1:0] mult_in_a = input_n[(i+1)*8*NUM_INPUTS-1:(i+0)*8*NUM_INPUTS];
                 wire [8*NUM_INPUTS-1:0] mult_in_b = input_n[(i+2)*8*NUM_INPUTS-1:(i+1)*8*NUM_INPUTS];
 
-                for (j = 0; j < NUM_INPUTS; j = j + 1) begin : gen2  
+                for (j = 0; j < NUM_INPUTS; j = j + 1) begin : gen2
                     wire mult_valid_;
 
                     if (i == 0 && j == 0) begin : gen3
@@ -55,7 +55,8 @@ module macc_8bit_single_1_to_n #(
                         .rst_n   (rst_n)
                     );
                 end
-            end else begin : gen4
+            end
+            else begin : gen4
                 wire mult_valid_;
 
                 if (i == 0) begin : gen5
@@ -120,7 +121,8 @@ endmodule
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             valid <= 3'b000;
-        end else begin
+        end
+        else begin
             valid <= {valid[1:0], i_valid};
         end
     end

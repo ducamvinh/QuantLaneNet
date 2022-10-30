@@ -33,7 +33,7 @@ def main():
             x.tofile(file=f)
 
         # Wait for output to be valid
-        while True: 
+        while True:
             with open(args.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
                 if f.read(8) == b'\x01\x00\x00\x00\x00\x00\x00\x00':  # 64-bit "00000...001" little endian
@@ -42,7 +42,7 @@ def main():
         # Read output
         with open(args.c2h_device, 'rb') as f:
             f.seek(fpga_address_map.OFFSET_OUTPUT)
-            hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64) 
+            hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64)
 
         runtime.append(time.perf_counter() - start_time)
 
@@ -50,8 +50,8 @@ def main():
     print(
         f'\n'
         f'[INFO] Results:\n'
-        f'\t- Runtime   : {(runtime * 1e3):.2f} ms\n'
-        f'\t- Framerate : {(1 / runtime):.2f} FPS\n'
+        f'    - Runtime   : {(runtime * 1e3):.2f} ms\n'
+        f'    - Framerate : {(1 / runtime):.2f} FPS\n'
     )
 
 if __name__ == '__main__':

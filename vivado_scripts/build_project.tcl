@@ -6,9 +6,9 @@ source -notrace "${script_dir}/procs.tcl"
 vivadoVersionCheck "2020.2.2"
 
 ##################################################################
-# Process arguments 
+# Process arguments
 ##################################################################
- 
+
 set valid_args  [list gui launch_run debug no_exit close_project launch_both]
 set project_dir ""
 
@@ -32,7 +32,7 @@ if {$project_dir eq ""} {
 # Set other paths and normalize
 set project_dir [file normalize "${project_dir}"                 ]
 set sources_dir [file normalize "${script_dir}/../vivado_sources"]
-set ip_repo_dir [file normalize "${project_dir}/ip_repo"         ] 
+set ip_repo_dir [file normalize "${project_dir}/ip_repo"         ]
 
 # Start GUI
 if {"gui" in $argv} {
@@ -40,7 +40,7 @@ if {"gui" in $argv} {
 }
 
 ##################################################################
-# Create project 
+# Create project
 ##################################################################
 
 puts "\n##########################################\n# Creating project in ${project_dir}\n##########################################\n"
@@ -48,7 +48,7 @@ create_project QuantLaneNet $project_dir -part xc7vx485tffg1761-2
 set_property board_part [lindex [lsort [get_board_parts *xilinx.com:vc707:part0*]] end] [current_project]
 
 ##################################################################
-# Create AXI IP 
+# Create AXI IP
 ##################################################################
 
 puts "\n##########################################\n# Creating IP\n##########################################\n"
@@ -87,7 +87,7 @@ set_property ip_repo_paths $ip_repo_dir [current_project]
 update_ip_catalog
 
 ##################################################################
-# Create block design in Vivado 
+# Create block design in Vivado
 ##################################################################
 
 puts "\n##########################################\n# Creating block design\n##########################################\n"
@@ -171,7 +171,7 @@ for {set i 0} {$i < [llength $clocks]} {incr i} {
         CONFIG.DIN_WIDTH      $blink_counter_width             \
         CONFIG.DOUT_WIDTH     1                                \
     ] [get_bd_cells "signal_leds/xlslice_${i}"]
-    
+
     # Connect counter to clock source slice block
     connect_bd_net [get_bd_pins "signal_leds/c_counter_binary_${i}/CLK"] [get_bd_pins [lindex $clocks $i]]
     connect_bd_net [get_bd_pins "signal_leds/c_counter_binary_${i}/Q"  ] [get_bd_pins "signal_leds/xlslice_${i}/Din"]
@@ -194,7 +194,7 @@ set led_signals [list              \
 ]
 
 for {set i 0} {$i < 8} {incr i} {
-    connect_bd_net [get_bd_pins [lindex $led_signals $i]] [get_bd_pins "signal_leds/xlconcat_0/In${i}"]  
+    connect_bd_net [get_bd_pins [lindex $led_signals $i]] [get_bd_pins "signal_leds/xlconcat_0/In${i}"]
 }
 
 # Make concat block's output external
@@ -202,7 +202,7 @@ make_bd_pins_external [get_bd_pins signal_leds/xlconcat_0/dout]
 set_property name "led_8bits" [get_bd_ports -of_objects [get_bd_nets -of_objects [get_bd_pins signal_leds/* -filter {DIR == O}]]]
 
 ##################################################################
-# Validate and save block design 
+# Validate and save block design
 ##################################################################
 
 puts "\n##########################################\n# Validate and save block design\n##########################################\n"

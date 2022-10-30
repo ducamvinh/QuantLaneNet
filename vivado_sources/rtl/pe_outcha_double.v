@@ -2,28 +2,28 @@
 
 module pe_outcha_double #(
     // Layer parameters
-    parameter IN_WIDTH = 513,
-    parameter IN_HEIGHT = 257,
-    parameter IN_CHANNEL = 3,
+    parameter IN_WIDTH    = 513,
+    parameter IN_HEIGHT   = 257,
+    parameter IN_CHANNEL  = 3,
     parameter OUT_CHANNEL = 4,
     // parameter OUTPUT_MODE = "relu",
     parameter OUTPUT_MODE = "dequant",
     // parameter OUTPUT_MODE = "sigmoid",
 
     // Conv parameters
-    parameter KERNEL_0 = 3,
-    parameter KERNEL_1 = 3,
+    parameter KERNEL_0   = 3,
+    parameter KERNEL_1   = 3,
     parameter DILATION_0 = 2,
     parameter DILATION_1 = 2,
-    parameter PADDING_0 = 2,
-    parameter PADDING_1 = 2,
-    parameter STRIDE_0 = 1,
-    parameter STRIDE_1 = 1,
+    parameter PADDING_0  = 2,
+    parameter PADDING_1  = 2,
+    parameter STRIDE_0   = 1,
+    parameter STRIDE_1   = 1,
 
     // Weight addr map
-    parameter KERNEL_BASE_ADDR = 23,
-    parameter BIAS_BASE_ADDR = KERNEL_BASE_ADDR + KERNEL_0 * KERNEL_1 * IN_CHANNEL * OUT_CHANNEL,
-    parameter MACC_COEFF_BASE_ADDR = BIAS_BASE_ADDR + OUT_CHANNEL,
+    parameter KERNEL_BASE_ADDR      = 23,
+    parameter BIAS_BASE_ADDR        = KERNEL_BASE_ADDR + KERNEL_0 * KERNEL_1 * IN_CHANNEL * OUT_CHANNEL,
+    parameter MACC_COEFF_BASE_ADDR  = BIAS_BASE_ADDR + OUT_CHANNEL,
     parameter LAYER_SCALE_BASE_ADDR = MACC_COEFF_BASE_ADDR + 1
 )(
     o_data,
@@ -39,7 +39,7 @@ module pe_outcha_double #(
     rst_n
 );
 
-    localparam KERNEL_PTS = KERNEL_0 * KERNEL_1;
+    localparam KERNEL_PTS        = KERNEL_0 * KERNEL_1;
     localparam OUTPUT_DATA_WIDTH = OUTPUT_MODE == "relu" ? 8 : 16;
 
     output [OUTPUT_DATA_WIDTH*OUT_CHANNEL-1:0] o_data;
@@ -58,14 +58,14 @@ module pe_outcha_double #(
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Weight ram write logic
-    
+
     // Kernel
     localparam NUM_KERNEL_WEIGHTS = KERNEL_PTS * IN_CHANNEL * OUT_CHANNEL;
-    localparam QUOTIENT_WIDTH = KERNEL_PTS * OUT_CHANNEL > IN_CHANNEL ? $clog2(KERNEL_PTS * OUT_CHANNEL) : $clog2(IN_CHANNEL);
+    localparam QUOTIENT_WIDTH     = KERNEL_PTS * OUT_CHANNEL > IN_CHANNEL ? $clog2(KERNEL_PTS * OUT_CHANNEL) : $clog2(IN_CHANNEL);
 
-    wire [31:0] kernel_addr = weight_wr_addr - KERNEL_BASE_ADDR;
+    wire [31:0]                 kernel_addr     = weight_wr_addr - KERNEL_BASE_ADDR;
     wire [QUOTIENT_WIDTH*2-1:0] kernel_addr_adj = kernel_addr[QUOTIENT_WIDTH*2-1:0];
-    wire kernel_wr_en = weight_wr_en && weight_wr_addr >= KERNEL_BASE_ADDR && weight_wr_addr < KERNEL_BASE_ADDR + NUM_KERNEL_WEIGHTS;
+    wire                        kernel_wr_en    = weight_wr_en && weight_wr_addr >= KERNEL_BASE_ADDR && weight_wr_addr < KERNEL_BASE_ADDR + NUM_KERNEL_WEIGHTS;
 
     wire [QUOTIENT_WIDTH-1:0]         kernel_ram_addr;
     wire [QUOTIENT_WIDTH-1:0]         kernel_word_en_num;
@@ -90,9 +90,9 @@ module pe_outcha_double #(
     );
 
     // Bias
-    wire [31:0] bias_wr_addr_ = weight_wr_addr - BIAS_BASE_ADDR;
-    wire [$clog2(OUT_CHANNEL)-1:0] bias_wr_addr = bias_wr_addr_[$clog2(OUT_CHANNEL)-1:0];
-    wire bias_wr_en = weight_wr_en && weight_wr_addr >= BIAS_BASE_ADDR && weight_wr_addr < BIAS_BASE_ADDR + OUT_CHANNEL;
+    wire [31:0]                    bias_wr_addr_ = weight_wr_addr - BIAS_BASE_ADDR;
+    wire [$clog2(OUT_CHANNEL)-1:0] bias_wr_addr  = bias_wr_addr_[$clog2(OUT_CHANNEL)-1:0];
+    wire                           bias_wr_en    = weight_wr_en && weight_wr_addr >= BIAS_BASE_ADDR && weight_wr_addr < BIAS_BASE_ADDR + OUT_CHANNEL;
 
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -127,10 +127,10 @@ module pe_outcha_double #(
 
     // Input registers
     reg  [8*IN_CHANNEL*KERNEL_PTS-1:0] i_data_reg_a_buf;
-    reg  [8*KERNEL_PTS-1:0] i_data_reg_a[0:IN_CHANNEL-1];
-    reg  [8*KERNEL_PTS-1:0] i_data_reg_b[0:IN_CHANNEL-1];
-    wire [8*KERNEL_PTS-1:0] i_data_reg_a_in[0:IN_CHANNEL-1];
-    wire [8*KERNEL_PTS-1:0] i_data_reg_b_in[0:IN_CHANNEL-1];
+    reg  [8*KERNEL_PTS-1:0]            i_data_reg_a     [0:IN_CHANNEL-1];
+    reg  [8*KERNEL_PTS-1:0]            i_data_reg_b     [0:IN_CHANNEL-1];
+    wire [8*KERNEL_PTS-1:0]            i_data_reg_a_in  [0:IN_CHANNEL-1];
+    wire [8*KERNEL_PTS-1:0]            i_data_reg_b_in  [0:IN_CHANNEL-1];
 
     always @ (posedge clk) begin
         if (data_latch_a) begin
@@ -154,7 +154,8 @@ module pe_outcha_double #(
                 if (data_latch_b) begin
                     i_data_reg_a[i] <= i_data_reg_a_in[i];
                     i_data_reg_b[i] <= i_data_reg_b_in[i];
-                end else if (cnt_en) begin
+                end
+                else if (cnt_en) begin
                     i_data_reg_a[i] <= i == IN_CHANNEL - 1 ? i_data_reg_a[i] : i_data_reg_a[i+1];
                     i_data_reg_b[i] <= i == IN_CHANNEL - 1 ? i_data_reg_b[i] : i_data_reg_b[i+1];
                 end
@@ -171,7 +172,8 @@ module pe_outcha_double #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             kernel_cnt <= 0;
-        end else if (cnt_en) begin
+        end
+        else if (cnt_en) begin
             kernel_cnt <= cnt_limit ? 0 : kernel_cnt + 1;
         end
     end
@@ -221,7 +223,8 @@ module pe_outcha_double #(
             macc_valid_i <= 1'b0;
             macc_valid_o_reg <= 1'b0;
             coeff_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             macc_valid_i <= cnt_en;
             macc_valid_o_reg <= macc_valid_o;
             coeff_valid <= macc_valid_o_reg;
@@ -245,7 +248,8 @@ module pe_outcha_double #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             macc_valid_i_pipeline <= 1'b0;
-        end else begin
+        end
+        else begin
             macc_valid_i_pipeline <= macc_valid_i;
         end
     end
@@ -259,7 +263,8 @@ module pe_outcha_double #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             in_cha_cnt <= 0;
-        end else if (macc_valid_o_reg) begin
+        end
+        else if (macc_valid_o_reg) begin
             in_cha_cnt <= in_cha_cnt_limit ? 0 : in_cha_cnt + 1;
         end
     end
@@ -276,7 +281,8 @@ module pe_outcha_double #(
         if (~rst_n) begin
             bias_valid_0 <= 1'b0;
             bias_valid_1 <= 1'b0;
-        end else begin  
+        end
+        else begin
             bias_valid_0 <= macc_valid_o_reg & in_cha_cnt_limit;
             bias_valid_1 <= bias_valid_0;
         end
@@ -284,18 +290,18 @@ module pe_outcha_double #(
 
     // Layer scale reg
     wire signed [15:0] layer_scale;
-    wire bias_sum_trunc_valid;
-    wire dequant_valid;
+    wire               bias_sum_trunc_valid;
+    wire               dequant_valid;
 
     generate
         if (OUTPUT_MODE == "dequant" || OUTPUT_MODE == "sigmoid") begin : gen3
             reg [15:0] layer_scale_reg;
-            reg bias_sum_trunc_valid_reg;
-            reg dequant_valid_reg;
+            reg        bias_sum_trunc_valid_reg;
+            reg        dequant_valid_reg;
 
-            assign layer_scale = layer_scale_reg;
+            assign layer_scale          = layer_scale_reg;
             assign bias_sum_trunc_valid = bias_sum_trunc_valid_reg;
-            assign dequant_valid = dequant_valid_reg;
+            assign dequant_valid        = dequant_valid_reg;
 
             always @ (posedge clk) begin
                 if (weight_wr_en && weight_wr_addr == LAYER_SCALE_BASE_ADDR) begin
@@ -307,7 +313,8 @@ module pe_outcha_double #(
                 if (~rst_n) begin
                     bias_sum_trunc_valid_reg <= 1'b0;
                     dequant_valid_reg <= 1'b0;
-                end else begin
+                end
+                else begin
                     bias_sum_trunc_valid_reg <= bias_valid_1;
                     dequant_valid_reg <= bias_sum_trunc_valid_reg;
                 end
@@ -369,7 +376,7 @@ module pe_outcha_double #(
 
             // In channel accum / bias
             localparam BIAS_SUM_WIDTH = MACC_OUTPUT_DATA_WIDTH + 16 + IN_CHANNEL;
-            
+
             reg  signed [BIAS_SUM_WIDTH-1:0] bias_sum_a;
             reg  signed [BIAS_SUM_WIDTH-1:0] bias_sum_b;
             wire signed [BIAS_SUM_WIDTH-1:0] accum_in_a = accum_in_sel ? {{BIAS_SUM_WIDTH-8{bias_ram[i][15]}}, bias_ram[i], {8{1'b0}}} : bias_sum_a;
@@ -390,8 +397,8 @@ module pe_outcha_double #(
                 // bias_sum truncate
                 wire signed [BIAS_SUM_WIDTH-16-1:0] bias_sum_a_int = bias_sum_a[BIAS_SUM_WIDTH-1:16];
                 wire signed [BIAS_SUM_WIDTH-16-1:0] bias_sum_b_int = bias_sum_b[BIAS_SUM_WIDTH-1:16];
-                reg signed [8+16-1:0] bias_sum_a_trunc;   // 24-bit bias sum truncate (x2^-16)
-                reg signed [8+16-1:0] bias_sum_b_trunc;
+                reg  signed [8+16-1:0]              bias_sum_a_trunc;   // 24-bit bias sum truncate (x2^-16)
+                reg  signed [8+16-1:0]              bias_sum_b_trunc;
 
                 always @ (posedge clk) begin
                     if (bias_valid_1) begin

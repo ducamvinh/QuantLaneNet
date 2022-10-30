@@ -34,7 +34,7 @@ def calc_framerate(start_event, return_dict):
     num_test = 100000
     elapsed_time_samples = []
     x = torch.rand(size=(1, 3, 256, 512), device='cuda')
-    
+
     # Start calc_power_clock process
     start_event.set()
 
@@ -58,7 +58,7 @@ def calc_power_clock(stop_event, return_dict):
     else:
         pattern = r'Power Draw\s+: (\S+)[\s\S]+\n\s+Clocks\s+Graphics\s+: (\S+)'
         time.sleep(1)
-    
+
     # Start sampling every 1 second
     power_samples = []
     clock_samples = []
@@ -68,7 +68,7 @@ def calc_power_clock(stop_event, return_dict):
         search = re.search(pattern, readings)
 
         power_samples.append(eval(search.group(1)))
-        clock_samples.append(eval(search.group(2)))  
+        clock_samples.append(eval(search.group(2)))
 
         time.sleep(1)
 

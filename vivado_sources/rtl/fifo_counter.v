@@ -5,7 +5,7 @@ module fifo_counter #(
 )(
     cnt,
     cnt_en,
-    rst_n, 
+    rst_n,
     clk
 );
 
@@ -16,14 +16,15 @@ module fifo_counter #(
 
     reg [ADDR_WIDTH-1:0] cnt_low;
     reg cnt_msb;
-    
+
     assign cnt = {cnt_msb, cnt_low};
     wire at_limit = cnt_low == DEPTH - 1;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             {cnt_msb, cnt_low} <= 0;
-        end else if (cnt_en) begin
+        end
+        else if (cnt_en) begin
             cnt_msb <= at_limit ^ cnt_msb;
             cnt_low <= at_limit ? 0 : cnt_low + 1;
         end

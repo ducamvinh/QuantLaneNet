@@ -10,7 +10,7 @@ module fifo_64bits_to_fifo_24bits_input (
     input             clk,
     input             rst_n
 );
-    
+
     genvar i;
 
     // Input bytes
@@ -37,8 +37,9 @@ module fifo_64bits_to_fifo_24bits_input (
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
-            current_state <= STATE_0; 
-        end else begin
+            current_state <= STATE_0;
+        end
+        else begin
             current_state <= next_state;
         end
     end

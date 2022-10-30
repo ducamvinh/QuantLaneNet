@@ -30,9 +30,9 @@ def main():
     # Print info
     print(
         f'[INFO] Initializing model...\n'
-        f'\t- Kernel modules : {args.h2c_device}\n'
-        f'\t                   {args.c2h_device}\n'
-        f'\t- Weights binary : {args.weights_bin_path}\n'
+        f'    - Kernel modules : {args.h2c_device}\n'
+        f'                       {args.c2h_device}\n'
+        f'    - Weights binary : {args.weights_bin_path}\n'
         f'\n'
         f'[INFO] Input video should be cropped to composition similar to TuSimple dataset for best accuracy\n'
         f'[INFO] Video path: {args.video_path}'
@@ -51,7 +51,7 @@ def main():
 
     # Video stream
     cap = cv2.VideoCapture(args.video_path)
-    
+
     # Other stuff
     offset_dummy = np.ones(shape=(32, 64, 4), dtype=np.float32) * (3.5 / 8)
     iterator = tqdm.tqdm(range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))))
@@ -72,7 +72,7 @@ def main():
             img.tofile(file=f)
 
         # Wait for output to be valid
-        while True: 
+        while True:
             with open(args.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
                 if f.read(8) == b'\x01\x00\x00\x00\x00\x00\x00\x00':  # 64-bit "00000...001" little endian
@@ -81,7 +81,7 @@ def main():
         # Read output
         with open(args.c2h_device, 'rb') as f:
             f.seek(fpga_address_map.OFFSET_OUTPUT)
-            hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64) 
+            hw_output = np.fromfile(file=f, dtype=np.ubyte, count=32*64)
 
         runtime.append(time.perf_counter() - start_time)
 
@@ -101,9 +101,9 @@ def main():
     runtime = sum(runtime) / len(runtime)
     print(
         f'\n'
-        f'\tAverage model runtime   : {(runtime * 1e3):.2f} ms\n'
-        f'\tAverage model framerate : {(1 / runtime):.2f} FPS\n'
-        f'\tActual video framerate  : {(iterator.format_dict["n"] / iterator.format_dict["elapsed"]):.2f} FPS\n'
+        f'    Average model runtime   : {(runtime * 1e3):.2f} ms\n'
+        f'    Average model framerate : {(1 / runtime):.2f} FPS\n'
+        f'    Actual video framerate  : {(iterator.format_dict["n"] / iterator.format_dict["elapsed"]):.2f} FPS\n'
     )
 
 if __name__ == '__main__':

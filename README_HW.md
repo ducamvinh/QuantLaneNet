@@ -12,7 +12,7 @@ Model quantization can be run using this example command:
     python3 ./quantization_convert.py                 \
         --dataset_path             ./dataset          \
         --checkpoint_path          ./checkpoint       \
-        --quantized_weights_path   ./weights/quantized_weights_pertensor_symmetric.pth  
+        --quantized_weights_path   ./weights/quantized_weights_pertensor_symmetric.pth
 
 ## Preparations for hardware implementation
 
@@ -34,7 +34,7 @@ All of these files are already included in the repo, but if they need to be re-g
 
         python3 ./fpga_weights_gen.py                                   \
             --weights_bin_path         ./weights/fpga_weights.bin       \
-            --quantized_weights_path   ./weights/quantized_weights_pertensor_symmetric.pth  
+            --quantized_weights_path   ./weights/quantized_weights_pertensor_symmetric.pth
 
 - Optionally, hardware can be synthesized with an Integrated Logic Analyzer (ILA) core that samples signals during runtime and send to Vivado to render waveform for debugging or just to observe the operations of the circuit underneath. To include this ILA core without using GUI (since the synthesized design is quite large and hard to navigate in GUI), a constraint file (.xdc) needs to be included before running Synthesis. This file is included in the repo at the path [./vivado_sources/constraints/debug.xdc](./vivado_sources/constraints/debug.xdc) that mark all the signals that I think is important. If you want to modify the list of signals included, they can be modified in the [fpga_debug_constrs_gen.py](fpga_debug_constrs_gen.py) script by changing the <code>debug_ports</code> list.
 
@@ -159,7 +159,7 @@ Just like the regular software version, this script offers 4 different test mode
         --weights_bin_path   ./weights/fpga_weights.bin  \
         --test_mode          random_image                \
         --dataset_path       ./dataset
-    
+
 Or:
 
     python3 ./test.py                                                                   \
@@ -175,4 +175,3 @@ In the main [test.py](./test.py) script, the FPGA model is wrapped in a class to
 In the same way, the [test_fpga_video.py](./test_fpga_video.py) is written to run videos with minimal delay by the Python language. This script can be run with an input argument <code>--video_path</code> for the path of the video:
 
     sudo python3 ./test_fpga_video.py --video_path <path to some video>
-    

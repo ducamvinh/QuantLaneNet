@@ -2,7 +2,7 @@
 
 module sigmoid #(
     parameter DATA_WIDTH = 16,
-    parameter FRAC_BITS = 10
+    parameter FRAC_BITS  = 10
 )(
     output signed [DATA_WIDTH-1:0] o_data,
     output                         o_valid,
@@ -32,22 +32,23 @@ module sigmoid #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             i_data_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             i_data_valid <= i_valid;
         end
     end
 
     // Stage 1
-    wire signed [DATA_WIDTH+1:0] x1 = {{2{i_data_reg[DATA_WIDTH-1]}}, i_data_reg};   // x1 = i_data_reg >>> 2
+    wire signed [DATA_WIDTH+1:0] x1            = {{2{i_data_reg[DATA_WIDTH-1]}}, i_data_reg}; // x1 = i_data_reg >>> 2
     wire signed [DATA_WIDTH+1:0] add_minus_one = i_data_reg < 0 ? ONE : MINUS_ONE;
-    wire signed [DATA_WIDTH+1:0] x2 = x1 + add_minus_one;
+    wire signed [DATA_WIDTH+1:0] x2            = x1 + add_minus_one;
 
-    wire past_limit = i_data_reg < MINUS_FOUR || i_data_reg > FOUR;
-    wire signed [DATA_WIDTH+1:0] x3 = past_limit ? 0 : x2;
+    wire                         past_limit    = i_data_reg < MINUS_FOUR || i_data_reg > FOUR;
+    wire signed [DATA_WIDTH+1:0] x3            = past_limit ? 0 : x2;
 
-    reg signed [DATA_WIDTH+1:0] stage1_reg_data;
-    reg                         stage1_reg_sign;
-    reg                         stage1_reg_valid;
+    reg  signed [DATA_WIDTH+1:0] stage1_reg_data;
+    reg                          stage1_reg_sign;
+    reg                          stage1_reg_valid;
 
     always @ (posedge clk) begin
         if (i_data_valid) begin
@@ -59,7 +60,8 @@ module sigmoid #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             stage1_reg_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             stage1_reg_valid <= i_data_valid;
         end
     end
@@ -79,18 +81,20 @@ module sigmoid #(
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
             stage2_reg_valid <= 1'b0;
-        end else begin
+        end
+        else begin
             stage2_reg_valid <= stage1_reg_valid;
         end
     end
 
     // Stage 3
     localparam signed [(DATA_WIDTH+2)*2:0] ONE_EXT = {{INT_BITS*2-1{1'b0}}, 1'b1, {(FRAC_BITS+2)*2+1{1'b0}}};
+
     wire signed [(DATA_WIDTH+2)*2:0] x4 = {stage2_reg_data[(DATA_WIDTH+2)*2-1], stage2_reg_data};  // x4 = stage2_reg_data >>> 1
     wire signed [(DATA_WIDTH+2)*2:0] x5 = ONE_EXT - x4;
     wire signed [(DATA_WIDTH+2)*2:0] x6 = stage2_reg_sign ? x4 : x5;
 
-    assign o_data = x6[(FRAC_BITS+2)*2+INT_BITS:FRAC_BITS+5];
+    assign o_data  = x6[(FRAC_BITS+2)*2+INT_BITS:FRAC_BITS+5];
     assign o_valid = stage2_reg_valid;
 
 endmodule

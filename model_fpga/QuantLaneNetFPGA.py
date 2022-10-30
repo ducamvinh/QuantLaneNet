@@ -22,7 +22,7 @@ class QuantLaneNetFPGA(object):
 
     @timeout_decorator.timeout(seconds=1, timeout_exception=TimeoutError)
     def poll_valid(self):
-        while True: 
+        while True:
             with open(self.c2h_device, 'rb') as f:
                 f.seek(fpga_address_map.OFFSET_OVALID)
                 if f.read(8) == b'\x01\x00\x00\x00\x00\x00\x00\x00':  # 64-bit "00000...001" little endian
@@ -57,7 +57,7 @@ class QuantLaneNetFPGA(object):
     def post_process(hw_output):
         if type(hw_output) == np.ndarray:
             hw_output = torch.from_numpy(hw_output)
-        
+
         num_frame = hw_output.size(0)
         cls = torch.zeros(size=(num_frame, 4, 32, 64), dtype=torch.float32)
         vertical = torch.zeros(size=(num_frame, 4, 32, 1), dtype=torch.float32)
@@ -81,12 +81,12 @@ class QuantLaneNetFPGA(object):
         if img.ndim == 3:
             if img.shape not in ((256, 512, 3), (3, 256, 512)):
                 raise ValueError(f'Unknown image shape: {img.shape}. Expected (3, 256, 512) or (256, 512, 3)')
-            
+
             hw_output = np.expand_dims(self._inference(img), axis=0)
         else:
             if img.shape[1:] not in ((256, 512, 3), (3, 256, 512)):
                 raise ValueError(f'Unknown image shape: {img.shape}. Expected (3, 256, 512) or (256, 512, 3)')
-            
+
             num_frame = img.shape[0]
             hw_output = np.zeros(shape=(num_frame, 32, 64), dtype=np.ubyte)
 
