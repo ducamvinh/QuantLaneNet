@@ -196,10 +196,11 @@ def get_arguments():
     parser.set_defaults(offset=False)
 
     args = parser.parse_args()
-    args.dataset_path = os.path.abspath(args.dataset_path)
-    args.checkpoint_path = os.path.abspath(args.checkpoint_path)
-    args.weights_bin_path = os.path.abspath(args.weights_bin_path)
-    args.video_path = os.path.abspath(args.video_path)
+
+    args.dataset_path           = os.path.abspath(args.dataset_path)
+    args.checkpoint_path        = os.path.abspath(args.checkpoint_path)
+    args.weights_bin_path       = os.path.abspath(args.weights_bin_path)
+    args.video_path             = os.path.abspath(args.video_path)
     args.quantized_weights_path = os.path.abspath(args.quantized_weights_path)
 
     if args.model == 'fpga' and args.offset:

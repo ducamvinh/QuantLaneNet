@@ -78,15 +78,15 @@ module pe_outcha_double #(
         .DIVISOR        (IN_CHANNEL),
         .DATA_WIDTH     (8)
     ) u_kernel_w (
-        .quotient  (kernel_word_en_num),
-        .remainder (kernel_ram_addr),
-        .o_data    (kernel_wr_data),
-        .o_valid   (kernel_ram_wr_en_),
-        .dividend  (kernel_addr_adj),
-        .i_data    (weight_wr_data[7:0]),
-        .i_valid   (kernel_wr_en),
-        .clk       (clk),
-        .rst_n     (rst_n)
+        .quotient       (kernel_word_en_num),
+        .remainder      (kernel_ram_addr),
+        .o_data         (kernel_wr_data),
+        .o_valid        (kernel_ram_wr_en_),
+        .dividend       (kernel_addr_adj),
+        .i_data         (weight_wr_data[7:0]),
+        .i_valid        (kernel_wr_en),
+        .clk            (clk),
+        .rst_n          (rst_n)
     );
 
     // Bias
@@ -103,16 +103,16 @@ module pe_outcha_double #(
     wire cnt_limit;
 
     pe_outcha_double_controller #(
-        .IN_WIDTH   (IN_WIDTH),
-        .IN_HEIGHT  (IN_HEIGHT),
-        .KERNEL_0   (KERNEL_0),
-        .KERNEL_1   (KERNEL_1),
-        .DILATION_0 (DILATION_0),
-        .DILATION_1 (DILATION_1),
-        .PADDING_0  (PADDING_0),
-        .PADDING_1  (PADDING_1),
-        .STRIDE_0   (STRIDE_0),
-        .STRIDE_1   (STRIDE_1)
+        .IN_WIDTH     (IN_WIDTH),
+        .IN_HEIGHT    (IN_HEIGHT),
+        .KERNEL_0     (KERNEL_0),
+        .KERNEL_1     (KERNEL_1),
+        .DILATION_0   (DILATION_0),
+        .DILATION_1   (DILATION_1),
+        .PADDING_0    (PADDING_0),
+        .PADDING_1    (PADDING_1),
+        .STRIDE_0     (STRIDE_0),
+        .STRIDE_1     (STRIDE_1)
     ) u_control (
         .data_latch_a (data_latch_a),
         .data_latch_b (data_latch_b),
@@ -185,13 +185,13 @@ module pe_outcha_double #(
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
     ) u_kernel (
-        .rd_data (kernel),
-        .wr_data (kernel_wr_data),
-        .rd_addr (kernel_cnt),
-        .wr_addr (kernel_ram_addr[$clog2(IN_CHANNEL)-1:0]),
-        .wr_en   (kernel_ram_wr_en),
-        .rd_en   (1'b1),
-        .clk     (clk)
+        .rd_data         (kernel),
+        .wr_data         (kernel_wr_data),
+        .rd_addr         (kernel_cnt),
+        .wr_addr         (kernel_ram_addr[$clog2(IN_CHANNEL)-1:0]),
+        .wr_en           (kernel_ram_wr_en),
+        .rd_en           (1'b1),
+        .clk             (clk)
     );
 
     // Bias ram
@@ -332,7 +332,7 @@ module pe_outcha_double #(
 
             wire [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_a;  // MACC_OUTPUT_DATA_WIDTH-bit (x2^0)
             wire [MACC_OUTPUT_DATA_WIDTH-1:0] macc_data_out_b;
-            wire macc_valid_o_;
+            wire                              macc_valid_o_;
 
             if (i == 0) begin : gen5
                 assign macc_valid_o = macc_valid_o_;
@@ -341,15 +341,15 @@ module pe_outcha_double #(
             macc_8bit_dual #(
                 .NUM_INPUTS (KERNEL_PTS)
             ) u_macc (
-                .o_data_a (macc_data_out_a),
-                .o_data_b (macc_data_out_b),
-                .o_valid  (macc_valid_o_),
-                .i_data_a (i_data_reg_a_pipeline),
-                .i_data_b (i_data_reg_b_pipeline),
-                .i_data_c (kernel[(i+1)*8*KERNEL_PTS-1:i*8*KERNEL_PTS]),
-                .i_valid  (macc_valid_i_pipeline),
-                .clk      (clk),
-                .rst_n    (rst_n)
+                .o_data_a   (macc_data_out_a),
+                .o_data_b   (macc_data_out_b),
+                .o_valid    (macc_valid_o_),
+                .i_data_a   (i_data_reg_a_pipeline),
+                .i_data_b   (i_data_reg_b_pipeline),
+                .i_data_c   (kernel[(i+1)*8*KERNEL_PTS-1:i*8*KERNEL_PTS]),
+                .i_valid    (macc_valid_i_pipeline),
+                .clk        (clk),
+                .rst_n      (rst_n)
             );
 
             // MACC output reg
@@ -439,12 +439,12 @@ module pe_outcha_double #(
                         .DATA_WIDTH (16),
                         .FRAC_BITS  (8)
                     ) u_sigmoid[1:0] (
-                        .o_data  ({obuffer_data_b[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH], obuffer_data_a[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH]}),
-                        .o_valid (sigmoid_valid),
-                        .i_data  ({dequant_trunc_b, dequant_trunc_a}),
-                        .i_valid (dequant_valid),
-                        .clk     (clk),
-                        .rst_n   (rst_n)
+                        .o_data     ({obuffer_data_b[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH], obuffer_data_a[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH]}),
+                        .o_valid    (sigmoid_valid),
+                        .i_data     ({dequant_trunc_b, dequant_trunc_a}),
+                        .i_valid    (dequant_valid),
+                        .clk        (clk),
+                        .rst_n      (rst_n)
                     );
                 end
             end
@@ -465,13 +465,13 @@ module pe_outcha_double #(
         .STRIDE_0   (STRIDE_0),
         .STRIDE_1   (STRIDE_1)
     ) u_obuffer (
-        .o_data   (o_data),
-        .o_valid  (o_valid),
-        .i_data_a (obuffer_data_a),
-        .i_data_b (obuffer_data_b),
-        .i_valid  (obuffer_valid),
-        .clk      (clk),
-        .rst_n    (rst_n)
+        .o_data     (o_data),
+        .o_valid    (o_valid),
+        .i_data_a   (obuffer_data_a),
+        .i_data_b   (obuffer_data_b),
+        .i_valid    (obuffer_valid),
+        .clk        (clk),
+        .rst_n      (rst_n)
     );
 
 endmodule

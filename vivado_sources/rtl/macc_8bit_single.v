@@ -61,12 +61,12 @@ module macc_8bit_single #(
         .DATA_WIDTH (16),
         .NUM_INPUTS (NUM_INPUTS)
     ) u_adder_tree (
-        .o_data  (o_data),
-        .o_valid (o_valid),
-        .i_data  (mult_data_out),
-        .i_valid (mult_valid_o),
-        .clk     (clk),
-        .rst_n   (rst_n)
+        .o_data     (o_data),
+        .o_valid    (o_valid),
+        .i_data     (mult_data_out),
+        .i_valid    (mult_valid_o),
+        .clk        (clk),
+        .rst_n      (rst_n)
     );
 
 endmodule

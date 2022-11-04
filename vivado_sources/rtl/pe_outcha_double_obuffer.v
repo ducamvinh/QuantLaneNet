@@ -24,7 +24,7 @@ module pe_outcha_double_obuffer #(
 
     // If num output pixels is odd
     localparam OUT_HEIGHT = (IN_HEIGHT + 2 * PADDING_0 - DILATION_0 * (KERNEL_0 - 1) - 1) / STRIDE_0 + 1;
-    localparam OUT_WIDTH  = (IN_WIDTH + 2 * PADDING_1 - DILATION_1 * (KERNEL_1 - 1) - 1) / STRIDE_1 + 1;
+    localparam OUT_WIDTH  = (IN_WIDTH  + 2 * PADDING_1 - DILATION_1 * (KERNEL_1 - 1) - 1) / STRIDE_1 + 1;
     localparam OUT_PIXELS = OUT_HEIGHT * OUT_WIDTH;
 
     wire last_odd;
@@ -88,20 +88,20 @@ module pe_outcha_double_obuffer #(
     always @ (*) begin
         case (current_state)
             STATE_0: begin
-                o_data <= last_odd ? i_data_b : i_data_a;
-                o_valid <= i_valid;
+                o_data    <= last_odd ? i_data_b : i_data_a;
+                o_valid   <= i_valid;
                 buffer_en <= i_valid & ~last_odd;
             end
 
             STATE_1: begin
-                o_data <= buffer;
-                o_valid <= 1'b1;
+                o_data    <= buffer;
+                o_valid   <= 1'b1;
                 buffer_en <= 1'b0;
             end
 
             default: begin
-                o_data <= {DATA_WIDTH{1'bx}};
-                o_valid <= 1'b0;
+                o_data    <= {DATA_WIDTH{1'bx}};
+                o_valid   <= 1'b0;
                 buffer_en <= 1'b0;
             end
         endcase

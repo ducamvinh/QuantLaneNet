@@ -1,7 +1,13 @@
 from model.QuantLaneNet import QuantLaneNet
 import torch
+import os
 
-torch.backends.quantized.engine = 'qnnpack'
+if os.name == 'nt':
+    # Windows
+    torch.backends.quantized.engine = 'fbgemm'
+else:
+    # Linux
+    torch.backends.quantized.engine = 'qnnpack'
 
 class QuantLaneNetQuantized(QuantLaneNet):
 

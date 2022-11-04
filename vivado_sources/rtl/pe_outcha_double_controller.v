@@ -25,7 +25,7 @@ module pe_outcha_double_controller #(
 
     // If num output pixels is odd
     localparam OUT_HEIGHT = (IN_HEIGHT + 2 * PADDING_0 - DILATION_0 * (KERNEL_0 - 1) - 1) / STRIDE_0 + 1;
-    localparam OUT_WIDTH  = (IN_WIDTH + 2 * PADDING_1 - DILATION_1 * (KERNEL_1 - 1) - 1) / STRIDE_1 + 1;
+    localparam OUT_WIDTH  = (IN_WIDTH  + 2 * PADDING_1 - DILATION_1 * (KERNEL_1 - 1) - 1) / STRIDE_1 + 1;
     localparam OUT_PIXELS = OUT_HEIGHT * OUT_WIDTH;
 
     wire last_odd;

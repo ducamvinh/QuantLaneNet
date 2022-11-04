@@ -31,8 +31,8 @@ module pe_incha_obuffer #(
     end
 
     // Output buffer
-    reg [DATA_WIDTH-1:0] obuffer[0:OBUFFER_DEPTH-1];
-    wire                 obuffer_en;
+    reg  [DATA_WIDTH-1:0] obuffer    [0:OBUFFER_DEPTH-1];
+    wire                  obuffer_en;
 
     generate
         for (i = 0; i < OBUFFER_DEPTH; i = i + 1) begin : gen0

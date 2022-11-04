@@ -14,7 +14,7 @@ module macc_8bit_dual #(
     rst_n
 );
 
-    localparam ADDER_LAYERS = $clog2(NUM_INPUTS);
+    localparam ADDER_LAYERS      = $clog2(NUM_INPUTS);
     localparam OUTPUT_DATA_WIDTH = 16 + ADDER_LAYERS;
 
     output [OUTPUT_DATA_WIDTH-1:0] o_data_a;
@@ -62,12 +62,12 @@ module macc_8bit_dual #(
         .DATA_WIDTH (16),
         .NUM_INPUTS (NUM_INPUTS)
     ) u_adder_tree[1:0] (
-        .o_data  ({o_data_b, o_data_a}),
-        .o_valid ({valid_dummy, o_valid}),
-        .i_data  ({mult_data_out[1], mult_data_out[0]}),
-        .i_valid (mult_valid_o),
-        .clk     (clk),
-        .rst_n   (rst_n)
+        .o_data     ({o_data_b, o_data_a}),
+        .o_valid    ({valid_dummy, o_valid}),
+        .i_data     ({mult_data_out[1], mult_data_out[0]}),
+        .i_valid    (mult_valid_o),
+        .clk        (clk),
+        .rst_n      (rst_n)
     );
 
 endmodule

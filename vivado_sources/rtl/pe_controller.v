@@ -35,7 +35,7 @@ module pe_controller (
     end
 
     assign pe_ready = (current_state == BUSY && cnt_limit) || current_state == IDLE;
-    assign pe_ack = i_valid && current_state == IDLE;
-    assign cnt_en = pe_ack || current_state == BUSY;
+    assign pe_ack   = i_valid && current_state == IDLE;
+    assign cnt_en   = pe_ack || current_state == BUSY;
 
 endmodule

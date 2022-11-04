@@ -53,18 +53,18 @@ module line_buffer#(
     wire                      shift;
 
     line_buffer_controller #(
-        .DATA_WIDTH (DATA_WIDTH),
-        .IN_CHANNEL (IN_CHANNEL),
-        .IN_WIDTH   (IN_WIDTH),
-        .IN_HEIGHT  (IN_HEIGHT),
-        .KERNEL_0   (KERNEL_0),
-        .KERNEL_1   (KERNEL_1),
-        .DILATION_0 (DILATION_0),
-        .DILATION_1 (DILATION_1),
-        .PADDING_0  (PADDING_0),
-        .PADDING_1  (PADDING_1),
-        .STRIDE_0   (STRIDE_0),
-        .STRIDE_1   (STRIDE_1)
+        .DATA_WIDTH       (DATA_WIDTH),
+        .IN_CHANNEL       (IN_CHANNEL),
+        .IN_WIDTH         (IN_WIDTH),
+        .IN_HEIGHT        (IN_HEIGHT),
+        .KERNEL_0         (KERNEL_0),
+        .KERNEL_1         (KERNEL_1),
+        .DILATION_0       (DILATION_0),
+        .DILATION_1       (DILATION_1),
+        .PADDING_0        (PADDING_0),
+        .PADDING_1        (PADDING_1),
+        .STRIDE_0         (STRIDE_0),
+        .STRIDE_1         (STRIDE_1)
     ) u_control (
         .fifo_rd_en       (fifo_rd_en),
         .o_valid          (o_valid),

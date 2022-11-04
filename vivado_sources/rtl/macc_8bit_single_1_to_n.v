@@ -66,13 +66,13 @@ module macc_8bit_single_1_to_n #(
                 mult_8bit_single_array #(
                     .NUM_INPUTS (NUM_INPUTS)
                 ) u_mult_single (
-                    .o_data   (mult_data[i]),
-                    .o_valid  (mult_valid_),
-                    .i_data_a (input_n[(i+1)*8*NUM_INPUTS-1:(i+0)*8*NUM_INPUTS]),
-                    .i_data_b (input_common),
-                    .i_valid  (i_valid),
-                    .clk      (clk),
-                    .rst_n    (rst_n)
+                    .o_data     (mult_data[i]),
+                    .o_valid    (mult_valid_),
+                    .i_data_a   (input_n[(i+1)*8*NUM_INPUTS-1:(i+0)*8*NUM_INPUTS]),
+                    .i_data_b   (input_common),
+                    .i_valid    (i_valid),
+                    .clk        (clk),
+                    .rst_n      (rst_n)
                 );
             end
         end
@@ -80,10 +80,10 @@ module macc_8bit_single_1_to_n #(
 
     // Adder tree stages
     generate
-        for (i = 0; i < NUM_MACC; i = i + 1) begin : gen4
+        for (i = 0; i < NUM_MACC; i = i + 1) begin : gen6
             wire adder_valid;
 
-            if (i == 0) begin : gen5
+            if (i == 0) begin : gen7
                 assign o_valid = adder_valid;
             end
 
@@ -91,12 +91,12 @@ module macc_8bit_single_1_to_n #(
                 .DATA_WIDTH (16),
                 .NUM_INPUTS (NUM_INPUTS)
             ) u_adder (
-                .o_data  (o_data[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH]),
-                .o_valid (adder_valid),
-                .i_data  (mult_data[i]),
-                .i_valid (mult_valid),
-                .clk     (clk),
-                .rst_n   (rst_n)
+                .o_data     (o_data[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH]),
+                .o_valid    (adder_valid),
+                .i_data     (mult_data[i]),
+                .i_valid    (mult_valid),
+                .clk        (clk),
+                .rst_n      (rst_n)
             );
         end
     endgenerate

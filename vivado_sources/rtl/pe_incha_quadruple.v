@@ -78,15 +78,15 @@ module pe_incha_quadruple #(
         .DIVISOR        (KERNEL_PTS * IN_CHANNEL * 2),
         .DATA_WIDTH     (8)
     ) u_kernel_w (
-        .quotient  (kernel_ram_addr),
-        .remainder (kernel_word_en_num),
-        .o_data    (kernel_wr_data),
-        .o_valid   (kernel_ram_wr_en_),
-        .dividend  (kernel_addr_adj),
-        .i_data    (weight_wr_data[7:0]),
-        .i_valid   (kernel_wr_en),
-        .clk       (clk),
-        .rst_n     (rst_n)
+        .quotient       (kernel_ram_addr),
+        .remainder      (kernel_word_en_num),
+        .o_data         (kernel_wr_data),
+        .o_valid        (kernel_ram_wr_en_),
+        .dividend       (kernel_addr_adj),
+        .i_data         (weight_wr_data[7:0]),
+        .i_valid        (kernel_wr_en),
+        .clk            (clk),
+        .rst_n          (rst_n)
     );
 
     // Bias
@@ -144,17 +144,17 @@ module pe_incha_quadruple #(
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
     ) u_kernel (
-        .rd_data_a (kernel_port_a),
-        .rd_data_b (kernel_port_b),
-        .wr_data_a (kernel_wr_data),
-        .wr_data_b ({8{1'b0}}),
-        .addr_a    (kernel_ram_wr_en_ ? kernel_ram_addr[$clog2(OUT_CHANNEL)-2:0] : {kernel_cnt, 1'b0}),
-        .addr_b    ({kernel_cnt, 1'b1}),
-        .rd_en_a   (1'b1),
-        .rd_en_b   (1'b1),
-        .wr_en_a   (kernel_ram_wr_en),
-        .wr_en_b   ({KERNEL_PTS*IN_CHANNEL*2{1'b0}}),
-        .clk       (clk)
+        .rd_data_a       (kernel_port_a),
+        .rd_data_b       (kernel_port_b),
+        .wr_data_a       (kernel_wr_data),
+        .wr_data_b       ({8{1'b0}}),
+        .addr_a          (kernel_ram_wr_en_ ? kernel_ram_addr[$clog2(OUT_CHANNEL)-2:0] : {kernel_cnt, 1'b0}),
+        .addr_b          ({kernel_cnt, 1'b1}),
+        .rd_en_a         (1'b1),
+        .rd_en_b         (1'b1),
+        .wr_en_a         (kernel_ram_wr_en),
+        .wr_en_b         ({KERNEL_PTS*IN_CHANNEL*2{1'b0}}),
+        .clk             (clk)
     );
 
     // Bias ram
@@ -181,17 +181,17 @@ module pe_incha_quadruple #(
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
     ) u_bias (
-        .rd_data_a (bias_port_a),
-        .rd_data_b (bias_port_b),
-        .wr_data_a (weight_wr_data),
-        .wr_data_b ({16{1'b0}}),
-        .addr_a    (bias_wr_en ? bias_wr_addr : {bias_cnt, 1'b0}),
-        .addr_b    ({bias_cnt, 1'b1}),
-        .rd_en_a   (1'b1),
-        .rd_en_b   (1'b1),
-        .wr_en_a   (bias_wr_en ? (bias_wr_addr_[0] ? 2'b10 : 2'b01) : 2'b00),
-        .wr_en_b   (2'b00),
-        .clk       (clk)
+        .rd_data_a       (bias_port_a),
+        .rd_data_b       (bias_port_b),
+        .wr_data_a       (weight_wr_data),
+        .wr_data_b       ({16{1'b0}}),
+        .addr_a          (bias_wr_en ? bias_wr_addr : {bias_cnt, 1'b0}),
+        .addr_b          ({bias_cnt, 1'b1}),
+        .rd_en_a         (1'b1),
+        .rd_en_b         (1'b1),
+        .wr_en_a         (bias_wr_en ? (bias_wr_addr_[0] ? 2'b10 : 2'b01) : 2'b00),
+        .wr_en_b         (2'b00),
+        .clk             (clk)
     );
 
     // 4 kernel and bias buses
@@ -281,15 +281,15 @@ module pe_incha_quadruple #(
     macc_8bit_dual #(
         .NUM_INPUTS (KERNEL_PTS * IN_CHANNEL)
     ) u_macc_dual[1:0] (
-        .o_data_a ({macc_data_out[1], macc_data_out[0]}),
-        .o_data_b ({macc_data_out[3], macc_data_out[2]}),
-        .o_valid  ({macc_valid_dummy, macc_valid_o}),
-        .i_data_a ({macc_kernel_in[0], kernel[0]}),
-        .i_data_b ({macc_kernel_in[2], macc_kernel_in[1]}),
-        .i_data_c (i_data_reg_pipeline),
-        .i_valid  (macc_valid_i_pipeline),
-        .clk      (clk),
-        .rst_n    (rst_n)
+        .o_data_a   ({macc_data_out[1], macc_data_out[0]}),
+        .o_data_b   ({macc_data_out[3], macc_data_out[2]}),
+        .o_valid    ({macc_valid_dummy, macc_valid_o}),
+        .i_data_a   ({macc_kernel_in[0], kernel[0]}),
+        .i_data_b   ({macc_kernel_in[2], macc_kernel_in[1]}),
+        .i_data_c   (i_data_reg_pipeline),
+        .i_valid    (macc_valid_i_pipeline),
+        .clk        (clk),
+        .rst_n      (rst_n)
     );
 
     // MACC out reg
@@ -447,12 +447,12 @@ module pe_incha_quadruple #(
                         .DATA_WIDTH (16),
                         .FRAC_BITS  (8)
                     ) u_sigmoid (
-                        .o_data  (obuffer_data[i]),
-                        .o_valid (sigmoid_valid),
-                        .i_data  (dequant_trunc),
-                        .i_valid (dequant_valid),
-                        .clk     (clk),
-                        .rst_n   (rst_n)
+                        .o_data     (obuffer_data[i]),
+                        .o_valid    (sigmoid_valid),
+                        .i_data     (dequant_trunc),
+                        .i_valid    (dequant_valid),
+                        .clk        (clk),
+                        .rst_n      (rst_n)
                     );
                 end
             end
@@ -465,12 +465,12 @@ module pe_incha_quadruple #(
         .NUM_INPUTS  (4),
         .OUT_CHANNEL (OUT_CHANNEL)
     ) u_obuffer (
-        .o_data  (o_data),
-        .o_valid (o_valid),
-        .i_data  ({obuffer_data[3], obuffer_data[2], obuffer_data[1], obuffer_data[0]}),
-        .i_valid (obuffer_valid),
-        .clk     (clk),
-        .rst_n   (rst_n)
+        .o_data      (o_data),
+        .o_valid     (o_valid),
+        .i_data      ({obuffer_data[3], obuffer_data[2], obuffer_data[1], obuffer_data[0]}),
+        .i_valid     (obuffer_valid),
+        .clk         (clk),
+        .rst_n       (rst_n)
     );
 
 endmodule

@@ -167,7 +167,7 @@ def train(device='cpu', dataset_path='./dataset', checkpoint_path='./checkpoint'
             optim_state=optimizer.state_dict()
         )
 
-        torch.save(checkpoint, f'{checkpoint_path}/checkpoint_{(epoch):03d}.pth')
+        torch.save(checkpoint,   f'{checkpoint_path}/checkpoint_{(epoch):03d}.pth')
         torch.save(eval_results, f'{checkpoint_path}/eval_{(epoch):03d}.pth')
 
 def get_arguments():

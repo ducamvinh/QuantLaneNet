@@ -12,7 +12,7 @@ module adder_tree #(
     rst_n
 );
 
-    localparam ADDER_LAYERS = $clog2(NUM_INPUTS);
+    localparam ADDER_LAYERS      = $clog2(NUM_INPUTS);
     localparam OUTPUT_DATA_WIDTH = DATA_WIDTH + ADDER_LAYERS;
 
     output [OUTPUT_DATA_WIDTH-1:0]     o_data;
@@ -24,8 +24,8 @@ module adder_tree #(
 
     genvar i, j;
 
-    wire [OUTPUT_DATA_WIDTH*NUM_INPUTS-1:0] adder_stage_out[0:ADDER_LAYERS-1];
-    reg  [0:0] adder_valid[0:ADDER_LAYERS-1];
+    wire [OUTPUT_DATA_WIDTH*NUM_INPUTS-1:0] adder_stage_out [0:ADDER_LAYERS-1];
+    reg  [0:0]                              adder_valid     [0:ADDER_LAYERS-1];
 
     generate
         for (i = 0; i < ADDER_LAYERS; i = i + 1) begin : gen0
@@ -34,8 +34,8 @@ module adder_tree #(
             localparam INPUT_WIDTH  = DATA_WIDTH + i;
             localparam OUTPUT_WIDTH = DATA_WIDTH + i + 1;
 
-            wire signed [INPUT_WIDTH-1:0] adder_layer_in[0:_NUM_INPUTS-1];
-            wire signed [OUTPUT_WIDTH-1:0] adder_layer_out[0:_NUM_OUTPUTS-1];
+            wire signed [INPUT_WIDTH-1:0]  adder_layer_in  [0:_NUM_INPUTS-1];
+            wire signed [OUTPUT_WIDTH-1:0] adder_layer_out [0:_NUM_OUTPUTS-1];
 
             // Assign adders inputs
             for (j = 0; j < _NUM_INPUTS; j = j + 1) begin : gen1
@@ -91,8 +91,8 @@ module adder_tree #(
         end
     endgenerate
 
-    assign o_data = adder_stage_out[ADDER_LAYERS-1][OUTPUT_DATA_WIDTH-1:0];
-    assign o_valid = adder_valid[ADDER_LAYERS-1];
+    assign o_data  = adder_stage_out [ADDER_LAYERS-1][OUTPUT_DATA_WIDTH-1:0];
+    assign o_valid = adder_valid     [ADDER_LAYERS-1];
 
     //////////////////////////////////////////////////////////////////////////////////////////////////
 

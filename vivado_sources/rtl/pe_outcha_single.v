@@ -78,15 +78,15 @@ module pe_outcha_single #(
         .DIVISOR        (IN_CHANNEL),
         .DATA_WIDTH     (8)
     ) u_kernel_w (
-        .quotient  (kernel_word_en_num),
-        .remainder (kernel_ram_addr),
-        .o_data    (kernel_wr_data),
-        .o_valid   (kernel_ram_wr_en_),
-        .dividend  (kernel_addr_adj),
-        .i_data    (weight_wr_data[7:0]),
-        .i_valid   (kernel_wr_en),
-        .clk       (clk),
-        .rst_n     (rst_n)
+        .quotient       (kernel_word_en_num),
+        .remainder      (kernel_ram_addr),
+        .o_data         (kernel_wr_data),
+        .o_valid        (kernel_ram_wr_en_),
+        .dividend       (kernel_addr_adj),
+        .i_data         (weight_wr_data[7:0]),
+        .i_valid        (kernel_wr_en),
+        .clk            (clk),
+        .rst_n          (rst_n)
     );
 
     // Bias
@@ -157,13 +157,13 @@ module pe_outcha_single #(
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("true")
     ) u_kernel (
-        .rd_data (kernel),
-        .wr_data (kernel_wr_data),
-        .rd_addr (kernel_cnt),
-        .wr_addr (kernel_ram_addr[$clog2(IN_CHANNEL)-1:0]),
-        .wr_en   (kernel_ram_wr_en),
-        .rd_en   (1'b1),
-        .clk     (clk)
+        .rd_data         (kernel),
+        .wr_data         (kernel_wr_data),
+        .rd_addr         (kernel_cnt),
+        .wr_addr         (kernel_ram_addr[$clog2(IN_CHANNEL)-1:0]),
+        .wr_en           (kernel_ram_wr_en),
+        .rd_en           (1'b1),
+        .clk             (clk)
     );
 
     // Bias ram
@@ -299,8 +299,8 @@ module pe_outcha_single #(
     wire [MACC_OUTPUT_DATA_WIDTH*OUT_CHANNEL-1:0] macc_data_out;
 
     macc_8bit_single_1_to_n #(
-        .NUM_INPUTS (KERNEL_PTS),
-        .NUM_MACC   (OUT_CHANNEL)
+        .NUM_INPUTS   (KERNEL_PTS),
+        .NUM_MACC     (OUT_CHANNEL)
     ) u_macc (
         .o_data       (macc_data_out),
         .o_valid      (macc_valid_o),
@@ -385,12 +385,12 @@ module pe_outcha_single #(
                         .DATA_WIDTH (16),
                         .FRAC_BITS  (8)
                     ) u_sigmoid (
-                        .o_data  (o_data[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH]),
-                        .o_valid (sigmoid_valid),
-                        .i_data  (dequant_trunc),
-                        .i_valid (dequant_valid),
-                        .clk     (clk),
-                        .rst_n   (rst_n)
+                        .o_data     (o_data[(i+1)*OUTPUT_DATA_WIDTH-1:i*OUTPUT_DATA_WIDTH]),
+                        .o_valid    (sigmoid_valid),
+                        .i_data     (dequant_trunc),
+                        .i_valid    (dequant_valid),
+                        .clk        (clk),
+                        .rst_n      (rst_n)
                     );
                 end
             end

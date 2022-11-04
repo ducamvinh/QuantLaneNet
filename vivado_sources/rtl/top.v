@@ -90,15 +90,15 @@ module top #(
         .DEPTH             (1024),
         .ALMOST_FULL_THRES (512)
     ) u_fifo_input (
-        .rd_data     (fifo_input_rd_data),
-        .empty       (fifo_input_empty),
-        .full        (),
-        .almost_full (fifo_input_almost_full),
-        .wr_data     (fifo_input_wr_data),
-        .wr_en       (fifo_input_wr_en),
-        .rd_en       (fifo_input_rd_en),
-        .rst_n       (internal_reset_n),
-        .clk         (clk)
+        .rd_data           (fifo_input_rd_data),
+        .empty             (fifo_input_empty),
+        .full              (),
+        .almost_full       (fifo_input_almost_full),
+        .wr_data           (fifo_input_wr_data),
+        .wr_en             (fifo_input_wr_en),
+        .rd_en             (fifo_input_rd_en),
+        .rst_n             (internal_reset_n),
+        .clk               (clk)
     );
 
     // Input FIFO translate
@@ -149,15 +149,15 @@ module top #(
         .DEPTH             (1024),
         .ALMOST_FULL_THRES (512)
     ) u_fifo_weight (
-        .rd_data     (fifo_weight_rd_data),
-        .empty       (fifo_weight_empty),
-        .full        (),
-        .almost_full (fifo_weight_almost_full),
-        .wr_data     (axi_wr_data),
-        .wr_en       (axi_wr_addr >= OFFSET_WEIGHT && axi_wr_addr < OFFSET_WEIGHT + NUM_WEIGHTS * 2 && axi_wr_en && |axi_wr_strobe),
-        .rd_en       (fifo_weight_rd_en),
-        .rst_n       (internal_reset_n),
-        .clk         (clk)
+        .rd_data           (fifo_weight_rd_data),
+        .empty             (fifo_weight_empty),
+        .full              (),
+        .almost_full       (fifo_weight_almost_full),
+        .wr_data           (axi_wr_data),
+        .wr_en             (axi_wr_addr >= OFFSET_WEIGHT && axi_wr_addr < OFFSET_WEIGHT + NUM_WEIGHTS * 2 && axi_wr_en && |axi_wr_strobe),
+        .rd_en             (fifo_weight_rd_en),
+        .rst_n             (internal_reset_n),
+        .clk               (clk)
     );
 
     // Weight FIFO translate
@@ -166,7 +166,7 @@ module top #(
     wire        weight_wr_en;
 
     fifo_64bits_to_mem_16bits_weight #(
-        .NUM_WEIGHTS (NUM_WEIGHTS)
+        .NUM_WEIGHTS    (NUM_WEIGHTS)
     ) u_translate_weight (
         .weight_wr_data (weight_wr_data),
         .weight_wr_addr (weight_wr_addr),
@@ -253,15 +253,15 @@ module top #(
         .DEPTH             (OUT_WIDTH * 1),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_cls (
-        .rd_data     (cls_fifo_rd_data),
-        .empty       (cls_fifo_empty),
-        .full        (),
-        .almost_full (cls_fifo_almost_full),
-        .wr_data     (model_o_data_cls),
-        .wr_en       (model_o_valid_cls),
-        .rd_en       (cls_fifo_rd_en),
-        .rst_n       (internal_reset_n),
-        .clk         (clk)
+        .rd_data           (cls_fifo_rd_data),
+        .empty             (cls_fifo_empty),
+        .full              (),
+        .almost_full       (cls_fifo_almost_full),
+        .wr_data           (model_o_data_cls),
+        .wr_en             (model_o_valid_cls),
+        .rd_en             (cls_fifo_rd_en),
+        .rst_n             (internal_reset_n),
+        .clk               (clk)
     );
 
     wire [16*NUM_LANES-1:0] vertical_fifo_rd_data;
@@ -273,15 +273,15 @@ module top #(
         .DEPTH             (OUT_HEIGHT),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_vertical (
-        .rd_data     (vertical_fifo_rd_data),
-        .empty       (vertical_fifo_empty),
-        .full        (),
-        .almost_full (vertical_fifo_almost_full),
-        .wr_data     (model_o_data_vertical),
-        .wr_en       (model_o_valid_vertical),
-        .rd_en       (vertical_fifo_rd_en),
-        .rst_n       (internal_reset_n),
-        .clk         (clk)
+        .rd_data           (vertical_fifo_rd_data),
+        .empty             (vertical_fifo_empty),
+        .full              (),
+        .almost_full       (vertical_fifo_almost_full),
+        .wr_data           (model_o_data_vertical),
+        .wr_en             (model_o_valid_vertical),
+        .rd_en             (vertical_fifo_rd_en),
+        .rst_n             (internal_reset_n),
+        .clk               (clk)
     );
 
     // Post process
@@ -290,11 +290,11 @@ module top #(
     wire                                    bram_wr_en;
 
     post_process #(
-        .OUT_WIDTH  (OUT_WIDTH),
-        .OUT_HEIGHT (OUT_HEIGHT),
-        .NUM_LANES  (NUM_LANES),
-        .DATA_WIDTH (16),
-        .FRAC_BITS  (8)
+        .OUT_WIDTH           (OUT_WIDTH),
+        .OUT_HEIGHT          (OUT_HEIGHT),
+        .NUM_LANES           (NUM_LANES),
+        .DATA_WIDTH          (16),
+        .FRAC_BITS           (8)
     ) u_post (
         .bram_wr_data        (bram_wr_data),
         .bram_wr_addr        (bram_wr_addr),
@@ -324,13 +324,13 @@ module top #(
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("false")
     ) u_bram (
-        .rd_data (bram_rd_data),
-        .wr_data (bram_wr_data),
-        .rd_addr (bram_rd_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:3]),
-        .wr_addr (bram_wr_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:3]),
-        .wr_en   (bram_byte_en),
-        .rd_en   (axi_rd_en & bram_within_range),
-        .clk     (clk)
+        .rd_data         (bram_rd_data),
+        .wr_data         (bram_wr_data),
+        .rd_addr         (bram_rd_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:3]),
+        .wr_addr         (bram_wr_addr[$clog2(OUT_WIDTH*OUT_HEIGHT)-1:3]),
+        .wr_en           (bram_byte_en),
+        .rd_en           (axi_rd_en & bram_within_range),
+        .clk             (clk)
     );
 
     // Clock counter

@@ -1,4 +1,5 @@
 import argparse
+import os
 
 def write_constrs(constrs_path):
 
@@ -161,6 +162,7 @@ def get_arguments():
 def main():
     args = get_arguments()
     write_constrs(args.debug_path)
+    print(f'[INFO] Generated debug constraints for ILA core at:\n    {os.path.abspath(args.debug_path)}')
 
 if __name__ == '__main__':
     main()

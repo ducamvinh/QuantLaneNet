@@ -43,17 +43,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76304),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_0 (
-        .o_data           (o_data_enc_0),
-        .o_valid          (o_valid_enc_0),
-        .fifo_rd_en       (fifo_rd_en),
-        .i_data           (i_data),
-        .i_valid          (i_valid),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_0),
+        .o_valid               (o_valid_enc_0),
+        .fifo_rd_en            (fifo_rd_en),
+        .i_data                (i_data),
+        .i_valid               (i_valid),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*8-1:0] fifo_rd_data_enc_0;
@@ -65,15 +65,15 @@ module model (
         .DEPTH             (1024),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_0 (
-        .rd_data     (fifo_rd_data_enc_0),
-        .empty       (fifo_empty_enc_0),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_0),
-        .wr_data     (o_data_enc_0),
-        .wr_en       (o_valid_enc_0),
-        .rd_en       (fifo_rd_en_enc_0),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_0),
+        .empty             (fifo_empty_enc_0),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_0),
+        .wr_data           (o_data_enc_0),
+        .wr_en             (o_valid_enc_0),
+        .rd_en             (fifo_rd_en_enc_0),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 0 conv 1
@@ -102,17 +102,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76305),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_1 (
-        .o_data           (o_data_enc_1),
-        .o_valid          (o_valid_enc_1),
-        .fifo_rd_en       (fifo_rd_en_enc_0),
-        .i_data           (fifo_rd_data_enc_0),
-        .i_valid          (~fifo_empty_enc_0),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_1),
+        .o_valid               (o_valid_enc_1),
+        .fifo_rd_en            (fifo_rd_en_enc_0),
+        .i_data                (fifo_rd_data_enc_0),
+        .i_valid               (~fifo_empty_enc_0),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*8-1:0] fifo_rd_data_enc_1;
@@ -124,15 +124,15 @@ module model (
         .DEPTH             (512),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_1 (
-        .rd_data     (fifo_rd_data_enc_1),
-        .empty       (fifo_empty_enc_1),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_1),
-        .wr_data     (o_data_enc_1),
-        .wr_en       (o_valid_enc_1),
-        .rd_en       (fifo_rd_en_enc_1),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_1),
+        .empty             (fifo_empty_enc_1),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_1),
+        .wr_data           (o_data_enc_1),
+        .wr_en             (o_valid_enc_1),
+        .rd_en             (fifo_rd_en_enc_1),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 0 conv 2
@@ -161,17 +161,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76306),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_2 (
-        .o_data           (o_data_enc_2),
-        .o_valid          (o_valid_enc_2),
-        .fifo_rd_en       (fifo_rd_en_enc_1),
-        .i_data           (fifo_rd_data_enc_1),
-        .i_valid          (~fifo_empty_enc_1),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_2),
+        .o_valid               (o_valid_enc_2),
+        .fifo_rd_en            (fifo_rd_en_enc_1),
+        .i_data                (fifo_rd_data_enc_1),
+        .i_valid               (~fifo_empty_enc_1),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*16-1:0] fifo_rd_data_enc_2;
@@ -183,15 +183,15 @@ module model (
         .DEPTH             (256),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_2 (
-        .rd_data     (fifo_rd_data_enc_2),
-        .empty       (fifo_empty_enc_2),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_2),
-        .wr_data     (o_data_enc_2),
-        .wr_en       (o_valid_enc_2),
-        .rd_en       (fifo_rd_en_enc_2),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_2),
+        .empty             (fifo_empty_enc_2),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_2),
+        .wr_data           (o_data_enc_2),
+        .wr_en             (o_valid_enc_2),
+        .rd_en             (fifo_rd_en_enc_2),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 1 conv 0
@@ -220,17 +220,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76307),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_3 (
-        .o_data           (o_data_enc_3),
-        .o_valid          (o_valid_enc_3),
-        .fifo_rd_en       (fifo_rd_en_enc_2),
-        .i_data           (fifo_rd_data_enc_2),
-        .i_valid          (~fifo_empty_enc_2),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_3),
+        .o_valid               (o_valid_enc_3),
+        .fifo_rd_en            (fifo_rd_en_enc_2),
+        .i_data                (fifo_rd_data_enc_2),
+        .i_valid               (~fifo_empty_enc_2),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*16-1:0] fifo_rd_data_enc_3;
@@ -242,15 +242,15 @@ module model (
         .DEPTH             (256),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_3 (
-        .rd_data     (fifo_rd_data_enc_3),
-        .empty       (fifo_empty_enc_3),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_3),
-        .wr_data     (o_data_enc_3),
-        .wr_en       (o_valid_enc_3),
-        .rd_en       (fifo_rd_en_enc_3),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_3),
+        .empty             (fifo_empty_enc_3),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_3),
+        .wr_data           (o_data_enc_3),
+        .wr_en             (o_valid_enc_3),
+        .rd_en             (fifo_rd_en_enc_3),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 1 conv 1
@@ -279,17 +279,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76308),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_4 (
-        .o_data           (o_data_enc_4),
-        .o_valid          (o_valid_enc_4),
-        .fifo_rd_en       (fifo_rd_en_enc_3),
-        .i_data           (fifo_rd_data_enc_3),
-        .i_valid          (~fifo_empty_enc_3),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_4),
+        .o_valid               (o_valid_enc_4),
+        .fifo_rd_en            (fifo_rd_en_enc_3),
+        .i_data                (fifo_rd_data_enc_3),
+        .i_valid               (~fifo_empty_enc_3),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*16-1:0] fifo_rd_data_enc_4;
@@ -301,15 +301,15 @@ module model (
         .DEPTH             (256),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_4 (
-        .rd_data     (fifo_rd_data_enc_4),
-        .empty       (fifo_empty_enc_4),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_4),
-        .wr_data     (o_data_enc_4),
-        .wr_en       (o_valid_enc_4),
-        .rd_en       (fifo_rd_en_enc_4),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_4),
+        .empty             (fifo_empty_enc_4),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_4),
+        .wr_data           (o_data_enc_4),
+        .wr_en             (o_valid_enc_4),
+        .rd_en             (fifo_rd_en_enc_4),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 1 conv 2
@@ -338,17 +338,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76309),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_5 (
-        .o_data           (o_data_enc_5),
-        .o_valid          (o_valid_enc_5),
-        .fifo_rd_en       (fifo_rd_en_enc_4),
-        .i_data           (fifo_rd_data_enc_4),
-        .i_valid          (~fifo_empty_enc_4),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_5),
+        .o_valid               (o_valid_enc_5),
+        .fifo_rd_en            (fifo_rd_en_enc_4),
+        .i_data                (fifo_rd_data_enc_4),
+        .i_valid               (~fifo_empty_enc_4),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*32-1:0] fifo_rd_data_enc_5;
@@ -360,15 +360,15 @@ module model (
         .DEPTH             (128),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_5 (
-        .rd_data     (fifo_rd_data_enc_5),
-        .empty       (fifo_empty_enc_5),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_5),
-        .wr_data     (o_data_enc_5),
-        .wr_en       (o_valid_enc_5),
-        .rd_en       (fifo_rd_en_enc_5),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_5),
+        .empty             (fifo_empty_enc_5),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_5),
+        .wr_data           (o_data_enc_5),
+        .wr_en             (o_valid_enc_5),
+        .rd_en             (fifo_rd_en_enc_5),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 2 conv 0
@@ -397,17 +397,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76310),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_6 (
-        .o_data           (o_data_enc_6),
-        .o_valid          (o_valid_enc_6),
-        .fifo_rd_en       (fifo_rd_en_enc_5),
-        .i_data           (fifo_rd_data_enc_5),
-        .i_valid          (~fifo_empty_enc_5),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_6),
+        .o_valid               (o_valid_enc_6),
+        .fifo_rd_en            (fifo_rd_en_enc_5),
+        .i_data                (fifo_rd_data_enc_5),
+        .i_valid               (~fifo_empty_enc_5),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*32-1:0] fifo_rd_data_enc_6;
@@ -419,15 +419,15 @@ module model (
         .DEPTH             (128),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_6 (
-        .rd_data     (fifo_rd_data_enc_6),
-        .empty       (fifo_empty_enc_6),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_6),
-        .wr_data     (o_data_enc_6),
-        .wr_en       (o_valid_enc_6),
-        .rd_en       (fifo_rd_en_enc_6),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_6),
+        .empty             (fifo_empty_enc_6),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_6),
+        .wr_data           (o_data_enc_6),
+        .wr_en             (o_valid_enc_6),
+        .rd_en             (fifo_rd_en_enc_6),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 2 conv 1
@@ -456,17 +456,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76311),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_7 (
-        .o_data           (o_data_enc_7),
-        .o_valid          (o_valid_enc_7),
-        .fifo_rd_en       (fifo_rd_en_enc_6),
-        .i_data           (fifo_rd_data_enc_6),
-        .i_valid          (~fifo_empty_enc_6),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_7),
+        .o_valid               (o_valid_enc_7),
+        .fifo_rd_en            (fifo_rd_en_enc_6),
+        .i_data                (fifo_rd_data_enc_6),
+        .i_valid               (~fifo_empty_enc_6),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*32-1:0] fifo_rd_data_enc_7;
@@ -478,15 +478,15 @@ module model (
         .DEPTH             (128),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_enc_7 (
-        .rd_data     (fifo_rd_data_enc_7),
-        .empty       (fifo_empty_enc_7),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_7),
-        .wr_data     (o_data_enc_7),
-        .wr_en       (o_valid_enc_7),
-        .rd_en       (fifo_rd_en_enc_7),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_enc_7),
+        .empty             (fifo_empty_enc_7),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_7),
+        .wr_data           (o_data_enc_7),
+        .wr_en             (o_valid_enc_7),
+        .rd_en             (fifo_rd_en_enc_7),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // Encoder stage 2 conv 2
@@ -515,17 +515,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76312),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_enc_8 (
-        .o_data           (o_data_enc_8),
-        .o_valid          (o_valid_enc_8),
-        .fifo_rd_en       (fifo_rd_en_enc_7),
-        .i_data           (fifo_rd_data_enc_7),
-        .i_valid          (~fifo_empty_enc_7),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_enc_8),
+        .o_valid               (o_valid_enc_8),
+        .fifo_rd_en            (fifo_rd_en_enc_7),
+        .i_data                (fifo_rd_data_enc_7),
+        .i_valid               (~fifo_empty_enc_7),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*64-1:0] enc_rd_data_a;
@@ -541,18 +541,18 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_dual (
-        .rd_data_a   (enc_rd_data_a),
-        .rd_data_b   (enc_rd_data_b),
-        .empty_a     (enc_empty_a),
-        .empty_b     (enc_empty_b),
-        .full        (),
-        .almost_full (fifo_almost_full_enc_8),
-        .wr_data     (o_data_enc_8),
-        .wr_en       (enc_wr_en),
-        .rd_en_a     (enc_rd_en_a),
-        .rd_en_b     (enc_rd_en_b),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data_a         (enc_rd_data_a),
+        .rd_data_b         (enc_rd_data_b),
+        .empty_a           (enc_empty_a),
+        .empty_b           (enc_empty_b),
+        .full              (),
+        .almost_full       (fifo_almost_full_enc_8),
+        .wr_data           (o_data_enc_8),
+        .wr_en             (enc_wr_en),
+        .rd_en_a           (enc_rd_en_a),
+        .rd_en_b           (enc_rd_en_b),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // cls branch conv 0
@@ -581,17 +581,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76313),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_cls_0 (
-        .o_data           (o_data_cls_0),
-        .o_valid          (o_valid_cls_0),
-        .fifo_rd_en       (enc_rd_en_a),
-        .i_data           (enc_rd_data_a),
-        .i_valid          (~enc_empty_a & ~enc_wr_en),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_cls_0),
+        .o_valid               (o_valid_cls_0),
+        .fifo_rd_en            (enc_rd_en_a),
+        .i_data                (enc_rd_data_a),
+        .i_valid               (~enc_empty_a & ~enc_wr_en),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*32-1:0] fifo_rd_data_cls_0;
@@ -603,15 +603,15 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_cls_0 (
-        .rd_data     (fifo_rd_data_cls_0),
-        .empty       (fifo_empty_cls_0),
-        .full        (),
-        .almost_full (fifo_almost_full_cls_0),
-        .wr_data     (o_data_cls_0),
-        .wr_en       (o_valid_cls_0),
-        .rd_en       (fifo_rd_en_cls_0),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_cls_0),
+        .empty             (fifo_empty_cls_0),
+        .full              (),
+        .almost_full       (fifo_almost_full_cls_0),
+        .wr_data           (o_data_cls_0),
+        .wr_en             (o_valid_cls_0),
+        .rd_en             (fifo_rd_en_cls_0),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // cls branch conv 1
@@ -640,17 +640,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76314),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_cls_1 (
-        .o_data           (o_data_cls_1),
-        .o_valid          (o_valid_cls_1),
-        .fifo_rd_en       (fifo_rd_en_cls_0),
-        .i_data           (fifo_rd_data_cls_0),
-        .i_valid          (~fifo_empty_cls_0),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_cls_1),
+        .o_valid               (o_valid_cls_1),
+        .fifo_rd_en            (fifo_rd_en_cls_0),
+        .i_data                (fifo_rd_data_cls_0),
+        .i_valid               (~fifo_empty_cls_0),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*16-1:0] fifo_rd_data_cls_1;
@@ -662,15 +662,15 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_cls_1 (
-        .rd_data     (fifo_rd_data_cls_1),
-        .empty       (fifo_empty_cls_1),
-        .full        (),
-        .almost_full (fifo_almost_full_cls_1),
-        .wr_data     (o_data_cls_1),
-        .wr_en       (o_valid_cls_1),
-        .rd_en       (fifo_rd_en_cls_1),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_cls_1),
+        .empty             (fifo_empty_cls_1),
+        .full              (),
+        .almost_full       (fifo_almost_full_cls_1),
+        .wr_data           (o_data_cls_1),
+        .wr_en             (o_valid_cls_1),
+        .rd_en             (fifo_rd_en_cls_1),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // cls branch conv 2
@@ -699,17 +699,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76315),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_cls_2 (
-        .o_data           (o_data_cls_2),
-        .o_valid          (o_valid_cls_2),
-        .fifo_rd_en       (fifo_rd_en_cls_1),
-        .i_data           (fifo_rd_data_cls_1),
-        .i_valid          (~fifo_empty_cls_1),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_cls_2),
+        .o_valid               (o_valid_cls_2),
+        .fifo_rd_en            (fifo_rd_en_cls_1),
+        .i_data                (fifo_rd_data_cls_1),
+        .i_valid               (~fifo_empty_cls_1),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*8-1:0] fifo_rd_data_cls_2;
@@ -721,15 +721,15 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_cls_2 (
-        .rd_data     (fifo_rd_data_cls_2),
-        .empty       (fifo_empty_cls_2),
-        .full        (),
-        .almost_full (fifo_almost_full_cls_2),
-        .wr_data     (o_data_cls_2),
-        .wr_en       (o_valid_cls_2),
-        .rd_en       (fifo_rd_en_cls_2),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_cls_2),
+        .empty             (fifo_empty_cls_2),
+        .full              (),
+        .almost_full       (fifo_almost_full_cls_2),
+        .wr_data           (o_data_cls_2),
+        .wr_en             (o_valid_cls_2),
+        .rd_en             (fifo_rd_en_cls_2),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // cls branch conv 3
@@ -757,17 +757,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76316),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR (76321)   // Num layer_scale: 1
     ) u_cls_3 (
-        .o_data           (o_data_cls_3),
-        .o_valid          (o_valid_cls_3),
-        .fifo_rd_en       (fifo_rd_en_cls_2),
-        .i_data           (fifo_rd_data_cls_2),
-        .i_valid          (~fifo_empty_cls_2),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_cls_3),
+        .o_valid               (o_valid_cls_3),
+        .fifo_rd_en            (fifo_rd_en_cls_2),
+        .i_data                (fifo_rd_data_cls_2),
+        .i_valid               (~fifo_empty_cls_2),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     assign o_data_cls = o_data_cls_3;
@@ -799,17 +799,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76317),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_vertical_0 (
-        .o_data           (o_data_vertical_0),
-        .o_valid          (o_valid_vertical_0),
-        .fifo_rd_en       (enc_rd_en_b),
-        .i_data           (enc_rd_data_b),
-        .i_valid          (~enc_empty_b & ~enc_wr_en),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_vertical_0),
+        .o_valid               (o_valid_vertical_0),
+        .fifo_rd_en            (enc_rd_en_b),
+        .i_data                (enc_rd_data_b),
+        .i_valid               (~enc_empty_b & ~enc_wr_en),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*32-1:0] fifo_rd_data_vertical_0;
@@ -821,15 +821,15 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_vertical_0 (
-        .rd_data     (fifo_rd_data_vertical_0),
-        .empty       (fifo_empty_vertical_0),
-        .full        (),
-        .almost_full (fifo_almost_full_vertical_0),
-        .wr_data     (o_data_vertical_0),
-        .wr_en       (o_valid_vertical_0),
-        .rd_en       (fifo_rd_en_vertical_0),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_vertical_0),
+        .empty             (fifo_empty_vertical_0),
+        .full              (),
+        .almost_full       (fifo_almost_full_vertical_0),
+        .wr_data           (o_data_vertical_0),
+        .wr_en             (o_valid_vertical_0),
+        .rd_en             (fifo_rd_en_vertical_0),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // vertical branch conv 1
@@ -858,17 +858,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76318),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_vertical_1 (
-        .o_data           (o_data_vertical_1),
-        .o_valid          (o_valid_vertical_1),
-        .fifo_rd_en       (fifo_rd_en_vertical_0),
-        .i_data           (fifo_rd_data_vertical_0),
-        .i_valid          (~fifo_empty_vertical_0),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_vertical_1),
+        .o_valid               (o_valid_vertical_1),
+        .fifo_rd_en            (fifo_rd_en_vertical_0),
+        .i_data                (fifo_rd_data_vertical_0),
+        .i_valid               (~fifo_empty_vertical_0),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*16-1:0] fifo_rd_data_vertical_1;
@@ -880,15 +880,15 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_vertical_1 (
-        .rd_data     (fifo_rd_data_vertical_1),
-        .empty       (fifo_empty_vertical_1),
-        .full        (),
-        .almost_full (fifo_almost_full_vertical_1),
-        .wr_data     (o_data_vertical_1),
-        .wr_en       (o_valid_vertical_1),
-        .rd_en       (fifo_rd_en_vertical_1),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_vertical_1),
+        .empty             (fifo_empty_vertical_1),
+        .full              (),
+        .almost_full       (fifo_almost_full_vertical_1),
+        .wr_data           (o_data_vertical_1),
+        .wr_en             (o_valid_vertical_1),
+        .rd_en             (fifo_rd_en_vertical_1),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // vertical branch conv 2
@@ -917,17 +917,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76319),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR ()
     ) u_vertical_2 (
-        .o_data           (o_data_vertical_2),
-        .o_valid          (o_valid_vertical_2),
-        .fifo_rd_en       (fifo_rd_en_vertical_1),
-        .i_data           (fifo_rd_data_vertical_1),
-        .i_valid          (~fifo_empty_vertical_1),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_vertical_2),
+        .o_valid               (o_valid_vertical_2),
+        .fifo_rd_en            (fifo_rd_en_vertical_1),
+        .i_data                (fifo_rd_data_vertical_1),
+        .i_valid               (~fifo_empty_vertical_1),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     wire [8*8-1:0] fifo_rd_data_vertical_2;
@@ -939,15 +939,15 @@ module model (
         .DEPTH             (64),
         .ALMOST_FULL_THRES (10)
     ) u_fifo_vertical_2 (
-        .rd_data     (fifo_rd_data_vertical_2),
-        .empty       (fifo_empty_vertical_2),
-        .full        (),
-        .almost_full (fifo_almost_full_vertical_2),
-        .wr_data     (o_data_vertical_2),
-        .wr_en       (o_valid_vertical_2),
-        .rd_en       (fifo_rd_en_vertical_2),
-        .rst_n       (rst_n),
-        .clk         (clk)
+        .rd_data           (fifo_rd_data_vertical_2),
+        .empty             (fifo_empty_vertical_2),
+        .full              (),
+        .almost_full       (fifo_almost_full_vertical_2),
+        .wr_data           (o_data_vertical_2),
+        .wr_en             (o_valid_vertical_2),
+        .rd_en             (fifo_rd_en_vertical_2),
+        .rst_n             (rst_n),
+        .clk               (clk)
     );
 
     // vertical branch conv 3
@@ -975,17 +975,17 @@ module model (
         .MACC_COEFF_BASE_ADDR  (76320),  // Num macc_coeff: 1
         .LAYER_SCALE_BASE_ADDR (76322)   // Num layer_scale: 1
     ) u_vertical_3 (
-        .o_data           (o_data_vertical_3),
-        .o_valid          (o_valid_vertical_3),
-        .fifo_rd_en       (fifo_rd_en_vertical_2),
-        .i_data           (fifo_rd_data_vertical_2),
-        .i_valid          (~fifo_empty_vertical_2),
-        .fifo_almost_full (1'b0),
-        .weight_wr_data   (weight_wr_data),
-        .weight_wr_addr   (weight_wr_addr),
-        .weight_wr_en     (weight_wr_en),
-        .clk              (clk),
-        .rst_n            (rst_n)
+        .o_data                (o_data_vertical_3),
+        .o_valid               (o_valid_vertical_3),
+        .fifo_rd_en            (fifo_rd_en_vertical_2),
+        .i_data                (fifo_rd_data_vertical_2),
+        .i_valid               (~fifo_empty_vertical_2),
+        .fifo_almost_full      (1'b0),
+        .weight_wr_data        (weight_wr_data),
+        .weight_wr_addr        (weight_wr_addr),
+        .weight_wr_en          (weight_wr_en),
+        .clk                   (clk),
+        .rst_n                 (rst_n)
     );
 
     assign o_data_vertical = o_data_vertical_3;

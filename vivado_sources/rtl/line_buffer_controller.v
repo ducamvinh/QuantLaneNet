@@ -54,17 +54,18 @@ module line_buffer_controller #(
     reg get_pixel;
 
     // Column and row counters
-    localparam COL_CNT_WIDTH = $clog2(IN_WIDTH) + (PADDING_1 > 0 ? 2 : 1);
-    reg signed [COL_CNT_WIDTH-1:0] col_cnt;
-    wire col_cnt_limit = col_cnt == IN_WIDTH + PADDING_1 - 1;
-    wire col_cnt_en = get_pixel;
-
+    localparam COL_CNT_WIDTH = $clog2(IN_WIDTH)  + (PADDING_1 > 0 ? 2 : 1);
     localparam ROW_CNT_WIDTH = $clog2(IN_HEIGHT) + (PADDING_0 > 0 ? 2 : 1);
-    reg signed [ROW_CNT_WIDTH-1:0] row_cnt;
-    wire row_cnt_limit = row_cnt == IN_HEIGHT + PADDING_0 - 1;
-    wire row_cnt_en = col_cnt_limit & get_pixel;
 
-    wire end_of_frame = col_cnt_limit & row_cnt_limit;
+    reg  signed [COL_CNT_WIDTH-1:0] col_cnt;
+    wire                            col_cnt_limit = col_cnt == IN_WIDTH + PADDING_1 - 1;
+    wire                            col_cnt_en    = get_pixel;
+
+    reg  signed [ROW_CNT_WIDTH-1:0] row_cnt;
+    wire                            row_cnt_limit = row_cnt == IN_HEIGHT + PADDING_0 - 1;
+    wire                            row_cnt_en    = col_cnt_limit & get_pixel;
+
+    wire                            end_of_frame  = col_cnt_limit & row_cnt_limit;
 
     always @ (posedge clk or negedge rst_n) begin
         if (~rst_n) begin
@@ -113,8 +114,8 @@ module line_buffer_controller #(
                 reg  [$clog2(STRIDE)-1:0] stride_cnt;
                 wire [$clog2(STRIDE)-1:0] soft_reset;
 
-                wire stride_cnt_en = i == 0 ? row_cnt_en : col_cnt_en;
-                wire stride_cnt_limit_big = i == 0 ? row_cnt_limit : col_cnt_limit;
+                wire stride_cnt_en          = i == 0 ? row_cnt_en : col_cnt_en;
+                wire stride_cnt_limit_big   = i == 0 ? row_cnt_limit : col_cnt_limit;
                 wire stride_cnt_limit_small = stride_cnt == STRIDE - 1;
 
                 if (i == 0) begin : gen2

@@ -40,17 +40,17 @@ module fifo_dual_read #(
         .RAM_STYLE       ("auto"),
         .OUTPUT_REGISTER ("false")
     ) u_bram (
-        .rd_data_a (rd_data_a),
-        .rd_data_b (rd_data_b),
-        .wr_data_a (wr_data),
-        .wr_data_b ({DATA_WIDTH{1'b0}}),
-        .addr_a    (wr_en ? wr_cnt[ADDR_WIDTH-1:0] : rd_cnt_a[ADDR_WIDTH-1:0]),
-        .addr_b    (rd_cnt_b[ADDR_WIDTH-1:0]),
-        .rd_en_a   (rd_en_a & ~wr_en),
-        .rd_en_b   (rd_en_b),
-        .wr_en_a   (wr_en),
-        .wr_en_b   (1'b0),
-        .clk       (clk)
+        .rd_data_a       (rd_data_a),
+        .rd_data_b       (rd_data_b),
+        .wr_data_a       (wr_data),
+        .wr_data_b       ({DATA_WIDTH{1'b0}}),
+        .addr_a          (wr_en ? wr_cnt[ADDR_WIDTH-1:0] : rd_cnt_a[ADDR_WIDTH-1:0]),
+        .addr_b          (rd_cnt_b[ADDR_WIDTH-1:0]),
+        .rd_en_a         (rd_en_a & ~wr_en),
+        .rd_en_b         (rd_en_b),
+        .wr_en_a         (wr_en),
+        .wr_en_b         (1'b0),
+        .clk             (clk)
     );
 
     // Status signals

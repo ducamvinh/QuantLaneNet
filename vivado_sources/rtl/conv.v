@@ -66,18 +66,18 @@ module conv #(
     wire                                      pe_ack;
 
     line_buffer#(
-        .DATA_WIDTH (8),
-        .IN_CHANNEL (IN_CHANNEL),
-        .IN_WIDTH   (IN_WIDTH),
-        .IN_HEIGHT  (IN_HEIGHT),
-        .KERNEL_0   (KERNEL_0),
-        .KERNEL_1   (KERNEL_1),
-        .DILATION_0 (DILATION_0),
-        .DILATION_1 (DILATION_1),
-        .PADDING_0  (PADDING_0),
-        .PADDING_1  (PADDING_1),
-        .STRIDE_0   (STRIDE_0),
-        .STRIDE_1   (STRIDE_1)
+        .DATA_WIDTH       (8),
+        .IN_CHANNEL       (IN_CHANNEL),
+        .IN_WIDTH         (IN_WIDTH),
+        .IN_HEIGHT        (IN_HEIGHT),
+        .KERNEL_0         (KERNEL_0),
+        .KERNEL_1         (KERNEL_1),
+        .DILATION_0       (DILATION_0),
+        .DILATION_1       (DILATION_1),
+        .PADDING_0        (PADDING_0),
+        .PADDING_1        (PADDING_1),
+        .STRIDE_0         (STRIDE_0),
+        .STRIDE_1         (STRIDE_1)
     ) u_line_buffer (
         .o_data           (line_buffer_data),
         .o_valid          (line_buffer_valid),
@@ -114,17 +114,17 @@ module conv #(
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
                 ) u_pe_incha_single (
-                    .o_data         (o_data),
-                    .o_valid        (o_valid),
-                    .pe_ready       (pe_ready),
-                    .pe_ack         (pe_ack),
-                    .i_data         (line_buffer_data),
-                    .i_valid        (line_buffer_valid),
-                    .weight_wr_data (weight_wr_data),
-                    .weight_wr_addr (weight_wr_addr),
-                    .weight_wr_en   (weight_wr_en),
-                    .clk            (clk),
-                    .rst_n          (rst_n)
+                    .o_data                (o_data),
+                    .o_valid               (o_valid),
+                    .pe_ready              (pe_ready),
+                    .pe_ack                (pe_ack),
+                    .i_data                (line_buffer_data),
+                    .i_valid               (line_buffer_valid),
+                    .weight_wr_data        (weight_wr_data),
+                    .weight_wr_addr        (weight_wr_addr),
+                    .weight_wr_en          (weight_wr_en),
+                    .clk                   (clk),
+                    .rst_n                 (rst_n)
                 );
             end
 
@@ -148,17 +148,17 @@ module conv #(
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
                 ) u_pe_incha_double (
-                    .o_data         (o_data),
-                    .o_valid        (o_valid),
-                    .pe_ready       (pe_ready),
-                    .pe_ack         (pe_ack),
-                    .i_data         (line_buffer_data),
-                    .i_valid        (line_buffer_valid),
-                    .weight_wr_data (weight_wr_data),
-                    .weight_wr_addr (weight_wr_addr),
-                    .weight_wr_en   (weight_wr_en),
-                    .clk            (clk),
-                    .rst_n          (rst_n)
+                    .o_data                (o_data),
+                    .o_valid               (o_valid),
+                    .pe_ready              (pe_ready),
+                    .pe_ack                (pe_ack),
+                    .i_data                (line_buffer_data),
+                    .i_valid               (line_buffer_valid),
+                    .weight_wr_data        (weight_wr_data),
+                    .weight_wr_addr        (weight_wr_addr),
+                    .weight_wr_en          (weight_wr_en),
+                    .clk                   (clk),
+                    .rst_n                 (rst_n)
                 );
             end
 
@@ -182,17 +182,17 @@ module conv #(
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
                 ) u_pe_incha_quadruple (
-                    .o_data         (o_data),
-                    .o_valid        (o_valid),
-                    .pe_ready       (pe_ready),
-                    .pe_ack         (pe_ack),
-                    .i_data         (line_buffer_data),
-                    .i_valid        (line_buffer_valid),
-                    .weight_wr_data (weight_wr_data),
-                    .weight_wr_addr (weight_wr_addr),
-                    .weight_wr_en   (weight_wr_en),
-                    .clk            (clk),
-                    .rst_n          (rst_n)
+                    .o_data                (o_data),
+                    .o_valid               (o_valid),
+                    .pe_ready              (pe_ready),
+                    .pe_ack                (pe_ack),
+                    .i_data                (line_buffer_data),
+                    .i_valid               (line_buffer_valid),
+                    .weight_wr_data        (weight_wr_data),
+                    .weight_wr_addr        (weight_wr_addr),
+                    .weight_wr_en          (weight_wr_en),
+                    .clk                   (clk),
+                    .rst_n                 (rst_n)
                 );
             end
         end
@@ -218,17 +218,17 @@ module conv #(
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
                 ) u_pe_outcha_single (
-                    .o_data         (o_data),
-                    .o_valid        (o_valid),
-                    .pe_ready       (pe_ready),
-                    .pe_ack         (pe_ack),
-                    .i_data         (line_buffer_data),
-                    .i_valid        (line_buffer_valid),
-                    .weight_wr_data (weight_wr_data),
-                    .weight_wr_addr (weight_wr_addr),
-                    .weight_wr_en   (weight_wr_en),
-                    .clk            (clk),
-                    .rst_n          (rst_n)
+                    .o_data                (o_data),
+                    .o_valid               (o_valid),
+                    .pe_ready              (pe_ready),
+                    .pe_ack                (pe_ack),
+                    .i_data                (line_buffer_data),
+                    .i_valid               (line_buffer_valid),
+                    .weight_wr_data        (weight_wr_data),
+                    .weight_wr_addr        (weight_wr_addr),
+                    .weight_wr_en          (weight_wr_en),
+                    .clk                   (clk),
+                    .rst_n                 (rst_n)
                 );
             end
 
@@ -252,17 +252,17 @@ module conv #(
                     .MACC_COEFF_BASE_ADDR  (MACC_COEFF_BASE_ADDR),
                     .LAYER_SCALE_BASE_ADDR (LAYER_SCALE_BASE_ADDR)
                 ) u_pe_outcha_double (
-                    .o_data         (o_data),
-                    .o_valid        (o_valid),
-                    .pe_ready       (pe_ready),
-                    .pe_ack         (pe_ack),
-                    .i_data         (line_buffer_data),
-                    .i_valid        (line_buffer_valid),
-                    .weight_wr_data (weight_wr_data),
-                    .weight_wr_addr (weight_wr_addr),
-                    .weight_wr_en   (weight_wr_en),
-                    .clk            (clk),
-                    .rst_n          (rst_n)
+                    .o_data                (o_data),
+                    .o_valid               (o_valid),
+                    .pe_ready              (pe_ready),
+                    .pe_ack                (pe_ack),
+                    .i_data                (line_buffer_data),
+                    .i_valid               (line_buffer_valid),
+                    .weight_wr_data        (weight_wr_data),
+                    .weight_wr_addr        (weight_wr_addr),
+                    .weight_wr_en          (weight_wr_en),
+                    .clk                   (clk),
+                    .rst_n                 (rst_n)
                 );
             end
         end
