@@ -37,17 +37,14 @@ class TuSimpleDataset(torch.utils.data.Dataset):
 
         self.processed_list = []
         for path in label_paths:
-            fin = open(path, 'r')
-            lines = fin.readlines()
-            fin.close()
+            with open(path, 'r') as f:
+                lines = f.readlines()
 
             if verbose:
                 print(f'\n[INFO] Loading "{path.split(os.sep)[-1]}"...')
-                lines_iter = tqdm.tqdm(lines)
-            else:
-                lines_iter = lines
-
-            for line in lines_iter:
+                lines = tqdm.tqdm(lines)
+            
+            for line in lines:
                 data = json.loads(line)
                 h_samples = data['h_samples']
 
@@ -61,12 +58,14 @@ class TuSimpleDataset(torch.utils.data.Dataset):
                 try:
                     ego_left = max([idx for idx, (_, theta) in enumerate(theta_list) if theta < 0])
                 except ValueError:
-                    ego_left = -1
+                    ego_left = -1   # A little expensive condition checking logic but is acceptable
+                                    # because this only runs in __init__ and the entire function
+                                    # runs quickly enough
 
                 if ego_left < 1:
                     for _ in range(1 - ego_left):
                         theta_list.insert(0, (-1, 0))
-                if ego_left > 1:
+                elif ego_left > 1:
                     for _ in range(ego_left - 1):
                         theta_list.pop(0)
 
