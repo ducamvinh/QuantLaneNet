@@ -132,7 +132,7 @@ def get_os_name():
     elif os.name == 'posix':
         # Linux
         with open('/etc/os-release', 'r') as f:
-            matches = re.search(r'(^|\s)NAME="([^"]+)[\s\S]+VERSION="([^"]+)', f.read())
+            matches = re.search(r'(^|\s)NAME="([^"]+)[\s\S]+\nVERSION="([^"]+)', f.read())
             return f'{matches.group(2)} {matches.group(3)}'
     else:
         # Other
