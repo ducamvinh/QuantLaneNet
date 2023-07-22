@@ -1,4 +1,4 @@
-# QuantLaneNet: A 549-FPS and 36-GOPS/W FPGA-based CNN Accelerator for Lane Detection
+# QuantLaneNet: A 640-FPS and 34-GOPS/W FPGA-based CNN Accelerator for Lane Detection
 
 ## Dependency
 
