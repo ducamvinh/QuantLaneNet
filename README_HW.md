@@ -3,6 +3,11 @@
 
 ![](graphics/hw_conv.png)
 
+## Hardware dependency
+
+- Vivado v2020.2.2
+- Virtex-7 VC707 FPGA
+
 ## Quantize model
 
 To prepare the model for hardware implementation, data quantization is needed because the hardware design is wrtten to use quantized operations. The purpose of this step is to generate a file of quantized weights from the trained weights from the training step. This quantized weights file is later converted into a binary file for hardware implementation.
