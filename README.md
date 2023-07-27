@@ -1,4 +1,20 @@
-# QuantLaneNet: A 640-FPS and 34-GOPS/W FPGA-based CNN Accelerator for Lane Detection
+# QuantLaneNet: A 640-FPS and 34-GOPS/W FPGA-Based CNN Accelerator for Lane Detection
+The official implementation of paper "[QuantLaneNet: A 640-FPS and 34-GOPS/W FPGA-Based CNN Accelerator for Lane Detection](https://www.mdpi.com/1424-8220/23/15/6661)".
+
+```BibTeX
+@Article{s23156661,
+    author={Lam, Duc Khai and Du, Cam Vinh and Pham, Hoai Luan},
+    title={QuantLaneNet: A 640-FPS and 34-GOPS/W FPGA-Based CNN Accelerator for Lane Detection},
+    journal={Sensors},
+    volume={23},
+    year={2023},
+    number={15},
+    article-number={6661},
+    url={https://www.mdpi.com/1424-8220/23/15/6661},
+    issn={1424-8220},
+    doi={10.3390/s23156661}
+}
+```
 
 ## Dependency
 
