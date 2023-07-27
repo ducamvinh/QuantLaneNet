@@ -25,7 +25,7 @@ module adder_tree #(
     genvar i, j;
 
     wire [OUTPUT_DATA_WIDTH*NUM_INPUTS-1:0] adder_stage_out [0:ADDER_LAYERS-1];
-    reg  [0:0]                              adder_valid     [0:ADDER_LAYERS-1];
+    wire [ADDER_LAYERS-1:0]                 adder_valid;
 
     generate
         for (i = 0; i < ADDER_LAYERS; i = i + 1) begin : gen0
@@ -57,36 +57,57 @@ module adder_tree #(
                 end
             end
 
-            // Determine valid in
-            wire adder_layer_out_reg_en;
-
-            if (i == 0) begin : gen7
-                assign adder_layer_out_reg_en = i_valid;
-            end
-            else begin : gen8
-                assign adder_layer_out_reg_en = adder_valid[i-1];
-            end
-
             // Connect adder layer output
-            for (j = 0; j < _NUM_OUTPUTS; j = j + 1) begin : gen9
-                reg [OUTPUT_WIDTH-1:0] adder_layer_out_reg;
-                assign adder_stage_out[i][(j+1)*OUTPUT_WIDTH-1:j*OUTPUT_WIDTH] = adder_layer_out_reg;
+            for (j = 0; j < _NUM_OUTPUTS; j = j + 1) begin : gen7
+                if (i == ADDER_LAYERS - 1 || i % 2 == 0) begin : gen8
+                    assign adder_stage_out[i][(j+1)*OUTPUT_WIDTH-1:j*OUTPUT_WIDTH] = adder_layer_out[j];
+                end
+                else begin : gen9
+                    reg [OUTPUT_WIDTH-1:0] adder_layer_out_reg;
+                    wire adder_layer_out_reg_en;
 
-                always @ (posedge clk) begin
-                    if (adder_layer_out_reg_en) begin
-                        adder_layer_out_reg <= adder_layer_out[j];
+                    assign adder_stage_out[i][(j+1)*OUTPUT_WIDTH-1:j*OUTPUT_WIDTH] = adder_layer_out_reg;
+
+                    if (i == 1) begin : gen10
+                        assign adder_layer_out_reg_en = i_valid;
+                    end
+                    else begin : gen11
+                        assign adder_layer_out_reg_en = adder_valid[i-2];
+                    end
+
+                    always @ (posedge clk) begin
+                        if (adder_layer_out_reg_en) begin
+                            adder_layer_out_reg <= adder_layer_out[j];
+                        end
                     end
                 end
             end
 
-            // Adder valid
-            always @ (posedge clk or negedge rst_n) begin
-                if (~rst_n) begin
-                    adder_valid[i] <= 1'b0;
+            // valid_reg
+            if (i % 2 && i != ADDER_LAYERS - 1) begin : gen12
+                reg  valid;
+                wire valid_in;
+
+                assign adder_valid[i] = valid;
+
+                if (i == 1) begin : gen13
+                    assign valid_in = i_valid;
                 end
-                else begin
-                    adder_valid[i] <= adder_layer_out_reg_en;
+                else begin : gen14
+                    assign valid_in = adder_valid[i-2];
                 end
+
+                always @ (posedge clk or negedge rst_n) begin
+                    if (~rst_n) begin
+                        valid <= 1'b0;
+                    end
+                    else begin
+                        valid <= valid_in;
+                    end
+                end
+            end
+            else if (i == ADDER_LAYERS - 1) begin : gen15
+                assign adder_valid[i] = adder_valid[i-(i%2+1)];
             end
         end
     endgenerate

@@ -127,10 +127,20 @@ set_property name "pcie_perstn"    [get_bd_ports      -of_objects [get_bd_nets  
 set_property name "pcie_refclk"    [get_bd_intf_ports -of_objects [get_bd_intf_nets -of_objects [get_bd_intf_pins  util_ds_buf_0/CLK_IN_D]]]
 set_property name "pci_express_x1" [get_bd_intf_ports -of_objects [get_bd_intf_nets -of_objects [get_bd_intf_pins  xdma_0/pcie_mgt       ]]]
 
+# FPGA 200 MHz clock
+create_bd_cell -type ip -vlnv xilinx.com:ip:clk_wiz clk_wiz_0
+apply_board_connection -board_interface "sys_diff_clock" -ip_intf "clk_wiz_0/CLK_IN1_D" -diagram "design_1"
+set_property -dict [list CONFIG.CLKOUT1_REQUESTED_OUT_FREQ "200.000"] [get_bd_cells clk_wiz_0]
+
 # Connect AXI interfaces
+apply_bd_automation -rule xilinx.com:bd_rule:board -config { \
+    Board_Interface "reset (FPGA Reset)"                     \
+    Manual_Source   "New External Port (ACTIVE_HIGH)"        \
+} [get_bd_pins clk_wiz_0/reset]
+
 apply_bd_automation -rule xilinx.com:bd_rule:axi4 -config { \
     Clk_master   "/xdma_0/axi_aclk"                         \
-    Clk_slave    "Auto"                                     \
+    Clk_slave    "/clk_wiz_0/clk_out1"                      \
     Clk_xbar     "Auto"                                     \
     Master       "/xdma_0/M_AXI"                            \
     Slave        "/QuantLaneNet_AXI_0/s00_axi"              \
@@ -152,6 +162,7 @@ set_property -dict [list CONFIG.CONST_VAL "0"] [get_bd_cells signal_leds/xlconst
 set clocks [list            \
     util_ds_buf_0/IBUF_OUT  \
     xdma_0/axi_aclk         \
+    clk_wiz_0/clk_out1      \
 ]
 
 # Create counters to make clock leds
@@ -185,8 +196,8 @@ set_property -dict [list CONFIG.NUM_PORTS "8"] [get_bd_cells signal_leds/xlconca
 set led_signals [list              \
     signal_leds/xlslice_0/Dout     \
     signal_leds/xlslice_1/Dout     \
+    signal_leds/xlslice_2/Dout     \
     xdma_0/user_lnk_up             \
-    signal_leds/xlconstant_0/dout  \
     signal_leds/xlconstant_0/dout  \
     QuantLaneNet_AXI_0/wr_led      \
     QuantLaneNet_AXI_0/rd_led      \
@@ -246,7 +257,7 @@ set release [lindex [split [version -short] "."] 0]
 create_run synth_debug                        \
     -constrset  "constrs_debug"               \
     -flow       "Vivado Synthesis ${release}" \
-    -strategy   "Flow_PerfOptimized_high"     \
+    -strategy   "Vivado Synthesis Defaults"   \
 
 create_run impl_debug                                  \
     -parent_run  "synth_debug"                         \
